@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "u2flib", "u2flib\u2flib.csproj", "{98777070-04C9-442D-8E60-4E0B1E7FCDBF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CF2ECEBB-9FFE-4C32-A577-675D0FD91765}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{60AA9869-09DB-4859-92AC-B10AEC0069D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{86B55A3E-AB20-40D3-90B7-14AF33C7A4B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{806228F6-072D-4532-A472-DB4FAD9E28D8}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+		u2flib.vsmdi = u2flib.vsmdi
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = u2flib.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98777070-04C9-442D-8E60-4E0B1E7FCDBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98777070-04C9-442D-8E60-4E0B1E7FCDBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98777070-04C9-442D-8E60-4E0B1E7FCDBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98777070-04C9-442D-8E60-4E0B1E7FCDBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86B55A3E-AB20-40D3-90B7-14AF33C7A4B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86B55A3E-AB20-40D3-90B7-14AF33C7A4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86B55A3E-AB20-40D3-90B7-14AF33C7A4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86B55A3E-AB20-40D3-90B7-14AF33C7A4B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{86B55A3E-AB20-40D3-90B7-14AF33C7A4B7} = {60AA9869-09DB-4859-92AC-B10AEC0069D8}
+		{806228F6-072D-4532-A472-DB4FAD9E28D8} = {60AA9869-09DB-4859-92AC-B10AEC0069D8}
+	EndGlobalSection
+EndGlobal
