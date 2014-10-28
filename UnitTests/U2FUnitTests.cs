@@ -19,46 +19,32 @@ namespace UnitTests
             Assert.AreEqual(results.AppId, TestConts.APP_ID_ENROLL);
         }
 
+        // TODO resolve test
         [TestMethod]
         public void U2F_FinishAuthentication()
         {
-            StartedRegistration startedRegistration = new StartedRegistration(
-                TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
+            StartedAuthentication startedAuthentication =
+                new StartedAuthentication(TestConts.SERVER_CHALLENGE_SIGN_BASE64, TestConts.APP_ID_ENROLL,
+                                          TestConts.KEY_HANDLE_BASE64);
+            AuthenticateResponse authenticateResponse = new AuthenticateResponse(TestConts.CLIENT_DATA_AUTHENTICATE_BASE64,
+                                                                                 TestConts.SIGN_RESPONSE_DATA_BASE64,
+                                                                                 TestConts.KEY_HANDLE_BASE64);
+            RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
+            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
+            DeviceRegistration deviceRegistration = rawAuthenticateResponse.CreateDevice();
+            int orginalValue = deviceRegistration.Counter;
 
-            var results = U2F.FinishAuthentication(startedRegistration,
-                                                   new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
-                                                                        TestConts.CLIENT_DATA_REGISTER_BASE64),
-                                                   TestConts.TRUSTED_DOMAINS);
+            U2F.FinishAuthentication(startedAuthentication, authenticateResponse, deviceRegistration);
 
-            Assert.IsNotNull(results);
-            Assert.IsNotNull(results.PublicKey);
-            Assert.IsNotNull(results.GetAttestationCertificate());
-            Assert.IsNotNull(results.KeyHandle);
-        }
-
-        [TestMethod]
-        public void U2F_FinishAuthenticationNoFacets()
-        {
-            StartedRegistration startedRegistration = new StartedRegistration(
-                TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
-
-            var results = U2F.FinishAuthentication(startedRegistration,
-                                                   new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
-                                                                        TestConts.CLIENT_DATA_REGISTER_BASE64));
-
-            Assert.IsNotNull(results);
-            Assert.IsNotNull(results.PublicKey);
-            Assert.IsNotNull(results.GetAttestationCertificate());
-            Assert.IsNotNull(results.KeyHandle);
+            Assert.IsTrue(deviceRegistration.Counter != 0);
+            Assert.AreNotEqual(orginalValue, deviceRegistration.Counter);
         }
 
         [TestMethod]
         public void U2F_FinishRegistration()
         {
-            StartedRegistration startedRegistration = new StartedRegistration(
-                TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
-            var registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
-                                                        TestConts.CLIENT_DATA_REGISTER_BASE64);
+            StartedRegistration startedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
+            RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
 
             var results = U2F.FinishRegistration(startedRegistration, registerResponse, TestConts.TRUSTED_DOMAINS);
 
@@ -71,10 +57,8 @@ namespace UnitTests
         [TestMethod]
         public void U2F_FinishRegistrationNoFacets()
         {
-            StartedRegistration startedRegistration = new StartedRegistration(
-                TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
-            var registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
-                                                        TestConts.CLIENT_DATA_REGISTER_BASE64);
+            StartedRegistration startedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
+            RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
 
             var results = U2F.FinishRegistration(startedRegistration, registerResponse);
 
@@ -87,10 +71,8 @@ namespace UnitTests
         [TestMethod]
         public void U2F_StartAuthentication()
         {
-            var registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
-                                                        TestConts.CLIENT_DATA_REGISTER_BASE64);
-            RawRegisterResponse rawAuthenticateResponse =
-                RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
+            RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
+            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
             DeviceRegistration deviceRegistration = rawAuthenticateResponse.CreateDevice();
 
             var results = U2F.StartAuthentication(TestConts.APP_ID_ENROLL, deviceRegistration);

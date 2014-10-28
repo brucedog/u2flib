@@ -126,10 +126,13 @@ namespace u2flib.Data.Messages
         /// <returns></returns>
         public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, int counter, byte[] challengeHash)
         {
+            byte parsedCounter;
+            byte.TryParse(counter.ToString(), out parsedCounter);
+
             List<byte> someBytes = new List<byte>();
             someBytes.AddRange(appIdHash);
             someBytes.Add(userPresence);
-            someBytes.Add(Convert.ToByte(counter));
+            someBytes.Add(parsedCounter);
             someBytes.AddRange(challengeHash);
 
             return someBytes.ToArray();

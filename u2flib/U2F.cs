@@ -46,7 +46,7 @@ namespace u2flib
         /**
        * Finishes a previously started registration.
        *
-       * @param startedRegistration
+       * @param startedAuthentication
        * @param tokenResponse the response from the token/client.
        * @return a DeviceRegistration object, holding information about the registered device. Servers should
        * persist this.
@@ -89,17 +89,19 @@ namespace u2flib
         * @param response the response from the token/client.
         * @return the new value of the DeviceRegistration's counter.
         */
-        public static DeviceRegistration FinishAuthentication(StartedRegistration startedRegistration,
-                                                              RegisterResponse response,
+        public static void FinishAuthentication(StartedAuthentication startedAuthentication,
+                                                              AuthenticateResponse response,
+                                                              DeviceRegistration deviceRegistration,
                                                               HashSet<String> facets = null)
         {
             ClientData clientData = response.GetClientData();
-            clientData.CheckContent(RegisterType, startedRegistration.Challenge, facets);
+            clientData.CheckContent(AuthenticateTyp, startedAuthentication.Challenge, facets);
 
-            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(response.RegistrationData);
-            rawAuthenticateResponse.CheckSignature(startedRegistration.AppId, clientData.AsJson());
+            RawAuthenticateResponse authenticateResponse = RawAuthenticateResponse.FromBase64(response.SignatureData);
+            authenticateResponse.CheckSignature(startedAuthentication.AppId, clientData.AsJson(), deviceRegistration.PublicKey);
+            authenticateResponse.CheckUserPresence();
 
-            return rawAuthenticateResponse.CreateDevice();
+            deviceRegistration.CheckAndIncrementCounter(authenticateResponse.Counter);
         }
     }
 }
