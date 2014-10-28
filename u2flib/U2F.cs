@@ -21,7 +21,7 @@ namespace u2flib
     public class U2F
     {
         public const String U2FVersion = "U2F_V2";
-        private static readonly IChallengeGenerator _challengeGenerator = new RandomChallengeGenerator();
+        private static readonly IChallengeGenerator ChallengeGenerator = new RandomChallengeGenerator();
         public static readonly ICrypto Crypto = new BouncyCastleCrypto();
         public const String AuthenticateTyp = "navigator.id.getAssertion";
         public const String RegisterType = "navigator.id.finishEnrollment";
@@ -37,7 +37,7 @@ namespace u2flib
          */
         public static StartedRegistration StartRegistration(String appId)
         {
-            byte[] challenge = _challengeGenerator.GenerateChallenge();
+            byte[] challenge = ChallengeGenerator.GenerateChallenge();
             String challengeBase64 = Convert.ToBase64String(challenge);
 
             return new StartedRegistration(challengeBase64, appId);
@@ -52,19 +52,14 @@ namespace u2flib
        * persist this.
        */
         public static DeviceRegistration FinishRegistration(StartedRegistration startedRegistration,
-                                                            RegisterResponse tokenResponse)
-        {
-            return FinishRegistration(startedRegistration, tokenResponse, new HashSet<string>());
-        }
-
-        public static DeviceRegistration FinishRegistration(StartedRegistration startedRegistration,
-                                                            RegisterResponse tokenResponse, HashSet<String> facets)
+                                                            RegisterResponse tokenResponse, HashSet<String> facets = null)
         {
             ClientData clientData = tokenResponse.GetClientData();
             clientData.CheckContent(RegisterType, startedRegistration.Challenge, facets);
 
             RawRegisterResponse rawRegisterResponse = RawRegisterResponse.FromBase64(tokenResponse.RegistrationData);
             rawRegisterResponse.CheckSignature(startedRegistration.AppId, clientData.AsJson());
+
             return rawRegisterResponse.CreateDevice();
         }
 
@@ -79,12 +74,12 @@ namespace u2flib
          */
         public static StartedAuthentication StartAuthentication(String appId, DeviceRegistration deviceRegistration)
         {
-            byte[] challenge = _challengeGenerator.GenerateChallenge();
+            byte[] challenge = ChallengeGenerator.GenerateChallenge();
+
             return new StartedAuthentication(
                 Convert.ToBase64String(challenge),
                 appId,
-                Convert.ToBase64String(deviceRegistration.KeyHandle)
-                );
+                Convert.ToBase64String(deviceRegistration.KeyHandle));
         }
 
         /**
@@ -95,17 +90,12 @@ namespace u2flib
         * @return the new value of the DeviceRegistration's counter.
         */
         public static DeviceRegistration FinishAuthentication(StartedRegistration startedRegistration,
-                                                              RegisterResponse tokenResponse)
-        {
-            return FinishAuthentication(startedRegistration, tokenResponse, null);
-        }
-
-        public static DeviceRegistration FinishAuthentication(StartedRegistration startedRegistration,
                                                               RegisterResponse response,
-                                                              HashSet<String> facets)
+                                                              HashSet<String> facets = null)
         {
             ClientData clientData = response.GetClientData();
             clientData.CheckContent(RegisterType, startedRegistration.Challenge, facets);
+
             RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(response.RegistrationData);
             rawAuthenticateResponse.CheckSignature(startedRegistration.AppId, clientData.AsJson());
 

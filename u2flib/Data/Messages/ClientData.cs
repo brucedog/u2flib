@@ -36,10 +36,12 @@ namespace u2flib.Data.Messages
             _rawClientData = Encoding.UTF8.GetString(Convert.FromBase64String(clientData));
 
             JObject clientDataAsElement = JObject.Parse(_rawClientData);
-            if (clientDataAsElement == null)
+            JToken typeParam;
+            if (clientDataAsElement == null || !clientDataAsElement.TryGetValue(TypeParam, out typeParam))
             {
                 throw new U2fException("ClientData has wrong format");
             }
+
 
             JToken theChallenge;
             JToken theOrgin;
@@ -48,6 +50,8 @@ namespace u2flib.Data.Messages
             Challenge = theChallenge.ToString();
             _origin = theOrgin.ToString();
         }
+
+        public string Challenge { get; private set; }
 
         public void CheckContent(String type, String challenge, HashSet<String> facets)
         {
@@ -69,8 +73,6 @@ namespace u2flib.Data.Messages
         {
             return _rawClientData;
         }
-
-        public string Challenge { get; private set; }
 
         private static void VerifyOrigin(String origin, HashSet<String> allowedOrigins)
         {
