@@ -12,7 +12,6 @@
 
 using System;
 using System.Linq;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Security.Certificates;
 using Org.BouncyCastle.Utilities;
@@ -21,21 +20,26 @@ using u2flib.Exceptions;
 
 namespace u2flib.Data
 {
-    public class DeviceRegistration : DataObject, ISerializable
+    public class DeviceRegistration : DataObject
     {
         private long serialVersionUID = -142942195464329902L;
         public static int INITIAL_COUNTER_VALUE = 0;
 
-        private readonly byte[] _keyHandle;
-        private readonly byte[] _publicKey;
         private readonly byte[] _attestationCert;
-        private int _counter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceRegistration"/> class.
+        /// </summary>
+        /// <param name="keyHandle">The key handle.</param>
+        /// <param name="publicKey">The public key.</param>
+        /// <param name="attestationCert">The attestation cert.</param>
+        /// <param name="counter">The counter.</param>
+        /// <exception cref="U2fException">Invalid attestation certificate</exception>
         public DeviceRegistration(byte[] keyHandle, byte[] publicKey, X509Certificate attestationCert, int counter)
         {
-            _keyHandle = keyHandle;
-            _publicKey = publicKey;
-            _counter = counter;
+            KeyHandle = keyHandle;
+            PublicKey = publicKey;
+            Counter = counter;
 
             try
             {
@@ -47,33 +51,74 @@ namespace u2flib.Data
             }
         }
 
-        public byte[] GetKeyHandle()
-        {
-            return _keyHandle;
-        }
+        /// <summary>
+        /// Gets the key handle.
+        /// </summary>
+        /// <value>
+        /// The key handle.
+        /// </value>
+        public byte[] KeyHandle { get; private set; }
 
-        public byte[] GetPublicKey()
-        {
-            return _publicKey;
-        }
+        /// <summary>
+        /// Gets the public key.
+        /// </summary>
+        /// <value>
+        /// The public key.
+        /// </value>
+        public byte[] PublicKey { get; private set; }
+
+        /// <summary>
+        /// Gets the counter.
+        /// </summary>
+        /// <value>
+        /// The counter.
+        /// </value>
+        public int Counter { get; private set; }
 
         public X509Certificate GetAttestationCertificate()
         {
-            X509CertificateParser test = new X509CertificateParser();
+            X509CertificateParser x509CertificateParser = new X509CertificateParser();
 
-            return test.ReadCertificate(_attestationCert);
+            return x509CertificateParser.ReadCertificate(_attestationCert);
         }
 
-        public int GetCounter()
+        /// <summary>
+        /// Froms the json.
+        /// </summary>
+        /// <param name="json">The json.</param>
+        /// <returns></returns>
+        public static DeviceRegistration FromJson(String json)
         {
-            return _counter;
+            return JsonConvert.DeserializeObject<DeviceRegistration>(json);
         }
 
+        /// <summary>
+        /// To the json with out attestion cert.
+        /// </summary>
+        /// <returns></returns>
+        public String ToJsonWithOutAttestionCert()
+        {
+            return JsonConvert.SerializeObject(new DeviceWithoutCertificate(KeyHandle, PublicKey, Counter));
+        }
+
+        /// <summary>
+        /// Checks the and increment counter.
+        /// </summary>
+        /// <param name="clientCounter">The client counter.</param>
+        /// <exception cref="U2fException">Counter value smaller than expected!</exception>
+        public void CheckAndIncrementCounter(int clientCounter)
+        {
+            if (clientCounter <= Counter++)
+            {
+                throw new U2fException("Counter value smaller than expected!");
+            }
+        }
+        
         public override int GetHashCode()
         {
-            int hash = _publicKey.Sum(b => b + 31);
+            int hash = PublicKey.Sum(b => b + 31);
             hash += _attestationCert.Sum(b => b + 31);
-            hash += _keyHandle.Sum(b => b + 31);
+            hash += KeyHandle.Sum(b => b + 31);
 
             return hash;
         }
@@ -84,43 +129,15 @@ namespace u2flib.Data
             {
                 return false;
             }
-            DeviceRegistration that = (DeviceRegistration) obj;
-            return Arrays.AreEqual(_keyHandle, that._keyHandle)
-                   && Arrays.AreEqual(_publicKey, that._publicKey)
+            DeviceRegistration that = (DeviceRegistration)obj;
+            return Arrays.AreEqual(KeyHandle, that.KeyHandle)
+                   && Arrays.AreEqual(PublicKey, that.PublicKey)
                    && Arrays.AreEqual(_attestationCert, that._attestationCert);
         }
 
         public override String ToString()
         {
             return base.ToJson();
-        }
-
-        public static DeviceRegistration FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<DeviceRegistration>(json);
-        }
-
-        public String toJson()
-        {
-            return JsonConvert.SerializeObject(new DeviceWithoutCertificate(_keyHandle, _publicKey, _counter));
-        }
-
-        public String ToJsonWithAttestationCert()
-        {
-            return ToJson();
-        }
-
-        public void CheckAndIncrementCounter(int clientCounter)
-        {
-            if (clientCounter <= _counter++)
-            {
-                throw new U2fException("Counter value smaller than expected!");
-            }
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            throw new System.NotImplementedException();
         }
     }
 

@@ -19,42 +19,55 @@ namespace u2flib.Data.Messages
     public class AuthenticateResponse : DataObject
     {
         /** websafe-base64(client data) */
-        private readonly String _clientData;
-
-        /** websafe-base64(raw response from U2F device) */
-        private readonly String _signatureData;
-
-        /** keyHandle originally passed */
-        private readonly String _keyHandle;
+        private readonly String ClientData;
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticateResponse"/> class.
+        /// </summary>
+        /// <param name="clientData">The client data.</param>
+        /// <param name="signatureData">The signature data.</param>
+        /// <param name="keyHandle">The key handle.</param>
         public AuthenticateResponse(String clientData, String signatureData, String keyHandle)
         {
-            _clientData = clientData;
-            _signatureData = signatureData;
-            _keyHandle = keyHandle;
+            ClientData = clientData;
+            SignatureData = signatureData;
+            KeyHandle = keyHandle;
         }
 
         public ClientData GetClientData()
         {
-            return new ClientData(_clientData);
+            return new ClientData(ClientData);
         }
 
-        public String GetSignatureData()
-        {
-            return _signatureData;
-        }
+        /// <summary>
+        /// Gets the signature data.
+        /// websafe-base64(raw response from U2F device) 
+        /// </summary>
+        /// <value>
+        /// The signature data.
+        /// </value>
+        public String SignatureData { get; private set; }
 
-        public String GetKeyHandle()
+        /// <summary>
+        ///  keyHandle originally passed
+        /// </summary>
+        /// <value>
+        /// The key handle.
+        /// </value>
+        public String KeyHandle { get; private set; }
+
+
+        public static AuthenticateResponse FromJson(String json)
         {
-            return _keyHandle;
+            return JsonConvert.DeserializeObject<AuthenticateResponse>(json);
         }
 
         public override int GetHashCode()
         {
-            int hash = _clientData.Sum(c => c + 31);
-            hash += _signatureData.Sum(c => c + 31);
-            hash += _keyHandle.Sum(c => c + 31);
+            int hash = ClientData.Sum(c => c + 31);
+            hash += SignatureData.Sum(c => c + 31);
+            hash += KeyHandle.Sum(c => c + 31);
 
             return hash;
         }
@@ -67,34 +80,34 @@ namespace u2flib.Data.Messages
                 return false;
             if (this.GetType() != obj.GetType())
                 return false;
-            AuthenticateResponse other = (AuthenticateResponse) obj;
-            if (_clientData == null)
-            {
-                if (other._clientData != null)
-                    return false;
-            }
-            else if (!_clientData.Equals(other._clientData))
-                return false;
-            if (_keyHandle == null)
-            {
-                if (other._keyHandle != null)
-                    return false;
-            }
-            else if (!_keyHandle.Equals(other._keyHandle))
-                return false;
-            if (_signatureData == null)
-            {
-                if (other._signatureData != null)
-                    return false;
-            }
-            else if (!_signatureData.Equals(other._signatureData))
-                return false;
-            return true;
-        }
 
-        public static AuthenticateResponse FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<AuthenticateResponse>(json);
+            AuthenticateResponse other = (AuthenticateResponse) obj;
+
+            if (ClientData == null)
+            {
+                if (other.ClientData != null)
+                    return false;
+            }
+            else if (!ClientData.Equals(other.ClientData))
+                return false;
+
+            if (KeyHandle == null)
+            {
+                if (other.KeyHandle != null)
+                    return false;
+            }
+            else if (!KeyHandle.Equals(other.KeyHandle))
+                return false;
+
+            if (SignatureData == null)
+            {
+                if (other.SignatureData != null)
+                    return false;
+            }
+            else if (!SignatureData.Equals(other.SignatureData))
+                return false;
+
+            return true;
         }
     }
 }

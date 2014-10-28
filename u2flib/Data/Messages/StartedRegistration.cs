@@ -18,45 +18,59 @@ namespace u2flib.Data.Messages
 {
     public class StartedRegistration : DataObject
     {
-        /**
-       * Version of the protocol that the to-be-registered U2F token must speak. For
-       * the version of the protocol described herein, must be "U2F_V2"
-       */
-        private readonly string _version;
-
-        /** The websafe-base64-encoded challenge. */
-        private readonly string _challenge;
-
-        public String GetChallenge()
-        {
-            return _challenge;
-        }
-
-        /**
-       * The application id that the RP would like to assert. The U2F token will
-       * enforce that the key handle provided above is associated with this
-       * application id. The browser enforces that the calling origin belongs to the
-       * application identified by the application id.
-       */
-        private readonly string _appId;
-
-        public String GetAppId()
-        {
-            return _appId;
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartedRegistration"/> class.
+        /// </summary>
+        /// <param name="challenge">The challenge.</param>
+        /// <param name="appId">The application identifier.</param>
         public StartedRegistration(String challenge, String appId)
         {
-            _version = U2F.U2FVersion;
-            _challenge = challenge;
-            _appId = appId;
+            Version = U2F.U2FVersion;
+            Challenge = challenge;
+            AppId = appId;
+        }
+
+        /// <summary>
+        /// Gets or sets the version.
+        /// Version of the protocol that the to-be-registered U2F token must speak. For
+        /// the version of the protocol described herein, must be "U2F_V2"
+        /// </summary>
+        /// <value>
+        /// The version.
+        /// </value>
+        public String Version { get; private set; }
+
+        /// <summary>
+        /// Gets the challenge.
+        /// The websafe-base64-encoded challenge.
+        /// </summary>
+        /// <value>
+        /// The challenge.
+        /// </value>
+        public String Challenge { get; private set; }
+
+        /// <summary>
+        /// Gets the application identifier.
+        /// The application id that the RP would like to assert. The U2F token will
+        /// enforce that the key handle provided above is associated with this
+        /// application id. The browser enforces that the calling origin belongs to the
+        /// application identified by the application id.
+        /// </summary>
+        /// <value>
+        /// The application identifier.
+        /// </value>
+        public String AppId { get; private set; }
+
+        public static StartedRegistration FromJson(String json)
+        {
+            return JsonConvert.DeserializeObject<StartedRegistration>(json);
         }
 
         public override int GetHashCode()
         {
-            int hash = _version.Sum(c => c + 31);
-            hash += _challenge.Sum(c => c + 31);
-            hash += _appId.Sum(c => c + 31);
+            int hash = Version.Sum(c => c + 31);
+            hash += Challenge.Sum(c => c + 31);
+            hash += AppId.Sum(c => c + 31);
 
             return hash;
         }
@@ -70,33 +84,28 @@ namespace u2flib.Data.Messages
             if (this.GetType() != obj.GetType())
                 return false;
             StartedRegistration other = (StartedRegistration) obj;
-            if (_appId == null)
+            if (AppId == null)
             {
-                if (other._appId != null)
+                if (other.AppId != null)
                     return false;
             }
-            else if (!_appId.Equals(other._appId))
+            else if (!AppId.Equals(other.AppId))
                 return false;
-            if (_challenge == null)
+            if (Challenge == null)
             {
-                if (other._challenge != null)
+                if (other.Challenge != null)
                     return false;
             }
-            else if (!_challenge.Equals(other._challenge))
+            else if (!Challenge.Equals(other.Challenge))
                 return false;
-            if (_version == null)
+            if (Version == null)
             {
-                if (other._version != null)
+                if (other.Version != null)
                     return false;
             }
-            else if (!_version.Equals(other._version))
+            else if (!Version.Equals(other.Version))
                 return false;
             return true;
-        }
-
-        public static StartedRegistration FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<StartedRegistration>(json);
         }
     }
 }

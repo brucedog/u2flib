@@ -18,22 +18,27 @@ namespace u2flib.Data.Messages
 {
     public class RegisterResponse : DataObject
     {
-        /** websafe-base64(raw registration response message) */
-        private readonly String _registrationData;
-
         /** websafe-base64(UTF8(stringified(client data))) */
         private readonly String _clientData;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RegisterResponse"/> class.
+        /// </summary>
+        /// <param name="registrationData">The registration data.</param>
+        /// <param name="clientData">The client data.</param>
         public RegisterResponse(String registrationData, String clientData)
         {
-            _registrationData = registrationData;
+            RegistrationData = registrationData;
             _clientData = clientData;
         }
 
-        public String GetRegistrationData()
-        {
-            return _registrationData;
-        }
+        /// <summary>
+        /// Gets the registration data.
+        /// </summary>
+        /// <value>
+        /// The registration data.
+        /// </value>
+        public String RegistrationData { get; private set; }
 
         public ClientData GetClientData()
         {
@@ -47,7 +52,7 @@ namespace u2flib.Data.Messages
 
         public override int GetHashCode()
         {
-            int hash = _registrationData.Sum(c => c + 31);
+            int hash = RegistrationData.Sum(c => c + 31);
             hash += _clientData.Sum(c => c + 31);
 
             return hash;
@@ -69,12 +74,12 @@ namespace u2flib.Data.Messages
             }
             else if (!_clientData.Equals(other._clientData))
                 return false;
-            if (_registrationData == null)
+            if (RegistrationData == null)
             {
-                if (other._registrationData != null)
+                if (other.RegistrationData != null)
                     return false;
             }
-            else if (!_registrationData.Equals(other._registrationData))
+            else if (!RegistrationData.Equals(other.RegistrationData))
                 return false;
             return true;
         }

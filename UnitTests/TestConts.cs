@@ -32,14 +32,6 @@ namespace UnitTests
 
         public static String CLIENT_DATA_REGISTER = "{\"typ\":\"navigator.id.finishEnrollment\"," +"\"challenge\":\"" + SERVER_CHALLENGE_REGISTER_BASE64
             + "\"," + "\"cid_pubkey\":" + CHANNEL_ID_STRING + "," + "\"origin\":\"" + ORIGIN + "\"}";
-//            String.Format(            
-//             "{\"typ\":\"navigator.id.finishEnrollment\","
-//            + "\"challenge\":\"{0}\","
-//            + "\"cid_pubkey\":{1},"
-//            + "\"origin\":\"{2}\"}",
-//            SERVER_CHALLENGE_REGISTER_BASE64,
-//            CHANNEL_ID_STRING,
-//            ORIGIN);
 
         public static String CLIENT_DATA_REGISTER_BASE64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(CLIENT_DATA_REGISTER));
 
@@ -47,15 +39,6 @@ namespace UnitTests
 
         public static String CLIENT_DATA_AUTHENTICATE = "{\"typ\":\"navigator.id.getAssertion\"," + "\"challenge\":\"" + SERVER_CHALLENGE_SIGN_BASE64
             + "\"," + "\"cid_pubkey\":" + CHANNEL_ID_STRING + "," + "\"origin\":\"" + ORIGIN + "\"}";
-//            String.Format(
-//            "{"
-//            + "\"typ\":\"navigator.id.getAssertion\","
-//            + "\"challenge\":\"{0}\","
-//            + "\"cid_pubkey\":{1},"
-//            + "\"origin\":\"{2}\"}",
-//            SERVER_CHALLENGE_SIGN_BASE64,
-//            CHANNEL_ID_STRING,
-//            ORIGIN);
 
         public static String CLIENT_DATA_AUTHENTICATE_BASE64 =
             Convert.ToBase64String(Encoding.UTF8.GetBytes(CLIENT_DATA_AUTHENTICATE));
@@ -108,14 +91,7 @@ namespace UnitTests
 
         public static byte[] SIGNATURE_AUTHENTICATE = StringToByteArray(
             "304402204b5f0cd17534cedd8c34ee09570ef542a353df4436030ce43d406de870b847780220267bb998fac9b7266eb60e7cb0b5eabdfd5ba9614f53c7b22272ec10047a923f");
-        
-//        static byte[] GetBytes(string str)
-//        {
-//            byte[] bytes = new byte[str.Length * sizeof(char)];
-//            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-//            return bytes;
-//        }
-//
+
         public static byte[] StringToByteArray(string hex)
         {
             int numberChars = hex.Length;

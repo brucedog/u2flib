@@ -18,43 +18,72 @@ namespace u2flib.Data.Messages
 {
     public class StartedAuthentication : DataObject
     {
-        /**
-       * Version of the protocol that the to-be-registered U2F token must speak. For
-       * the version of the protocol described herein, must be "U2F_V2"
-       */
-        private readonly String _version;
-
-        /** The websafe-base64-encoded challenge. */
-        private readonly String _challenge;
-
-        /**
-       * The application id that the RP would like to assert. The U2F token will
-       * enforce that the key handle provided above is associated with this
-       * application id. The browser enforces that the calling origin belongs to the
-       * application identified by the application id.
-       */
-        private readonly String _appId;
-
-        /**
-       * websafe-base64 encoding of the key handle obtained from the U2F token
-       * during registration.
-       */
-        private readonly String _keyHandle;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartedAuthentication"/> class.
+        /// </summary>
+        /// <param name="challenge">The challenge.</param>
+        /// <param name="appId">The application identifier.</param>
+        /// <param name="keyHandle">The key handle.</param>
         public StartedAuthentication(String challenge, String appId, String keyHandle)
         {
-            _version = U2F.U2FVersion;
-            _challenge = challenge;
-            _appId = appId;
-            _keyHandle = keyHandle;
+            Version = U2F.U2FVersion;
+            Challenge = challenge;
+            AppId = appId;
+            KeyHandle = keyHandle;
+        }
+
+        /// <summary>
+        /// Gets the Version
+        /// Version of the protocol that the to-be-registered U2F token must speak. For
+        /// the version of the protocol described herein, must be "U2F_V2"
+        /// </summary>
+        /// <value>
+        /// The key handle.
+        /// </value>
+        public String Version { get; private set; }
+
+        /// <summary>
+        /// Gets the key handle.
+        /// websafe-base64 encoding of the key handle obtained from the U2F token
+        /// during registration.
+        /// </summary>
+        /// <value>
+        /// The key handle.
+        /// </value>
+        public String KeyHandle { get; private set; }
+
+        /// <summary>
+        /// Gets the challenge.
+        /// The websafe-base64-encoded challenge.
+        /// </summary>
+        /// <value>
+        /// The challenge.
+        /// </value>
+        public String Challenge { get; private set; }
+
+        /// <summary>
+        /// Gets the application identifier.
+        /// The application id that the RP would like to assert. The U2F token will
+        /// enforce that the key handle provided above is associated with this
+        /// application id. The browser enforces that the calling origin belongs to the
+        /// application identified by the application id.
+        /// </summary>
+        /// <value>
+        /// The application identifier.
+        /// </value>
+        public String AppId { get; private set; }
+
+        public static StartedAuthentication FromJson(String json)
+        {
+            return JsonConvert.DeserializeObject<StartedAuthentication>(json);
         }
 
         public override int GetHashCode()
         {
-            int hash = 23 + _version.Sum(c => c + 31);
-            hash += _challenge.Sum(c => c + 31);
-            hash += _appId.Sum(c => c + 31);
-            hash += _keyHandle.Sum(c => c + 31);
+            int hash = 23 + Version.Sum(c => c + 31);
+            hash += Challenge.Sum(c => c + 31);
+            hash += AppId.Sum(c => c + 31);
+            hash += KeyHandle.Sum(c => c + 31);
 
             return hash;
         }
@@ -68,55 +97,35 @@ namespace u2flib.Data.Messages
             if (this.GetType() != obj.GetType())
                 return false;
             StartedAuthentication other = (StartedAuthentication) obj;
-            if (_appId == null)
+            if (AppId == null)
             {
-                if (other._appId != null)
+                if (other.AppId != null)
                     return false;
             }
-            else if (!_appId.Equals(other._appId))
+            else if (!AppId.Equals(other.AppId))
                 return false;
-            if (_challenge == null)
+            if (Challenge == null)
             {
-                if (other._challenge != null)
+                if (other.Challenge != null)
                     return false;
             }
-            else if (!_challenge.Equals(other._challenge))
+            else if (!Challenge.Equals(other.Challenge))
                 return false;
-            if (_keyHandle == null)
+            if (KeyHandle == null)
             {
-                if (other._keyHandle != null)
+                if (other.KeyHandle != null)
                     return false;
             }
-            else if (!_keyHandle.Equals(other._keyHandle))
+            else if (!KeyHandle.Equals(other.KeyHandle))
                 return false;
-            if (_version == null)
+            if (Version == null)
             {
-                if (other._version != null)
+                if (other.Version != null)
                     return false;
             }
-            else if (!_version.Equals(other._version))
+            else if (!Version.Equals(other.Version))
                 return false;
             return true;
-        }
-
-        public String GetKeyHandle()
-        {
-            return _keyHandle;
-        }
-
-        public String GetChallenge()
-        {
-            return _challenge;
-        }
-
-        public String GetAppId()
-        {
-            return _appId;
-        }
-
-        public static StartedAuthentication FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<StartedAuthentication>(json);
         }
     }
 }

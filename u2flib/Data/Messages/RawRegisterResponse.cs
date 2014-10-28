@@ -41,8 +41,14 @@ namespace u2flib.Data.Messages
 
         /** A ECDSA signature (on P-256) */
         private readonly byte[] _signature;
-        private readonly Utils _utils;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RawRegisterResponse"/> class.
+        /// </summary>
+        /// <param name="userPublicKey">The user public key.</param>
+        /// <param name="keyHandle">The key handle.</param>
+        /// <param name="attestationCertificate">The attestation certificate.</param>
+        /// <param name="signature">The signature.</param>
         public RawRegisterResponse(byte[] userPublicKey, byte[] keyHandle,
                                    X509Certificate attestationCertificate, byte[] signature)
         {
@@ -50,7 +56,6 @@ namespace u2flib.Data.Messages
             _keyHandle = keyHandle;
             _attestationCertificate = attestationCertificate;
             _signature = signature;
-            _utils = new Utils();
         }
 
         public static RawRegisterResponse FromBase64(String rawDataBase64)

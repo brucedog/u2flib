@@ -23,27 +23,68 @@ namespace u2flib.Data.Messages
     public class RawAuthenticateResponse
     {
         public static byte UserPresentFlag = 0x01;
-        private readonly byte _userPresence;
-        private readonly int _counter;
-        private readonly byte[] _signature;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RawAuthenticateResponse"/> class.
+        /// </summary>
+        /// <param name="userPresence">The user presence.</param>
+        /// <param name="counter">The counter.</param>
+        /// <param name="signature">The signature.</param>
         public RawAuthenticateResponse(byte userPresence, int counter, byte[] signature)
         {
-            _userPresence = userPresence;
-            _counter = counter;
-            _signature = signature;
+            UserPresence = userPresence;
+            Counter = counter;
+            Signature = signature;
         }
 
+        /// <summary>
+        /// Gets the user presence.
+        /// Bit 0 is set to 1, which means that user presence was verified. (This
+        /// version of the protocol doesn't specify a way to request authentication
+        /// responses without requiring user presence.) A different value of bit 0, as
+        /// well as bits 1 through 7, are reserved for future use. The values of bit 1
+        /// through 7 SHOULD be 0
+        /// </summary>
+        /// <value>
+        /// The user presence.
+        /// </value>
+        public byte UserPresence { get; private set; }
+
+        /// <summary>
+        /// Gets the counter.
+        /// This is the big-endian representation of a counter value that the U2F device
+        /// increments every time it performs an authentication operation.
+        /// </summary>
+        /// <value>
+        /// The counter.
+        /// </value>
+        public int Counter { get; private set; }
+
+        /// <summary>
+        /// Gets the signature.
+        /// This is a ECDSA signature (on P-256)
+        /// </summary>
+        /// <value>
+        /// The signature.
+        /// </value>
+        public byte[] Signature { get; private set; }
+
+        /// <summary>
+        /// Froms the base64.
+        /// </summary>
+        /// <param name="rawDataBase64">The raw data base64.</param>
+        /// <returns></returns>
         public static RawAuthenticateResponse FromBase64(String rawDataBase64)
         {
             byte[] bytes = Convert.FromBase64String(rawDataBase64);
             Stream stream = new MemoryStream(bytes);
-            var binaryReader = new BinaryReader(stream);
+            BinaryReader binaryReader = new BinaryReader(stream);
+
             try
             {
                 return new RawAuthenticateResponse(
                     binaryReader.ReadByte(),
-                    binaryReader.ReadInt32(), // TODO figure out
+                    binaryReader.ReadInt32(),
                     Utils.ReadAllBytes(binaryReader)
                     );
             }
@@ -54,21 +95,35 @@ namespace u2flib.Data.Messages
             }
         }
 
+        /// <summary>
+        /// Checks the signature.
+        /// </summary>
+        /// <param name="appId">The application identifier.</param>
+        /// <param name="clientData">The client data.</param>
+        /// <param name="publicKey">The public key.</param>
         public void CheckSignature(String appId, String clientData, byte[] publicKey)
         {
             byte[] signedBytes = PackBytesToSign(
                 U2F.Crypto.Hash(appId),
-                _userPresence,
-                _counter,
+                UserPresence,
+                Counter,
                 U2F.Crypto.Hash(clientData)
                 );
             U2F.Crypto.CheckSignature(
                 U2F.Crypto.DecodePublicKey(publicKey),
                 signedBytes,
-                _signature
+                Signature
                 );
         }
 
+        /// <summary>
+        /// Packs the bytes to sign.
+        /// </summary>
+        /// <param name="appIdHash">The application identifier hash.</param>
+        /// <param name="userPresence">The user presence.</param>
+        /// <param name="counter">The counter.</param>
+        /// <param name="challengeHash">The challenge hash.</param>
+        /// <returns></returns>
         public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, int counter, byte[] challengeHash)
         {
             List<byte> someBytes = new List<byte>();
@@ -80,39 +135,17 @@ namespace u2flib.Data.Messages
             return someBytes.ToArray();
         }
 
-        /**
-         * Bit 0 is set to 1, which means that user presence was verified. (This
-         * version of the protocol doesn't specify a way to request authentication
-         * responses without requiring user presence.) A different value of bit 0, as
-         * well as bits 1 through 7, are reserved for future use. The values of bit 1
-         * through 7 SHOULD be 0
-         */
-
-        public byte GetUserPresence()
+        public void CheckUserPresence()
         {
-            return _userPresence;
-        }
-
-        /**
-         * This is the big-endian representation of a counter value that the U2F device
-         * increments every time it performs an authentication operation.
-         */
-
-        public int GetCounter()
-        {
-            return _counter;
-        }
-
-        /** This is a ECDSA signature (on P-256) */
-
-        public byte[] GetSignature()
-        {
-            return _signature;
+            if (UserPresence != UserPresentFlag)
+            {
+                throw new U2fException("User presence invalid during authentication");
+            }
         }
 
         public override int GetHashCode()
         {
-            return 23 + _signature.Sum(b => b + 31 + _counter + _userPresence);
+            return 23 + Signature.Sum(b => b + 31 + Counter + UserPresence);
         }
 
         public override bool Equals(Object obj)
@@ -124,19 +157,11 @@ namespace u2flib.Data.Messages
             if (this.GetType() != obj.GetType())
                 return false;
             RawAuthenticateResponse other = (RawAuthenticateResponse) obj;
-            if (_counter != other._counter)
+            if (Counter != other.Counter)
                 return false;
-            if (!Arrays.AreEqual(_signature, other._signature))
+            if (!Arrays.AreEqual(Signature, other.Signature))
                 return false;
-            return _userPresence == other._userPresence;
-        }
-
-        public void CheckUserPresence()
-        {
-            if (_userPresence != UserPresentFlag)
-            {
-                throw new U2fException("User presence invalid during authentication");
-            }
+            return UserPresence == other.UserPresence;
         }
     }
 }

@@ -23,10 +23,14 @@ namespace u2flib.Data.Messages
         private const String TypeParam = "typ";
         private const String ChallengeParam = "challenge";
         private const String OriginParam = "origin";
-        private readonly String _challenge;
         private readonly String _origin;
         private readonly String _rawClientData;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientData"/> class.
+        /// </summary>
+        /// <param name="clientData">The client data.</param>
+        /// <exception cref="U2fException">ClientData has wrong format</exception>
         public ClientData(String clientData)
         {
             _rawClientData = Encoding.UTF8.GetString(Convert.FromBase64String(clientData));
@@ -41,7 +45,7 @@ namespace u2flib.Data.Messages
             JToken theOrgin;
             clientDataAsElement.TryGetValue(ChallengeParam, out theChallenge);
             clientDataAsElement.TryGetValue(OriginParam, out theOrgin);
-            _challenge = theChallenge.ToString();
+            Challenge = theChallenge.ToString();
             _origin = theOrgin.ToString();
         }
 
@@ -51,7 +55,7 @@ namespace u2flib.Data.Messages
             {
                 throw new U2fException("Bad clientData: bad type " + type);
             }
-            if (!challenge.Equals(_challenge))
+            if (!challenge.Equals(Challenge))
             {
                 throw new U2fException("Wrong challenge signed in clientData");
             }
@@ -66,10 +70,7 @@ namespace u2flib.Data.Messages
             return _rawClientData;
         }
 
-        public String GetChallenge()
-        {
-            return _challenge;
-        }
+        public string Challenge { get; private set; }
 
         private static void VerifyOrigin(String origin, HashSet<String> allowedOrigins)
         {

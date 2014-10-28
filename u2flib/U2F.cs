@@ -35,7 +35,6 @@ namespace u2flib
          * @return a StartedRegistration, which should be sent to the client and temporary saved by the
          * server.
          */
-
         public static StartedRegistration StartRegistration(String appId)
         {
             byte[] challenge = _challengeGenerator.GenerateChallenge();
@@ -52,21 +51,20 @@ namespace u2flib
        * @return a DeviceRegistration object, holding information about the registered device. Servers should
        * persist this.
        */
-
         public static DeviceRegistration FinishRegistration(StartedRegistration startedRegistration,
                                                             RegisterResponse tokenResponse)
         {
-            return FinishRegistration(startedRegistration, tokenResponse, null);
+            return FinishRegistration(startedRegistration, tokenResponse, new HashSet<string>());
         }
 
         public static DeviceRegistration FinishRegistration(StartedRegistration startedRegistration,
                                                             RegisterResponse tokenResponse, HashSet<String> facets)
         {
             ClientData clientData = tokenResponse.GetClientData();
-            clientData.CheckContent(RegisterType, startedRegistration.GetChallenge(), facets);
+            clientData.CheckContent(RegisterType, startedRegistration.Challenge, facets);
 
-            RawRegisterResponse rawRegisterResponse = RawRegisterResponse.FromBase64(tokenResponse.GetRegistrationData());
-            rawRegisterResponse.CheckSignature(startedRegistration.GetAppId(), clientData.AsJson());
+            RawRegisterResponse rawRegisterResponse = RawRegisterResponse.FromBase64(tokenResponse.RegistrationData);
+            rawRegisterResponse.CheckSignature(startedRegistration.AppId, clientData.AsJson());
             return rawRegisterResponse.CreateDevice();
         }
 
@@ -79,14 +77,13 @@ namespace u2flib
          * @return a StartedAuthentication which should be sent to the client and temporary saved by
          * the server.
          */
-
         public static StartedAuthentication StartAuthentication(String appId, DeviceRegistration deviceRegistration)
         {
             byte[] challenge = _challengeGenerator.GenerateChallenge();
             return new StartedAuthentication(
                 Convert.ToBase64String(challenge),
                 appId,
-                Convert.ToBase64String(deviceRegistration.GetKeyHandle())
+                Convert.ToBase64String(deviceRegistration.KeyHandle)
                 );
         }
 
@@ -97,7 +94,6 @@ namespace u2flib
         * @param response the response from the token/client.
         * @return the new value of the DeviceRegistration's counter.
         */
-
         public static DeviceRegistration FinishAuthentication(StartedRegistration startedRegistration,
                                                               RegisterResponse tokenResponse)
         {
@@ -109,9 +105,9 @@ namespace u2flib
                                                               HashSet<String> facets)
         {
             ClientData clientData = response.GetClientData();
-            clientData.CheckContent(RegisterType, startedRegistration.GetChallenge(), facets);
-            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(response.GetRegistrationData());
-            rawAuthenticateResponse.CheckSignature(startedRegistration.GetAppId(), clientData.AsJson());
+            clientData.CheckContent(RegisterType, startedRegistration.Challenge, facets);
+            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(response.RegistrationData);
+            rawAuthenticateResponse.CheckSignature(startedRegistration.AppId, clientData.AsJson());
 
             return rawAuthenticateResponse.CreateDevice();
         }
