@@ -126,6 +126,7 @@ namespace u2flib.Data.Messages
         /// <returns></returns>
         public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, int counter, byte[] challengeHash)
         {
+            // covert the counter to a byte array in case the int is to big for a single byte
             byte[] byteArray = BitConverter.GetBytes(counter);
             List<byte> someBytes = new List<byte>();
             someBytes.AddRange(appIdHash);
