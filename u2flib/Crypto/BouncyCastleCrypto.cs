@@ -63,7 +63,7 @@ namespace u2flib.Crypto
         {
             try
             {
-                X9ECParameters curve = NistNamedCurves.GetByName("P-256");
+                X9ECParameters curve = SecNamedCurves.GetByName("secp256r1");
                 ECPoint point;
                 try
                 {
@@ -74,8 +74,8 @@ namespace u2flib.Crypto
                     throw new U2fException("Could not parse user public key", e);
                 }
 
-                ECPublicKeyParameters xxpk = new ECPublicKeyParameters("ECDH", point,
-                                                                       SecObjectIdentifiers.SecP521r1);
+                ECPublicKeyParameters xxpk = new ECPublicKeyParameters("ECDSA", point,
+                                                                       SecObjectIdentifiers.SecP256r1);
 
                 return xxpk;
             }

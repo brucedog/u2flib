@@ -19,7 +19,6 @@ namespace UnitTests
             Assert.AreEqual(results.AppId, TestConts.APP_ID_ENROLL);
         }
 
-        // TODO resolve test
         [TestMethod]
         public void U2F_FinishAuthentication()
         {
