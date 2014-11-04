@@ -17,7 +17,7 @@ namespace u2flib.Data
 {
     public abstract class DataObject
     {
-        protected String ToJson()
+        public String ToJson()
         {
             return JsonConvert.SerializeObject(this);
         }

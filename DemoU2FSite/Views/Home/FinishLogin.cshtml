@@ -1,0 +1,32 @@
+﻿@model DemoU2FSite.Models.CompleteLoginModel
+
+@{
+    ViewBag.Title = "FinishAuthentication";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>FinishAuthentication</h2>
+@using (Html.BeginForm("CompleteLogin", "Home"))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+
+    <fieldset>
+        <legend>Registration Form</legend>
+        <ol>
+            <li>
+                @Html.LabelFor(m => m.UserName)
+                @Html.LabelFor(m => m.UserName)
+            </li>
+            <li>
+                @Html.LabelFor(m => m.TokenResponse)
+                @Html.TextBoxFor(m => m.TokenResponse)
+            </li>
+        </ol>
+        <input type="submit" value="Register" />
+    </fieldset>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

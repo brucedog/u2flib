@@ -1,0 +1,42 @@
+﻿@model DemoU2FSite.Models.RegisterModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h2>Register</h2>
+@section featured {
+    
+    <h2>Register</h2>
+    <p>Enter a username and then touch your U2F token.</p>
+   
+    @using (Html.BeginForm("CompleteRegister", "Home"))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <fieldset>
+            <legend>Log in Form</legend>
+            <ol>
+                <li>
+                    @Html.LabelFor(m => m.UserName)
+                    @Html.TextBoxFor(m => m.UserName)
+                    @Html.ValidationMessageFor(m => m.UserName)
+                </li>
+                <li>
+                    @Html.LabelFor(m => m.TokenResponse)
+                    @Html.TextBoxFor(m => m.TokenResponse)
+                    @Html.ValidationMessageFor(m => m.TokenResponse)
+                </li>
+            </ol>
+            @Html.HiddenFor(m => m.AppId)
+            @Html.HiddenFor(m => m.Challenge)
+            @Html.HiddenFor(m => m.Version)
+            <input type="submit" value="Register" />
+        </fieldset>   
+    }
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
