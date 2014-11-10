@@ -18,9 +18,6 @@ namespace u2flib.Data.Messages
 {
     public class RegisterResponse : DataObject
     {
-        /** websafe-base64(UTF8(stringified(client data))) */
-        private readonly String _clientData;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RegisterResponse"/> class.
         /// </summary>
@@ -29,7 +26,7 @@ namespace u2flib.Data.Messages
         public RegisterResponse(String registrationData, String clientData)
         {
             RegistrationData = registrationData;
-            _clientData = clientData;
+            ClientData = clientData;
         }
 
         /// <summary>
@@ -40,9 +37,17 @@ namespace u2flib.Data.Messages
         /// </value>
         public String RegistrationData { get; private set; }
 
+        /// <summary>
+        /// Gets the Client data.
+        /// </summary>
+        /// <value>
+        /// The Client data.
+        /// </value>
+        public String ClientData { get; private set; }
+
         public ClientData GetClientData()
         {
-            return new ClientData(_clientData);
+            return new ClientData(ClientData);
         }
 
         public static RegisterResponse FromJson(String json)
@@ -53,7 +58,7 @@ namespace u2flib.Data.Messages
         public override int GetHashCode()
         {
             int hash = RegistrationData.Sum(c => c + 31);
-            hash += _clientData.Sum(c => c + 31);
+            hash += ClientData.Sum(c => c + 31);
 
             return hash;
         }
@@ -67,12 +72,12 @@ namespace u2flib.Data.Messages
             if (this.GetType() != obj.GetType())
                 return false;
             RegisterResponse other = (RegisterResponse) obj;
-            if (_clientData == null)
+            if (ClientData == null)
             {
-                if (other._clientData != null)
+                if (other.ClientData != null)
                     return false;
             }
-            else if (!_clientData.Equals(other._clientData))
+            else if (!ClientData.Equals(other.ClientData))
                 return false;
             if (RegistrationData == null)
             {

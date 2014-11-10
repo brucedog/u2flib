@@ -18,10 +18,6 @@ namespace u2flib.Data.Messages
 {
     public class AuthenticateResponse : DataObject
     {
-        /** websafe-base64(client data) */
-        private readonly String ClientData;
-
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticateResponse"/> class.
         /// </summary>
@@ -48,6 +44,14 @@ namespace u2flib.Data.Messages
         /// The signature data.
         /// </value>
         public String SignatureData { get; private set; }
+
+        /// <summary>
+        /// Gets the Client data.
+        /// </summary>
+        /// <value>
+        /// The Client data.
+        /// </value>
+        public String ClientData { get; private set; }
 
         /// <summary>
         ///  keyHandle originally passed

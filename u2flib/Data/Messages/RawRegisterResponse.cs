@@ -124,7 +124,7 @@ namespace u2flib.Data.Messages
             return new DeviceRegistration(
                 _keyHandle,
                 _userPublicKey,
-                _attestationCertificate,
+                _attestationCertificate.GetEncoded(),
                 DeviceRegistration.INITIAL_COUNTER_VALUE
                 );
         }

@@ -48,7 +48,14 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConts.cs" />
-    <Compile Include="U2FUnitTests.cs" />
+    <Compile Include="U2F\Messages\AuthenticateResponseUnitTests.cs" />
+    <Compile Include="U2F\Messages\DeviceRegistrationUnitTests.cs" />
+    <Compile Include="U2F\Messages\RawAuthenticateResponseUnitTests.cs" />
+    <Compile Include="U2F\Messages\RawRegisterResponseUnitTests.cs" />
+    <Compile Include="U2F\Messages\RegisterResponseUnitTests.cs" />
+    <Compile Include="U2F\Messages\StartedAuthenticationUnitTests.cs" />
+    <Compile Include="U2F\Messages\StartedRegistrationUnitTests.cs" />
+    <Compile Include="U2F\U2FUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\u2flib\u2flib.csproj">

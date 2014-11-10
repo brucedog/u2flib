@@ -25,8 +25,6 @@ namespace u2flib.Data
         private long serialVersionUID = -142942195464329902L;
         public static int INITIAL_COUNTER_VALUE = 0;
 
-        private readonly byte[] _attestationCert;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceRegistration"/> class.
         /// </summary>
@@ -35,7 +33,7 @@ namespace u2flib.Data
         /// <param name="attestationCert">The attestation cert.</param>
         /// <param name="counter">The counter.</param>
         /// <exception cref="U2fException">Invalid attestation certificate</exception>
-        public DeviceRegistration(byte[] keyHandle, byte[] publicKey, X509Certificate attestationCert, int counter)
+        public DeviceRegistration(byte[] keyHandle, byte[] publicKey, byte[] attestationCert, int counter)
         {
             KeyHandle = keyHandle;
             PublicKey = publicKey;
@@ -43,7 +41,7 @@ namespace u2flib.Data
 
             try
             {
-                _attestationCert = attestationCert.GetEncoded();
+                AttestationCert = attestationCert;
             }
             catch (CertificateEncodingException e)
             {
@@ -68,6 +66,14 @@ namespace u2flib.Data
         public byte[] PublicKey { get; private set; }
 
         /// <summary>
+        /// Gets the attestation cert.
+        /// </summary>
+        /// <value>
+        /// The attestation cert.
+        /// </value>
+        public byte[] AttestationCert { get; private set; }
+
+        /// <summary>
         /// Gets the counter.
         /// </summary>
         /// <value>
@@ -79,7 +85,7 @@ namespace u2flib.Data
         {
             X509CertificateParser x509CertificateParser = new X509CertificateParser();
 
-            return x509CertificateParser.ReadCertificate(_attestationCert);
+            return x509CertificateParser.ReadCertificate(AttestationCert);
         }
 
         /// <summary>
@@ -117,7 +123,7 @@ namespace u2flib.Data
         public override int GetHashCode()
         {
             int hash = PublicKey.Sum(b => b + 31);
-            hash += _attestationCert.Sum(b => b + 31);
+            hash += AttestationCert.Sum(b => b + 31);
             hash += KeyHandle.Sum(b => b + 31);
 
             return hash;
@@ -132,26 +138,23 @@ namespace u2flib.Data
             DeviceRegistration that = (DeviceRegistration)obj;
             return Arrays.AreEqual(KeyHandle, that.KeyHandle)
                    && Arrays.AreEqual(PublicKey, that.PublicKey)
-                   && Arrays.AreEqual(_attestationCert, that._attestationCert);
-        }
-
-        public override String ToString()
-        {
-            return base.ToJson();
+                   && Arrays.AreEqual(AttestationCert, that.AttestationCert);
         }
     }
 
     internal class DeviceWithoutCertificate
     {
-        private byte[] _keyHandle;
-        private byte[] _publicKey;
-        private int _counter;
-
         internal DeviceWithoutCertificate(byte[] keyHandle, byte[] publicKey, int counter)
         {
-            _keyHandle = keyHandle;
-            _publicKey = publicKey;
-            _counter = counter;
+            KeyHandle = keyHandle;
+            PublicKey = publicKey;
+            Counter = counter;
         }
+
+        public byte[] PublicKey { get; private set; }
+
+        public byte[] KeyHandle { get; private set; }
+
+        public int Counter { get; private set; }
     }
 }
