@@ -4,39 +4,64 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <h2>Register</h2>
 @section featured {
     
     <h2>Register</h2>
-    <p>Enter a username and then touch your U2F token.</p>
+    <p>Enter a username and password.</p>
    
-    @using (Html.BeginForm("CompleteRegister", "Home"))
+    @using (Html.BeginForm("BeginRegister", "Home", FormMethod.Post, new { id = "registerForm" }))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true)
         <fieldset>
-            <legend>Log in Form</legend>
-            <ol>
-                <li>
+            <legend>Register Form</legend>
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
                     @Html.LabelFor(m => m.UserName)
+
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
                     @Html.TextBoxFor(m => m.UserName)
                     @Html.ValidationMessageFor(m => m.UserName)
-                </li>
-                <li>
-                    @Html.LabelFor(m => m.TokenResponse)
-                    @Html.TextBoxFor(m => m.TokenResponse)
-                    @Html.ValidationMessageFor(m => m.TokenResponse)
-                </li>
-            </ol>
+                </div>
+            </div>
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.Password)
+
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.PasswordFor(m => m.Password)
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+            </div>
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.ConfirmPassword)
+
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.PasswordFor(m => m.ConfirmPassword)
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                </div>
+            </div>
+
             @Html.HiddenFor(m => m.AppId)
             @Html.HiddenFor(m => m.Challenge)
             @Html.HiddenFor(m => m.Version)
+            <br/>
             <input type="submit" value="Register" />
         </fieldset>   
     }
 }
 
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+        });
+    </script>
 }

@@ -7,6 +7,10 @@ namespace DemoU2FSite.Models
         [Required]
         [Display(Name = "User name")]
         public string UserName { get; set; }
+
+        [Required]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
     }
 
     public class CompleteLoginModel
@@ -14,6 +18,10 @@ namespace DemoU2FSite.Models
         [Required]
         [Display(Name = "User name")]
         public string UserName { get; set; }
+
+        [Required]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
 
         [Required]
         [Display(Name = "Token response")]
@@ -25,6 +33,14 @@ namespace DemoU2FSite.Models
         [Required]
         [Display(Name = "User name")]
         public string UserName { get; set; }
+
+        [Required]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
+        [Required]
+        [Display(Name = "Password")]
+        public string ConfirmPassword { get; set; }
 
         [Display(Name = "Token")]
         public string TokenResponse { get; set; }

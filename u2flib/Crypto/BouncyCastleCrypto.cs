@@ -53,10 +53,6 @@ namespace u2flib.Crypto
             {
                 throw new U2fException(SignatureError, e);
             }
-            catch (NoSuchAlgorithmException e)
-            {
-                throw new U2fException(SignatureError, e);
-            }
         }
 
         public ECPublicKeyParameters DecodePublicKey(byte[] encodedPublicKey)
@@ -83,10 +79,6 @@ namespace u2flib.Crypto
             {
                 throw new U2fException(ErrorDecodingPublicKey, e);
             }
-            catch (NoSuchAlgorithmException e)
-            {
-                throw new U2fException(ErrorDecodingPublicKey, e);
-            }
         }
 
 
@@ -96,7 +88,7 @@ namespace u2flib.Crypto
             {
                 return _sha256Managed.ComputeHash(bytes);
             }
-            catch (NoSuchAlgorithmException e)
+            catch (Exception e)
             {
                 throw new UnsupportedOperationException("Error when computing SHA-256", e);
             }

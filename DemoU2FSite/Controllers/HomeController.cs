@@ -12,13 +12,11 @@ namespace DemoU2FSite.Controllers
     public class HomeController : Controller
     {
         public static Dictionary<string, string> storage = new Dictionary<string, string>();
-        private const string DemoAppId = "Demo MVC .NET application.";
+        private const string DemoAppId = "http://localhost:52701/Home";
 
         [System.Web.Mvc.AllowAnonymous]
         public ActionResult Index()
         {
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
-
             return View("Login");
         }
 
@@ -39,13 +37,13 @@ namespace DemoU2FSite.Controllers
             StartedAuthentication startedAuthentication = u2flib.U2F.StartAuthentication(DemoAppId, registration);
             storage.Add(startedAuthentication.Challenge, startedAuthentication.ToJson());
 
-            return View("FinishLogin", model);
+            return View("FinishLogin");
         }
 
         [System.Web.Mvc.HttpPost]
         [System.Web.Mvc.AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult CompleteLogin(CompleteLoginModel model)
+        public ActionResult CompletedLogin(CompleteLoginModel model)
         {
             string userName;
             if (!ModelState.IsValid || !storage.TryGetValue(model.UserName, out userName))
@@ -66,7 +64,7 @@ namespace DemoU2FSite.Controllers
                 storage.Remove(theChallenge);
                 u2flib.U2F.FinishAuthentication(authentication, authenticateResponse, registration);
 
-                return View("LoginCompleted", model);
+                return View("CompletedLogin", model);
             }
 
             ModelState.AddModelError("", "Error finding challenge");
@@ -76,20 +74,37 @@ namespace DemoU2FSite.Controllers
         [System.Web.Mvc.AllowAnonymous]
         public ActionResult Register()
         {
-            StartedRegistration startedRegistration = u2flib.U2F.StartRegistration(DemoAppId);
-            storage.Add(startedRegistration.Challenge, startedRegistration.ToJson());
-            JObject jObject = JObject.Parse(startedRegistration.ToJson());
+            return View();
+        }
 
-            RegisterModel registerModel = new RegisterModel
-                {
-                    AppId = jObject["AppId"].ToString(),
-                    Challenge = jObject["Challenge"].ToString(),
-                    Version = jObject["Version"].ToString(),
-                    UserName = string.Empty,
-                    TokenResponse = string.Empty
-                };
+        [System.Web.Mvc.HttpPost]
+        [System.Web.Mvc.AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult BeginRegister([FromBody]RegisterModel value)
+        {
 
-            return View(registerModel);
+            if (value.Password.Equals(value.ConfirmPassword) 
+                && !string.IsNullOrWhiteSpace(value.Password)
+                && !string.IsNullOrWhiteSpace(value.UserName))
+            {
+
+                StartedRegistration startedRegistration = u2flib.U2F.StartRegistration(DemoAppId);
+                storage.Add(startedRegistration.Challenge, value.UserName.Trim());
+                JObject jObject = JObject.Parse(startedRegistration.ToJson());
+                RegisterModel registerModel = new RegisterModel
+                                              {
+                                                  UserName = value.UserName,
+                                                  AppId = jObject["AppId"].ToString(),
+                                                  Challenge = jObject["Challenge"].ToString(),
+                                                  Version = jObject["Version"].ToString()
+                                              };
+
+                return View("CompleteRegister", registerModel);
+            }
+            else
+            {
+                return View("CompleteRegister", value);
+            }
         }
 
         [System.Web.Mvc.HttpPost]
@@ -97,9 +112,10 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CompleteRegister([FromBody]RegisterModel value)
         {
-            // TODO need to figure this out.
-            if (ModelState.IsValid)
+            if (!string.IsNullOrWhiteSpace(value.TokenResponse)
+                && !string.IsNullOrWhiteSpace(value.UserName))
             {
+
                 RegisterResponse registerResponse = RegisterResponse.FromJson(value.TokenResponse);
                 String challenge = registerResponse.GetClientData().Challenge;
                 string theChallenge;
@@ -109,14 +125,13 @@ namespace DemoU2FSite.Controllers
                     DeviceRegistration registration = u2flib.U2F.FinishRegistration(startedRegistration, registerResponse);
                     storage.Add(value.UserName, registration.ToJson());
                     storage.Remove(challenge);
-
-                    return View("CompleteRegister");
                 }
-                return View("Register", value);
+
+                return View("FinishRegister");
             }
             else
             {
-                return View("Register", value);
+                return View("CompleteRegister", value);
             }
         }
     }
