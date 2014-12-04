@@ -1,0 +1,12 @@
+﻿@model DemoU2FSite.Models.CompleteRegisterModel
+
+@{
+    ViewBag.Title = "Registeration Completed";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1> good job @Model.UserName</h1>
+
+<p>
+    @Html.ActionLink("Log in", "Index", "Home") now you can log in with Yubico's U2F
+</p>

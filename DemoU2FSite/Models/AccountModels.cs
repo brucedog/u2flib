@@ -39,7 +39,7 @@ namespace DemoU2FSite.Models
         public string Password { get; set; }
 
         [Required]
-        [Display(Name = "Password")]
+        [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
 
         [Display(Name = "Token")]
@@ -53,5 +53,23 @@ namespace DemoU2FSite.Models
         
         [Display(Name = "App ID")]
         public string AppId { get; set; }
+    }
+
+    public class CompleteRegisterModel
+    {
+        [Required]
+        [Display(Name = "User name")]
+        public string UserName { get; set; }
+
+        [Display(Name = "Challenge")]
+        public string Challenge { get; set; }
+
+        [Display(Name = "Version")]
+        public string Version { get; set; }
+
+        [Display(Name = "App ID")]
+        public string AppId { get; set; }
+
+        public string DeviceResponse { get; set; }
     }
 }

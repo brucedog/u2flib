@@ -6,18 +6,16 @@
 
 @section featured {
     
-    <h1> This is currently not complete!!!</h1>
     <br/>
-
-    <h2>Login</h2>
-    <p>Enter a username and then touch your U2F token.</p>
    
     @using (Html.BeginForm("BeginLogin", "Home"))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true)
         <fieldset>
-            <legend>Log in Form</legend>
+            <legend>Login</legend>
+            <p>Enter a username and password.</p>
+
             <div class=".col-xs-12 .col-sm-6 .col-lg-8">
                 <div class=".col-xs-6 .col-sm-4">
                     @Html.LabelFor(m => m.UserName)
@@ -45,9 +43,6 @@
         </fieldset>
         
         <br/>
-        <p>
-            @Html.ActionLink("Register", "Register", "Home") if you don't have an account.
-        </p>
     }
 }
 
