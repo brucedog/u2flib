@@ -27,7 +27,7 @@ namespace DemoU2FSite.Controllers
         public ActionResult BeginLogin(BeginLoginModel model)
         {
             string deviceRegistration;
-            if (!ModelState.IsValid || !storage.TryGetValue(model.UserName, out deviceRegistration))
+            if (!ModelState.IsValid || !storage.TryGetValue(model.UserName.Trim(), out deviceRegistration))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("CustomError", "User has not been registered");
@@ -39,8 +39,15 @@ namespace DemoU2FSite.Controllers
                 DeviceRegistration registration = DeviceRegistration.FromJson(deviceRegistration);
                 StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
                 storage.Add(startedAuthentication.Challenge, startedAuthentication.ToJson());
-
-                return View("FinishLogin");
+                CompleteLoginModel loginModel = new CompleteLoginModel
+                                                {
+                                                    AppId = startedAuthentication.AppId,
+                                                    KeyHandle = startedAuthentication.KeyHandle,
+                                                    Version = startedAuthentication.Version,
+                                                    Challenge = startedAuthentication.Challenge,
+                                                    UserName = model.UserName.Trim()
+                                                };
+                return View("FinishLogin", loginModel);
             }
             catch (Exception e)
             {
@@ -67,7 +74,7 @@ namespace DemoU2FSite.Controllers
             try
             {
                 DeviceRegistration registration = DeviceRegistration.FromJson(userName);
-                AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(model.TokenResponse);
+                AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(model.DeviceResponse);
                 String challenge = authenticateResponse.GetClientData().Challenge;
                 string theChallenge;
 
@@ -116,7 +123,7 @@ namespace DemoU2FSite.Controllers
                 string startedRegistrationJson = startedRegistration.ToJson();
                 storage.Add(value.UserName.Trim(), startedRegistrationJson);
                 JObject jObject = JObject.Parse(startedRegistrationJson);
-                RegisterModel registerModel = new RegisterModel
+                CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
                         AppId = jObject["AppId"].ToString(),
@@ -136,9 +143,6 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CompleteRegister([FromBody] CompleteRegisterModel value)
         {
-            // Below is test data
-//            value.DeviceResponse =
-//                "{ \"registrationData\": \"BQQOtd__bgnv8V6_T-E4914xE-Pb6ji1YMUoP0LDLDCGtzCHPwbkMLlxlo6C6fawnQ7671o85nSbek9v0m3_fK7fQBLviOeAdzHiknazlys7eXtC9DBraClKAhYO-2SuxHnyFS9Jfk2nNrib1dtJJNcfRJrOBGILWIIlXzSt5xV4VBgwggIbMIIBBaADAgECAgRAxBIlMAsGCSqGSIb3DQEBCzAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowKjEoMCYGA1UEAwwfWXViaWNvIFUyRiBFRSBTZXJpYWwgMTA4NjU5MTUyNTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABK2iSVV7KGNEdPE-oHGvobNnHVw6ZZ6vB3jNIYB1C4t32OucHzMweHqM5CAMSMDHtfp1vuJYaiQSk7jb6M48WtejEjAQMA4GCisGAQQBgsQKAQEEADALBgkqhkiG9w0BAQsDggEBAVg0BoEHEEp4LJLYPYFACRGS8WZiXkCA8crYLgGnzvfKXwPwyKJlUzYxxv5xoRrl5zjkIUXhZ4mnHZVsnj9EY_VGDuRRzKX7YtxTZpFZn7ej3abjLhckTkkQ_AhUkmP7VuK2AWLgYsS8ejGUqughBsKvh_84uxTAEr5BS-OGg2yi7UIjd8W0nOCc6EN8d_8wCiPOjt2Y_-TKpLLTXKszk4UnWNzRdxBThmBBprJBZbF1VyVRvJm5yRLBpth3G8KMvrt4Nu3Ecoj_Q154IJpWe1Dp1upDFLOG9nWCRQk25Y264k9BDISfqs-wHvUjIo2iDnKl5UVoauTWaT7M6KuEwl4wRAIgU5qU72pCVD-bq68tETIKZ8aw7FRKviPVyFZc5Q8BlC0CICTc7_QuTWZFHwxGIotQO639WIllrPf1QqtvHCyzzKg_\", \"clientData\": \"eyAiY2hhbGxlbmdlIjogIjZsOGFSTTZmMzVod3JyYW1ydDdzS3Q3Z0RrdlRhbXQycllyTWdNWUU5cm8iLCAib3JpZ2luIjogImh0dHA6XC9cL2RlbW8ueXViaWNvLmNvbSIsICJ0eXAiOiAibmF2aWdhdG9yLmlkLmZpbmlzaEVucm9sbG1lbnQiIH0=\" }";
             if (!string.IsNullOrWhiteSpace(value.DeviceResponse)
                 && !string.IsNullOrWhiteSpace(value.UserName))
             {
@@ -149,13 +153,13 @@ namespace DemoU2FSite.Controllers
                     string theChallenge;
                     if (storage.TryGetValue(value.UserName, out theChallenge))
                     {
-                        StartedRegistration startedRegistration = StartedRegistration.FromJson(theChallenge);
+                        StartedRegistration startedRegistration = StartedRegistration.FromJson(theChallenge);                        
                         DeviceRegistration registration = U2F.FinishRegistration(startedRegistration, registerResponse);
                         storage.Remove(value.UserName);
                         storage.Add(value.UserName.Trim(), registration.ToJson());
                     }
 
-                    return View("CompletedRegister");
+                    return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName});
                 }
                 catch (Exception e)
                 {

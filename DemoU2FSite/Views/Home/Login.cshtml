@@ -6,8 +6,6 @@
 
 @section featured {
     
-    <br/>
-   
     @using (Html.BeginForm("BeginLogin", "Home"))
     {
         @Html.AntiForgeryToken()
@@ -34,18 +32,15 @@
             </div>
             <div class=".col-xs-12 .col-sm-6 .col-lg-8">
                 <div class=".col-xs-6 .col-sm-4">
-                    @Html.TextBoxFor(m => m.Password)
+                    @Html.PasswordFor(m => m.Password)
                     @Html.ValidationMessageFor(m => m.Password)
                 </div>
             </div>
             <br/>
             <input type="submit" value="Log in" />
-        </fieldset>
-        
-        <br/>
+        </fieldset>        
     }
 }
 
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
 }

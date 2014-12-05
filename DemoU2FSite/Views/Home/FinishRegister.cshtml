@@ -1,4 +1,4 @@
-﻿@model DemoU2FSite.Models.RegisterModel
+﻿@model DemoU2FSite.Models.CompleteRegisterModel
 @{
     ViewBag.Title = "Complete Register";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -7,62 +7,55 @@
 @section featured
 {
     
-    @Html.ValidationMessage("CustomError")
-    <br/>
-}
-@using (Html.BeginForm("CompleteRegister", "Home", FormMethod.Post, new { id = "registerForm" }))
-{
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
-    <fieldset>
-        <legend>Complete Registration Form</legend>
-        <h3>Please plug in your device and touch the button.</h3>
+    @using (Html.BeginForm("CompleteRegister", "Home", FormMethod.Post, new {id = "registerForm"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <fieldset>
+            <legend>Complete Registration Form</legend>
+            <h3>Please plug in your device and touch the button.</h3>
 
-        <div class=".col-xs-12 .col-sm-6 .col-lg-8">
-            <div class=".col-xs-6 .col-sm-4">
-                @Html.LabelFor(m => m.UserName)
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.UserName)
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.TextBoxFor(m => m.UserName, new {@readonly = true})
+                    @Html.ValidationMessageFor(m => m.UserName)
+                </div>
             </div>
-            <div class=".col-xs-6 .col-sm-4">
-                @Html.TextBoxFor(m => m.UserName, new { @readonly = true })
-                @Html.ValidationMessageFor(m => m.UserName)
-            </div>
-        </div>
-        <div class=".col-xs-12 .col-sm-6 .col-lg-8">
-            <div class=".col-xs-6 .col-sm-4">
-                @Html.LabelFor(m => m.TokenResponse)
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.DeviceResponse)
 
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.TextBoxFor(m => m.DeviceResponse, new {@readonly = true})
+                </div>
             </div>
-            <div class=".col-xs-6 .col-sm-4">
-                @Html.TextBoxFor(m => m.TokenResponse, new { @readonly = true })
-            </div>
-        </div>
+            <br />
+            <input type="submit" value="Complete Register" />
+        </fieldset>
+    }
 
-@*        @Html.Hidden("TokenResponse", Model.TokenResponse)*@
-@*        @Html.Hidden("AppId", Model.AppId)*@
-@*        @Html.Hidden("Challenge", Model.Challenge)*@
-@*        @Html.Hidden("Version", Model.Version)*@
-        <br />
-        <input type="submit" value="Complete Register" />
-    </fieldset>
-}
-
-  <!-- Modal -->
-<div id="promptModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h3 id="myModalLabel">Performing U2F action</h3>
-            </div>
-            <div class="modal-body">
-                <p>You may be prompted to allow the site permission to access your security keys. After granting permission, the device will start to blink.</p>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-default" href="javascript:history.back()">Abort</a>
+    <!-- Modal -->
+    <div id="promptModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h3 id="myModalLabel">Performing U2F action</h3>
+                </div>
+                <div class="modal-body">
+                    <p>You may be prompted to allow the site permission to access your security keys. After granting permission, the device will start to blink.</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-default" href="javascript:history.back()">Abort</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
 
 @section Scripts {
     
@@ -76,23 +69,20 @@
         };
 
         setTimeout(function () {
-            var request = { "challenge": "@Model.Challenge", "version": "@Model.Version", "appId": "@Model.AppId" };
-            console.log("Register: ", request);
             $('#promptModal').modal('show');
             window.u2f.register([{
-                version: "@Model.Version",
                 challenge: "@Model.Challenge",
-                appId: "http://localhost:52701"
-            }],
-                [], function (data) {
+                version: "@Model.Version",
+                appId: "@Model.AppId"
+            }],[], function (data) {
                     if (data.errorCode) {
                         $('#promptModal').modal('hide');
                         return alert(errorMap[data.errorCode]);
                     }
                     console.log("Register callback", data);
                     $('#promptModal').modal('hide');
-                    $('#TokenResponse').val(JSON.stringify(data));
-                    //$('#bind-form').submit();
+                    $('#DeviceResponse').val(JSON.stringify(data));
+                    $('#registerForm').submit();
                 });
         }, 1000);
     </script>

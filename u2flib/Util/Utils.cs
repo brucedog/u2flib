@@ -4,6 +4,24 @@ namespace u2flib.Util
 {
     public class Utils
     {
+        /// <summary>
+        /// Formats the string to base64. 
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns>properly base64 string</returns>
+        public static string FormatStringToBase64(string input)
+        {
+            input = input.Replace('-', '+');
+            input = input.Replace('_', '/');
+            int mod4 = input.Length % 4;
+            if (mod4 > 0)
+            {
+                input += new string('=', 4 - mod4);
+            }
+
+            return input;
+        }
+
         public static byte[] ReadAllBytes(BinaryReader reader)
         {
             const int bufferSize = 4096;

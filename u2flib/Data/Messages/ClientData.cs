@@ -33,7 +33,7 @@ namespace u2flib.Data.Messages
         /// <exception cref="U2fException">ClientData has wrong format</exception>
         public ClientData(String clientData)
         {
-            _rawClientData = Encoding.UTF8.GetString(Convert.FromBase64String(clientData));
+            _rawClientData = Encoding.UTF8.GetString(Convert.FromBase64String(Util.Utils.FormatStringToBase64(clientData)));
 
             JObject clientDataAsElement = JObject.Parse(_rawClientData);
             JToken typeParam;
@@ -41,7 +41,6 @@ namespace u2flib.Data.Messages
             {
                 throw new U2fException("ClientData has wrong format");
             }
-
 
             JToken theChallenge;
             JToken theOrgin;

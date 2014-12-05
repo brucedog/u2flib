@@ -24,8 +24,24 @@ namespace DemoU2FSite.Models
         public string Password { get; set; }
 
         [Required]
-        [Display(Name = "Token response")]
-        public string TokenResponse { get; set; }
+        [Display(Name = "App id")]
+        public string AppId { get; set; }
+
+        [Required]
+        [Display(Name = "Key Handel")]
+        public string KeyHandle { get; set; }
+
+        [Required]
+        [Display(Name = "Version")]
+        public string Version { get; set; }
+
+        [Required]
+        [Display(Name = "Device Response")]
+        public string DeviceResponse { get; set; }
+
+        [Required]
+        [Display(Name = "Challenge")]
+        public string Challenge { get; set; }
     }
 
     public class RegisterModel

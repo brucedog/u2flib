@@ -4,12 +4,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<br/>
-
 @section featured {
-
-    <br/>
-
+    
     @using (Html.BeginForm("BeginRegister", "Home", FormMethod.Post, new { id = "registerForm" }))
     {
         @Html.AntiForgeryToken()
@@ -58,7 +54,5 @@
     }
 }
 
-
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
 }
