@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Mvc;
 using DemoU2FSite.Models;
-using Newtonsoft.Json.Linq;
 using u2flib;
 using u2flib.Data;
 using u2flib.Data.Messages;
@@ -14,7 +13,7 @@ namespace DemoU2FSite.Controllers
     {
         public static Dictionary<string, string> storage = new Dictionary<string, string>();
         private const string DemoAppId = "http://localhost:52701";
-
+        
         [System.Web.Mvc.AllowAnonymous]
         public ActionResult Index()
         {
@@ -64,7 +63,7 @@ namespace DemoU2FSite.Controllers
         public ActionResult CompletedLogin(CompleteLoginModel model)
         {
             string userName;
-            if (!ModelState.IsValid || !storage.TryGetValue(model.UserName, out userName))
+            if (!storage.TryGetValue(model.UserName, out userName))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("", "User has not been registered");
@@ -122,13 +121,12 @@ namespace DemoU2FSite.Controllers
                 StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
                 string startedRegistrationJson = startedRegistration.ToJson();
                 storage.Add(value.UserName.Trim(), startedRegistrationJson);
-                JObject jObject = JObject.Parse(startedRegistrationJson);
                 CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
-                        AppId = jObject["AppId"].ToString(),
-                        Challenge = jObject["Challenge"].ToString(),
-                        Version = jObject["Version"].ToString()
+                        AppId = startedRegistration.AppId,
+                        Challenge = startedRegistration.Challenge,
+                        Version = startedRegistration.Version
                     };
 
                 return View("FinishRegister", registerModel);

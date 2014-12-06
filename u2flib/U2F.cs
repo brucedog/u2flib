@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using u2flib.Crypto;
 using u2flib.Data;
 using u2flib.Data.Messages;
+using u2flib.Util;
 
 namespace u2flib
 {
@@ -38,7 +39,7 @@ namespace u2flib
         public static StartedRegistration StartRegistration(String appId)
         {
             byte[] challenge = ChallengeGenerator.GenerateChallenge();
-            String challengeBase64 = Convert.ToBase64String(challenge);
+            String challengeBase64 = Utils.ByteArrayToBase64String(challenge);
 
             return new StartedRegistration(challengeBase64, appId);
         }
@@ -77,9 +78,9 @@ namespace u2flib
             byte[] challenge = ChallengeGenerator.GenerateChallenge();
 
             return new StartedAuthentication(
-                Convert.ToBase64String(challenge),
+                Utils.ByteArrayToBase64String(challenge),
                 appId,
-                Convert.ToBase64String(deviceRegistration.KeyHandle));
+                Utils.ByteArrayToBase64String(deviceRegistration.KeyHandle));
         }
 
         /**

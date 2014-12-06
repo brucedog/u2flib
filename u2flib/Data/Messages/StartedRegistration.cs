@@ -81,7 +81,7 @@ namespace u2flib.Data.Messages
                 return true;
             if (obj == null)
                 return false;
-            if (this.GetType() != obj.GetType())
+            if (GetType() != obj.GetType())
                 return false;
             StartedRegistration other = (StartedRegistration) obj;
             if (AppId == null)

@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Org.BouncyCastle.Security.Certificates;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
@@ -61,7 +60,7 @@ namespace u2flib.Data.Messages
 
         public static RawRegisterResponse FromBase64(String rawDataBase64)
         {
-            byte[] bytes = Convert.FromBase64String(Utils.FormatStringToBase64(rawDataBase64));
+            byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64); 
 
             Stream stream = new MemoryStream(bytes);
             var binaryReader = new BinaryReader(stream);
@@ -146,7 +145,7 @@ namespace u2flib.Data.Messages
                 return true;
             if (obj == null)
                 return false;
-            if (this.GetType() != obj.GetType())
+            if (GetType() != obj.GetType())
                 return false;
             RawRegisterResponse other = (RawRegisterResponse) obj;
             if (!_attestationCertificate.Equals(other._attestationCertificate))

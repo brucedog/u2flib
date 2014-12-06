@@ -69,7 +69,7 @@ namespace u2flib.Data.Messages
                 return true;
             if (obj == null)
                 return false;
-            if (this.GetType() != obj.GetType())
+            if (GetType() != obj.GetType())
                 return false;
             RegisterResponse other = (RegisterResponse) obj;
             if (ClientData == null)

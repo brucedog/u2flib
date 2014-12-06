@@ -6,7 +6,7 @@
 }
 
 <h2>FinishAuthentication</h2>
-@using (Html.BeginForm("CompletedLogin", "Home"))
+@using (Html.BeginForm("CompletedLogin", "Home", FormMethod.Post, new { id = "loginForm" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary()
@@ -69,14 +69,16 @@
         console.log("sign: ", request);
         $('#promptModal').modal('show');
 
-        window.u2f.sign([
-            {
-                challenge: "@Model.Challenge",
+
+        setTimeout(function() {
+            window.u2f.sign([
+                {
+                    challenge: "@Model.Challenge",
                     version: "@Model.Version",
                     appId: "@Model.AppId",
                     keyHandle: "@Model.KeyHandle"
                 }
-            ], function (data) {
+            ], function(data) {
                 console.log("call back data: ", data);
 
                 if (data.errorCode) {
@@ -85,10 +87,10 @@
                 }
                 $('#promptModal').modal('hide');
                 $('#DeviceResponse').val(JSON.stringify(data));
-                //                $('#verify-form').submit();
-            }, 15);
-        setTimeout(function() {
-  
+                $('#loginForm').submit();
+
+                return "";
+            });
         }, 1000);
     </script>
 }

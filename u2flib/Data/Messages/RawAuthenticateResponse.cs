@@ -76,7 +76,7 @@ namespace u2flib.Data.Messages
         /// <returns></returns>
         public static RawAuthenticateResponse FromBase64(String rawDataBase64)
         {
-            byte[] bytes = Convert.FromBase64String(rawDataBase64);
+            byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64);
             Stream stream = new MemoryStream(bytes);
             BinaryReader binaryReader = new BinaryReader(stream);
 
@@ -156,7 +156,7 @@ namespace u2flib.Data.Messages
                 return true;
             if (obj == null)
                 return false;
-            if (this.GetType() != obj.GetType())
+            if (GetType() != obj.GetType())
                 return false;
             RawAuthenticateResponse other = (RawAuthenticateResponse) obj;
             if (Counter != other.Counter)

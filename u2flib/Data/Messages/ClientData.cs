@@ -12,9 +12,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using u2flib.Exceptions;
+using u2flib.Util;
 
 namespace u2flib.Data.Messages
 {
@@ -33,7 +33,7 @@ namespace u2flib.Data.Messages
         /// <exception cref="U2fException">ClientData has wrong format</exception>
         public ClientData(String clientData)
         {
-            _rawClientData = Encoding.UTF8.GetString(Convert.FromBase64String(Util.Utils.FormatStringToBase64(clientData)));
+            _rawClientData = Utils.GetString(Utils.Base64StringToByteArray(clientData));
 
             JObject clientDataAsElement = JObject.Parse(_rawClientData);
             JToken typeParam;
