@@ -102,7 +102,7 @@ namespace u2flib
             authenticateResponse.CheckSignature(startedAuthentication.AppId, clientData.AsJson(), deviceRegistration.PublicKey);
             authenticateResponse.CheckUserPresence();
 
-            deviceRegistration.CheckAndIncrementCounter(authenticateResponse.Counter);
+            deviceRegistration.CheckAndUpdateCounter(authenticateResponse.Counter);
         }
     }
 }

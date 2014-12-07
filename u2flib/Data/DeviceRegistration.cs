@@ -112,12 +112,13 @@ namespace u2flib.Data
         /// </summary>
         /// <param name="clientCounter">The client counter.</param>
         /// <exception cref="U2fException">Counter value smaller than expected!</exception>
-        public void CheckAndIncrementCounter(int clientCounter)
+        public void CheckAndUpdateCounter(int clientCounter)
         {
-            if (clientCounter <= Counter++)
+            if (clientCounter <= Counter)
             {
                 throw new U2fException("Counter value smaller than expected!");
             }
+            Counter = clientCounter;
         }
         
         public override int GetHashCode()
