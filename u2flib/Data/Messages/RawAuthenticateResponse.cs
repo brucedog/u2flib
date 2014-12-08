@@ -30,7 +30,7 @@ namespace u2flib.Data.Messages
         /// <param name="userPresence">The user presence.</param>
         /// <param name="counter">The counter.</param>
         /// <param name="signature">The signature.</param>
-        public RawAuthenticateResponse(byte userPresence, int counter, byte[] signature)
+        public RawAuthenticateResponse(byte userPresence, uint counter, byte[] signature)
         {
             UserPresence = userPresence;
             Counter = counter;
@@ -58,7 +58,7 @@ namespace u2flib.Data.Messages
         /// <value>
         /// The counter.
         /// </value>
-        public int Counter { get; private set; }
+        public uint Counter { get; private set; }
 
         /// <summary>
         /// Gets the signature.
@@ -83,9 +83,9 @@ namespace u2flib.Data.Messages
             try
             {
                 return new RawAuthenticateResponse(
-                    binaryReader.ReadByte(),
-                    binaryReader.ReadInt32(),
-                    Utils.ReadAllBytes(binaryReader)
+                    userPresence: binaryReader.ReadByte(),
+                    counter: binaryReader.ReadUInt32(),
+                    signature: Utils.ReadAllBytes(binaryReader)
                     );
             }
             finally
@@ -124,7 +124,7 @@ namespace u2flib.Data.Messages
         /// <param name="counter">The counter.</param>
         /// <param name="challengeHash">The challenge hash.</param>
         /// <returns></returns>
-        public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, int counter, byte[] challengeHash)
+        public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, uint counter, byte[] challengeHash)
         {
             // covert the counter to a byte array in case the int is to big for a single byte
             byte[] byteArray = BitConverter.GetBytes(counter);
@@ -147,7 +147,7 @@ namespace u2flib.Data.Messages
 
         public override int GetHashCode()
         {
-            return 23 + Signature.Sum(b => b + 31 + Counter + UserPresence);
+            return 23 + Signature.Sum(b => b + 31 + (int)Counter + UserPresence);
         }
 
         public override bool Equals(Object obj)

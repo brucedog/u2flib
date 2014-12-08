@@ -23,7 +23,7 @@ namespace u2flib.Data
     public class DeviceRegistration : DataObject
     {
         private long serialVersionUID = -142942195464329902L;
-        public static int INITIAL_COUNTER_VALUE = 0;
+        public static uint INITIAL_COUNTER_VALUE = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceRegistration"/> class.
@@ -33,7 +33,7 @@ namespace u2flib.Data
         /// <param name="attestationCert">The attestation cert.</param>
         /// <param name="counter">The counter.</param>
         /// <exception cref="U2fException">Invalid attestation certificate</exception>
-        public DeviceRegistration(byte[] keyHandle, byte[] publicKey, byte[] attestationCert, int counter)
+        public DeviceRegistration(byte[] keyHandle, byte[] publicKey, byte[] attestationCert, uint counter)
         {
             KeyHandle = keyHandle;
             PublicKey = publicKey;
@@ -74,12 +74,12 @@ namespace u2flib.Data
         public byte[] AttestationCert { get; private set; }
 
         /// <summary>
-        /// Gets the counter.
+        /// Usage counter from the device, this should be incremented by 1 every use.
         /// </summary>
         /// <value>
-        /// The counter.
+        /// Number of device uses.
         /// </value>
-        public int Counter { get; private set; }
+        public uint Counter { get; private set; }
 
         public X509Certificate GetAttestationCertificate()
         {
@@ -112,7 +112,7 @@ namespace u2flib.Data
         /// </summary>
         /// <param name="clientCounter">The client counter.</param>
         /// <exception cref="U2fException">Counter value smaller than expected!</exception>
-        public void CheckAndUpdateCounter(int clientCounter)
+        public void CheckAndUpdateCounter(uint clientCounter)
         {
             if (clientCounter <= Counter)
             {
@@ -145,7 +145,7 @@ namespace u2flib.Data
 
     internal class DeviceWithoutCertificate
     {
-        internal DeviceWithoutCertificate(byte[] keyHandle, byte[] publicKey, int counter)
+        internal DeviceWithoutCertificate(byte[] keyHandle, byte[] publicKey, uint counter)
         {
             KeyHandle = keyHandle;
             PublicKey = publicKey;
@@ -156,6 +156,6 @@ namespace u2flib.Data
 
         public byte[] KeyHandle { get; private set; }
 
-        public int Counter { get; private set; }
+        public uint Counter { get; private set; }
     }
 }

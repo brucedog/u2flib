@@ -23,8 +23,11 @@ namespace u2flib.Data.Messages
         private const String TypeParam = "typ";
         private const String ChallengeParam = "challenge";
         private const String OriginParam = "origin";
-        private readonly String _origin;
-        private readonly String _rawClientData;
+
+        public string Type { get; private set; }
+        public string Challenge { get; private set; }
+        public string Origin { get; private set; }
+        public string RawClientData { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientData"/> class.
@@ -33,44 +36,43 @@ namespace u2flib.Data.Messages
         /// <exception cref="U2fException">ClientData has wrong format</exception>
         public ClientData(String clientData)
         {
-            _rawClientData = Utils.GetString(Utils.Base64StringToByteArray(clientData));
+            RawClientData = Utils.GetString(Utils.Base64StringToByteArray(clientData));
 
-            JObject clientDataAsElement = JObject.Parse(_rawClientData);
-            JToken typeParam;
-            if (clientDataAsElement == null || !clientDataAsElement.TryGetValue(TypeParam, out typeParam))
-            {
+			JObject element = JObject.Parse(RawClientData);
+            if (element == null)
                 throw new U2fException("ClientData has wrong format");
-            }
 
-            JToken theChallenge;
-            JToken theOrgin;
-            clientDataAsElement.TryGetValue(ChallengeParam, out theChallenge);
-            clientDataAsElement.TryGetValue(OriginParam, out theOrgin);
+            JToken theType, theChallenge, theOrgin;
+            if (!element.TryGetValue(TypeParam, out theType))
+                throw new U2fException("Bad clientData: missing 'typ' param");
+            if (!element.TryGetValue(ChallengeParam, out theChallenge))
+                throw new U2fException("Bad clientData: missing 'challenge' param");
+
+            Type = theType.ToString();
             Challenge = theChallenge.ToString();
-            _origin = theOrgin.ToString();
+            if (element.TryGetValue(OriginParam, out theOrgin))
+                Origin = theOrgin.ToString();
         }
-
-        public string Challenge { get; private set; }
 
         public void CheckContent(String type, String challenge, HashSet<String> facets)
         {
-            if (!type.Equals(type))
+            if (!type.Equals(this.Type))
             {
                 throw new U2fException("Bad clientData: bad type " + type);
             }
-            if (!challenge.Equals(Challenge))
+            if (!challenge.Equals(this.Challenge))
             {
                 throw new U2fException("Wrong challenge signed in clientData");
             }
             if (facets != null)
             {
-                VerifyOrigin(_origin, CanonicalizeOrigins(facets));
+                VerifyOrigin(Origin, CanonicalizeOrigins(facets));
             }
         }
 
         public String AsJson()
         {
-            return _rawClientData;
+            return RawClientData;
         }
 
         private static void VerifyOrigin(String origin, HashSet<String> allowedOrigins)
@@ -78,7 +80,7 @@ namespace u2flib.Data.Messages
             if (!allowedOrigins.Contains(CanonicalizeOrigin(origin)))
             {
                 throw new UriFormatException(origin +
-                                             " is not a recognized home origin for this backend");
+                    " is not a recognized home origin for this backend");
             }
         }
 
