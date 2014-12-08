@@ -31,7 +31,7 @@ namespace UnitTests
             RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
             RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
             DeviceRegistration deviceRegistration = rawAuthenticateResponse.CreateDevice();
-            int orginalValue = deviceRegistration.Counter;
+            uint orginalValue = deviceRegistration.Counter;
 
             U2F.FinishAuthentication(startedAuthentication, authenticateResponse, deviceRegistration);
 
