@@ -56,6 +56,7 @@
     <Compile Include="U2F\Messages\StartedAuthenticationUnitTests.cs" />
     <Compile Include="U2F\Messages\StartedRegistrationUnitTests.cs" />
     <Compile Include="U2F\U2FUnitTests.cs" />
+    <Compile Include="U2F\UtilsUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\u2flib\u2flib.csproj">
