@@ -2,17 +2,18 @@
 using System.Web.Http;
 using System.Web.Mvc;
 using DemoU2FSite.Models;
+using DemoU2FSite.Services;
 
 namespace DemoU2FSite.Controllers
 {
     public class HomeController : Controller
     {
         private const string DemoAppId = "http://localhost:52701";
-        private IMemeberShipService memeberShipService;
+        private readonly IMemeberShipService _memeberShipService;
 
-        public HomeController()
+        public HomeController(IMemeberShipService memeberShipService)
         {
-             memeberShipService = new MemeberShipService();
+            _memeberShipService = memeberShipService;
         }
         
         [System.Web.Mvc.AllowAnonymous]
@@ -32,7 +33,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginLogin(BeginLoginModel model)
         {
-            if (!memeberShipService.IsUserRegistered(model.UserName.Trim(), model.Password.Trim()))
+            if (!_memeberShipService.IsUserRegistered(model.UserName.Trim(), model.Password.Trim()))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("CustomError", "User has not been registered");
@@ -41,7 +42,7 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                ServerChallenge serverChallenge = memeberShipService.GenerateServerChallenge(model.UserName.Trim());
+                ServerChallenge serverChallenge = _memeberShipService.GenerateServerChallenge(model.UserName.Trim());
 
                 CompleteLoginModel loginModel = new CompleteLoginModel
                                                 {
@@ -67,7 +68,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CompletedLogin(CompleteLoginModel model)
         {
-            if (!memeberShipService.IsUserRegistered(model.UserName.Trim(), string.Empty))
+            if (!_memeberShipService.IsUserRegistered(model.UserName.Trim(), string.Empty))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("", "User has not been registered");
@@ -76,7 +77,7 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                if (memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
+                if (_memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
                 {
                     return View("CompletedLogin", model);
                 }
@@ -107,7 +108,7 @@ namespace DemoU2FSite.Controllers
                 && !string.IsNullOrWhiteSpace(value.Password)
                 && !string.IsNullOrWhiteSpace(value.UserName))
             {
-                ServerRegisterResponse serverRegisterResponse = memeberShipService.GenerateServerRegisteration(value.UserName.Trim(), value.Password.Trim());
+                ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerRegisteration(value.UserName.Trim(), value.Password.Trim());
                 CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
@@ -133,7 +134,7 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    memeberShipService.CompleteRegisteration(value.UserName.Trim(), value.DeviceResponse.Trim());
+                    _memeberShipService.CompleteRegisteration(value.UserName.Trim(), value.DeviceResponse.Trim());
 
                     return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName});
                 }

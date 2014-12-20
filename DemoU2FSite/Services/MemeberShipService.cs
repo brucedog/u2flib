@@ -4,7 +4,7 @@ using u2flib;
 using u2flib.Data;
 using u2flib.Data.Messages;
 
-namespace DemoU2FSite.Controllers
+namespace DemoU2FSite.Services
 {
     public class MemeberShipService : IMemeberShipService
     {

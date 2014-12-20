@@ -1,6 +1,6 @@
 ﻿using DemoU2FSite.Models;
 
-namespace DemoU2FSite.Controllers
+namespace DemoU2FSite.Services
 {
     public interface IMemeberShipService
     {
