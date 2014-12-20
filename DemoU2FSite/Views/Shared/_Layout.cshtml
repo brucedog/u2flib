@@ -25,27 +25,28 @@
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li>@Html.ActionLink("Login", "Index", "Home")</li>
+                        <li>@Html.ActionLink("Login", "Login", "Home")</li>
                         <li>@Html.ActionLink("Register", "Register", "Home")</li>
                     </ul>
                 </div><!--/.nav-collapse -->
             </div>
         </nav>
-        
-        <div class="container">
-            <br/>
-            <div class="page-header">
-                <p class="lead">Demo site for ACP.NET MVC working with U2F</p>
-            </div>
-            @*for some reason the "alert alert-danger" is always visible need to figure out later.*@
-            <div class="bg-danger" role="alert">        
-                @Html.ValidationMessage("CustomError")
-            </div>
-            <br />
-            @RenderSection("featured", required: false)
-            @RenderBody()
-        </div>
 
+    <div class="container">
+        <br/>
+        <br/>
+        <br/>
+        <div class="bg-danger" role="alert">
+            @Html.ValidationMessage("CustomError")
+        </div>
+        <br/>
+
+        @RenderSection("featured", required: false)
+        @RenderBody()
+    </div>
+
+        <br/>
+    
         <footer class="footer">
             <div class="container">
                 <p class="text-muted">&copy; @DateTime.Now.Year - ASP.NET MVC Application U2F Demo</p>                

@@ -20,10 +20,6 @@ namespace DemoU2FSite.Models
         public string UserName { get; set; }
 
         [Required]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
-
-        [Required]
         [Display(Name = "App id")]
         public string AppId { get; set; }
 
@@ -57,9 +53,6 @@ namespace DemoU2FSite.Models
         [Required]
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
-
-        [Display(Name = "Token")]
-        public string TokenResponse { get; set; }
 
         [Display(Name = "Challenge")]
         public string Challenge { get; set; }

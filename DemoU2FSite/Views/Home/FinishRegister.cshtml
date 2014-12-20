@@ -21,9 +21,36 @@
                 </div>
                 <div class=".col-xs-6 .col-sm-4">
                     @Html.TextBoxFor(m => m.UserName, new {@readonly = true})
-                    @Html.ValidationMessageFor(m => m.UserName)
                 </div>
             </div>
+            
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.AppId)
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    <input data-val="true" name="appId" readonly="True" type="text" value="@Model.AppId" />
+                </div>
+            </div>
+            
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.Version)
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    <input data-val="true" name="version" readonly="True" type="text" value="@Model.Version" />
+                </div>
+            </div>
+
+            <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+                <div class=".col-xs-6 .col-sm-4">
+                    @Html.LabelFor(m => m.Challenge)
+                </div>
+                <div class=".col-xs-6 .col-sm-4">
+                    <input data-val="true" name="challenge" readonly="True" type="text" value="@Model.Challenge" />
+                </div>
+            </div>
+
             <div class=".col-xs-12 .col-sm-6 .col-lg-8">
                 <div class=".col-xs-6 .col-sm-4">
                     @Html.LabelFor(m => m.DeviceResponse)

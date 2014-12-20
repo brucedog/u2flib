@@ -1,21 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Mvc;
 using DemoU2FSite.Models;
-using u2flib;
-using u2flib.Data;
-using u2flib.Data.Messages;
 
 namespace DemoU2FSite.Controllers
 {
     public class HomeController : Controller
     {
-        public static Dictionary<string, string> storage = new Dictionary<string, string>();
         private const string DemoAppId = "http://localhost:52701";
+        private IMemeberShipService memeberShipService;
+
+        public HomeController()
+        {
+             memeberShipService = new MemeberShipService();
+        }
         
         [System.Web.Mvc.AllowAnonymous]
         public ActionResult Index()
+        {
+            return View();
+        }
+
+        [System.Web.Mvc.AllowAnonymous]
+        public ActionResult Login()
         {
             return View("Login");
         }
@@ -25,8 +32,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginLogin(BeginLoginModel model)
         {
-            string deviceRegistration;
-            if (!ModelState.IsValid || !storage.TryGetValue(model.UserName.Trim(), out deviceRegistration))
+            if (!memeberShipService.IsUserRegistered(model.UserName.Trim(), model.Password.Trim()))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("CustomError", "User has not been registered");
@@ -35,15 +41,14 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                DeviceRegistration registration = DeviceRegistration.FromJson(deviceRegistration);
-                StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
-                storage.Add(startedAuthentication.Challenge, startedAuthentication.ToJson());
+                ServerChallenge serverChallenge = memeberShipService.GenerateServerChallenge(model.UserName.Trim());
+
                 CompleteLoginModel loginModel = new CompleteLoginModel
                                                 {
-                                                    AppId = startedAuthentication.AppId,
-                                                    KeyHandle = startedAuthentication.KeyHandle,
-                                                    Version = startedAuthentication.Version,
-                                                    Challenge = startedAuthentication.Challenge,
+                                                    AppId = serverChallenge.AppId,
+                                                    KeyHandle = serverChallenge.KeyHandle,
+                                                    Version = serverChallenge.Version,
+                                                    Challenge = serverChallenge.Challenge,
                                                     UserName = model.UserName.Trim()
                                                 };
                 return View("FinishLogin", loginModel);
@@ -62,8 +67,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CompletedLogin(CompleteLoginModel model)
         {
-            string userName;
-            if (!storage.TryGetValue(model.UserName, out userName))
+            if (!memeberShipService.IsUserRegistered(model.UserName.Trim(), string.Empty))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("", "User has not been registered");
@@ -72,17 +76,8 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                DeviceRegistration registration = DeviceRegistration.FromJson(userName);
-                AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(model.DeviceResponse);
-                String challenge = authenticateResponse.GetClientData().Challenge;
-                string theChallenge;
-
-                if (storage.TryGetValue(challenge, out theChallenge))
+                if (memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
                 {
-                    StartedAuthentication authentication = StartedAuthentication.FromJson(theChallenge);
-                    storage.Remove(theChallenge);
-                    U2F.FinishAuthentication(authentication, authenticateResponse, registration);
-
                     return View("CompletedLogin", model);
                 }
             }
@@ -112,21 +107,13 @@ namespace DemoU2FSite.Controllers
                 && !string.IsNullOrWhiteSpace(value.Password)
                 && !string.IsNullOrWhiteSpace(value.UserName))
             {
-                // user has already tried register
-                if (storage.ContainsKey(value.UserName.Trim()))
-                {
-                    storage.Remove(value.UserName.Trim());
-                }
-
-                StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
-                string startedRegistrationJson = startedRegistration.ToJson();
-                storage.Add(value.UserName.Trim(), startedRegistrationJson);
+                ServerRegisterResponse serverRegisterResponse = memeberShipService.GenerateServerRegisteration(value.UserName.Trim(), value.Password.Trim());
                 CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
-                        AppId = startedRegistration.AppId,
-                        Challenge = startedRegistration.Challenge,
-                        Version = startedRegistration.Version
+                        AppId = serverRegisterResponse.AppId,
+                        Challenge = serverRegisterResponse.Challenge,
+                        Version = serverRegisterResponse.Version
                     };
 
                 return View("FinishRegister", registerModel);
@@ -146,16 +133,7 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    RegisterResponse registerResponse = RegisterResponse.FromJson(value.DeviceResponse);
-                    String challenge = registerResponse.GetClientData().Challenge;
-                    string theChallenge;
-                    if (storage.TryGetValue(value.UserName, out theChallenge))
-                    {
-                        StartedRegistration startedRegistration = StartedRegistration.FromJson(theChallenge);                        
-                        DeviceRegistration registration = U2F.FinishRegistration(startedRegistration, registerResponse);
-                        storage.Remove(value.UserName);
-                        storage.Add(value.UserName.Trim(), registration.ToJson());
-                    }
+                    memeberShipService.CompleteRegisteration(value.UserName.Trim(), value.DeviceResponse.Trim());
 
                     return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName});
                 }
