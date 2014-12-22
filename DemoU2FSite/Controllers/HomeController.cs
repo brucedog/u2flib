@@ -33,7 +33,8 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginLogin(BeginLoginModel model)
         {
-            if (!_memeberShipService.IsUserRegistered(model.UserName.Trim(), model.Password.Trim()))
+            if ((string.IsNullOrWhiteSpace(model.UserName) || string.IsNullOrWhiteSpace(model.Password))||
+                !_memeberShipService.IsUserRegistered(model.UserName.Trim(), model.Password.Trim()))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("CustomError", "User has not been registered");
@@ -104,9 +105,9 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginRegister([FromBody] RegisterModel value)
         {
-            if (value.Password.Equals(value.ConfirmPassword)
-                && !string.IsNullOrWhiteSpace(value.Password)
-                && !string.IsNullOrWhiteSpace(value.UserName))
+            if (!string.IsNullOrWhiteSpace(value.Password)
+                && !string.IsNullOrWhiteSpace(value.UserName)
+                && value.Password.Equals(value.ConfirmPassword))
             {
                 ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerRegisteration(value.UserName.Trim(), value.Password.Trim());
                 CompleteRegisterModel registerModel = new CompleteRegisterModel
