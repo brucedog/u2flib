@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using DemoU2FSite.Controllers;
 using DemoU2FSite.Models;
 using DemoU2FSite.Services;
@@ -82,6 +83,21 @@ namespace UnitTests
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishLogin", result.ViewName);
             _memeberShipService.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void HomeController_CompletedLoginExceptionThrown()
+        {
+            _memeberShipService.Expect(s => s.AuthenticateUser(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+
+            HomeController homeController = new HomeController(_memeberShipService);
+            CompleteLoginModel beginLoginModel = new CompleteLoginModel { UserName = string.Empty };
+
+            ViewResult result = homeController.CompletedLogin(beginLoginModel) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(homeController.ModelState.IsValid);
+            Assert.AreEqual("FinishLogin", result.ViewName);
         }
 
         [TestMethod]
@@ -188,6 +204,20 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void HomeController_CompleteRegisterExceptionThrown()
+        {
+            _memeberShipService.Expect(s => s.AuthenticateUser(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+            HomeController homeController = new HomeController(_memeberShipService);
+            CompleteRegisterModel registerModel = new CompleteRegisterModel();
+
+            ViewResult result = homeController.CompleteRegister(registerModel) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(homeController.ModelState.IsValid);
+            Assert.AreEqual("FinishRegister", result.ViewName);
+        }
+
+        [TestMethod]
         public void HomeController_CompleteRegisterWithDeviceTokenNoUsername()
         {
             HomeController homeController = new HomeController(_memeberShipService);
@@ -231,6 +261,26 @@ namespace UnitTests
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("CompletedRegister", result.ViewName);
             _memeberShipService.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void HomeController_Index()
+        {
+            HomeController homeController = new HomeController(_memeberShipService);
+            ViewResult result = homeController.Index() as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ViewName);
+        }
+
+        [TestMethod]
+        public void HomeController_Login()
+        {
+            HomeController homeController = new HomeController(_memeberShipService);
+            ViewResult result = homeController.Login() as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Login", result.ViewName);
         }
     }
 }

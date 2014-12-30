@@ -45,6 +45,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -129,6 +135,10 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Models\ServerRegisterResponse.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Repository\AuthenticationRequest.cs" />
+    <Compile Include="Repository\DataContext.cs" />
+    <Compile Include="Repository\Device.cs" />
+    <Compile Include="Repository\User.cs" />
     <Compile Include="Services\IMemeberShipService.cs" />
     <Compile Include="Services\MemeberShipService.cs" />
     <Compile Include="Models\ServerChallenge.cs" />

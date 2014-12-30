@@ -19,7 +19,7 @@ namespace DemoU2FSite.Controllers
         [System.Web.Mvc.AllowAnonymous]
         public ActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         [System.Web.Mvc.AllowAnonymous]
