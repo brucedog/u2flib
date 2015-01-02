@@ -5,14 +5,6 @@ namespace DemoU2FSite.Services
     public interface IMemeberShipService
     {
         /// <summary>
-        /// Gets the device registration info for given username.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="password">Name of the user.</param>
-        /// <returns></returns>
-        string GetDeviceRegistration(string name, string password);
-
-        /// <summary>
         /// Determines whether [is user registered] [the specified user name].
         /// </summary>
         /// <param name="userName">Name of the user.</param>

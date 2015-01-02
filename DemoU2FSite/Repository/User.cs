@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DemoU2FSite.Repository
 {
     public class User
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -17,6 +19,8 @@ namespace DemoU2FSite.Repository
 
         public DateTime UpdatedOn { get; set; }
 
-        public virtual ICollection<Device> Devices { get; set; }
+        public virtual ICollection<DeviceRegistration> DeviceRegistrations { get; set; }
+
+        public virtual AuthenticationRequest AuthenticationRequest { get; set; }
     }
 }
