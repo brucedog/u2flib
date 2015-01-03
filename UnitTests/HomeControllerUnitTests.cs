@@ -4,6 +4,7 @@ using DemoU2FSite.Controllers;
 using DemoU2FSite.Models;
 using DemoU2FSite.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Org.BouncyCastle.Bcpg;
 using Rhino.Mocks;
 
 namespace UnitTests
@@ -86,12 +87,40 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void HomeController_Register()
+        {
+            HomeController homeController = new HomeController(_memeberShipService);
+
+            ViewResult result = homeController.Register() as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Register", result.ViewName);
+        }
+
+        [TestMethod]
+        public void HomeController_BeginLoginExceptionThrown()
+        {
+            _memeberShipService.Stub(s => s.GenerateServerChallenge(Arg<string>.Is.Anything)).Throw(new Exception());
+            _memeberShipService.Stub(s => s.IsUserRegistered(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(true);
+
+            HomeController homeController = new HomeController(_memeberShipService);
+            BeginLoginModel beginLoginModel = new BeginLoginModel { UserName = "UserName", Password = "Password"};
+
+            ViewResult result = homeController.BeginLogin(beginLoginModel) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(homeController.ModelState.IsValid);
+            Assert.AreEqual("Login", result.ViewName);
+        }
+
+        [TestMethod]
         public void HomeController_CompletedLoginExceptionThrown()
         {
             _memeberShipService.Expect(s => s.AuthenticateUser(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+            _memeberShipService.Stub(s => s.IsUserRegistered(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(true);
 
             HomeController homeController = new HomeController(_memeberShipService);
-            CompleteLoginModel beginLoginModel = new CompleteLoginModel { UserName = string.Empty };
+            CompleteLoginModel beginLoginModel = new CompleteLoginModel { UserName = "UserName" };
 
             ViewResult result = homeController.CompletedLogin(beginLoginModel) as ViewResult;
 
@@ -206,9 +235,13 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompleteRegisterExceptionThrown()
         {
-            _memeberShipService.Expect(s => s.AuthenticateUser(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+            _memeberShipService.Expect(s => s.CompleteRegisteration(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
             HomeController homeController = new HomeController(_memeberShipService);
-            CompleteRegisterModel registerModel = new CompleteRegisterModel();
+            CompleteRegisterModel registerModel = new CompleteRegisterModel
+                                                  {
+                                                      UserName = "username",
+                                                      DeviceResponse = "DeviceResponse"
+                                                  };
 
             ViewResult result = homeController.CompleteRegister(registerModel) as ViewResult;
 

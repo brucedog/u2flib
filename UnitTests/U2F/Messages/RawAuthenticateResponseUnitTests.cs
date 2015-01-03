@@ -55,5 +55,14 @@ namespace UnitTests.Messages
             Assert.IsNotNull(signedBytes);
             Assert.IsTrue(signedBytes.Length > 0);
         }
+
+        [TestMethod]
+        public void RawAuthenticateResponse_Equals()
+        {
+            RawAuthenticateResponse rawAuthenticateResponse1 = RawAuthenticateResponse.FromBase64(_authenticateResponse.SignatureData);
+            RawAuthenticateResponse rawAuthenticateResponse = RawAuthenticateResponse.FromBase64(_authenticateResponse.SignatureData);
+
+            Assert.IsTrue(rawAuthenticateResponse1.Equals(rawAuthenticateResponse));
+        }
     }
 }

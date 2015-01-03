@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using DemoU2FSite.Models;
 using DemoU2FSite.Repository;
 using u2flib;
-using u2flib.Data;
 using u2flib.Data.Messages;
 using DeviceRegistration = u2flib.Data.DeviceRegistration;
 

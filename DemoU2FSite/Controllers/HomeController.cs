@@ -97,7 +97,7 @@ namespace DemoU2FSite.Controllers
         [System.Web.Mvc.AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            return View("Register");
         }
 
         [System.Web.Mvc.HttpPost]
