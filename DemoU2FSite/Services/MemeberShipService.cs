@@ -11,37 +11,100 @@ namespace DemoU2FSite.Services
 {
     public class MemeberShipService : IMemeberShipService
     {
-        private IDataContext _dataContext;
+        private readonly IUserRepository _userRepository;
         private const string DemoAppId = "http://localhost:52701";
 
-        public MemeberShipService(IDataContext dataContext)
+        public MemeberShipService(IUserRepository userRepository)
         {
-            _dataContext = dataContext;
+            _userRepository = userRepository;
         }
 
-        public bool IsUserRegistered(string userName, string password)
+        #region IMemeberShipService methods
+
+        public ServerRegisterResponse GenerateServerRegistration(string userName, string password)
         {
-            //   string hashedPassword = HashPassword(password);
-            return _dataContext.Users.Any(w => w.Name.Equals(userName.Trim()));
+            StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
+            string hashedPassword = HashPassword(password);
+
+            _userRepository.AddUser(userName, hashedPassword);
+            _userRepository.AddAuthenticationRequest(userName, startedRegistration.AppId, startedRegistration.Challenge, startedRegistration.Version);
+
+            return new ServerRegisterResponse
+            {
+                AppId = startedRegistration.AppId,
+                Challenge = startedRegistration.Challenge,
+                Version = startedRegistration.Version
+            };
         }
 
-        private string HashPassword(string password)
+        public void CompleteRegistration(string userName, string deviceResponse)
         {
-            // TODO salt password
-            byte[] bytes = new byte[password.Length*sizeof (char)];
-            Buffer.BlockCopy(password.ToCharArray(), 0, bytes, 0, bytes.Length);
-            var hasher = SHA256Managed.Create();
-            var results = hasher.ComputeHash(bytes);
+            RegisterResponse registerResponse = RegisterResponse.FromJson(deviceResponse);
 
-            return Convert.ToBase64String(results);
+            var user = _userRepository.FindUser(userName);
+
+            if (user == null || user.AuthenticationRequest == null)
+                return;
+
+            StartedRegistration startedRegistration = new StartedRegistration(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId);
+            DeviceRegistration registration = U2F.FinishRegistration(startedRegistration, registerResponse);
+            
+            _userRepository.RemoveUsersAuthenticationRequest(userName);
+            _userRepository.AddDeviceRegistration(userName, registration.AttestationCert, registration.Counter, registration.KeyHandle, registration.PublicKey);
+        }
+
+        public bool AuthenticateUser(string userName, string deviceResponse)
+        {
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(deviceResponse))
+                return false;
+            
+            User user = _userRepository.FindUser(userName);
+            if (user == null)
+                return false;
+
+            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(deviceResponse);
+
+            byte[] keyHandle = Base64StringToByteArray(authenticateResponse.KeyHandle);
+            var device = user.DeviceRegistrations.FirstOrDefault(f => f.KeyHandle.Equals(keyHandle));
+
+            if (device == null || user.AuthenticationRequest == null)
+                return false;
+
+            DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
+
+            StartedAuthentication authentication = new StartedAuthentication(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId, user.AuthenticationRequest.KeyHandle);
+
+            U2F.FinishAuthentication(authentication, authenticateResponse, registration);
+            
+            _userRepository.RemoveUsersAuthenticationRequest(user.Name);
+            _userRepository.UpdateDeviceCounter(user.Name, device.PublicKey, registration.Counter);
+
+            return true;
+        }
+
+        public bool IsUserRegistered(string userName)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+                return false;
+
+            User user = _userRepository.FindUser(userName);
+
+            if (user == null)
+                return false;
+
+            return user.DeviceRegistrations.Count > 0;
         }
 
         public ServerChallenge GenerateServerChallenge(string userName)
         {
-            var user = _dataContext.Users.FirstOrDefault(w => w.Name.Equals(userName));
+            if (string.IsNullOrWhiteSpace(userName))
+                return null;
+
+            User user = _userRepository.FindUser(userName);
 
             if (user == null)
                 return null;
+
             // TODO  this would have to change 
             var device = user.DeviceRegistrations.FirstOrDefault();
 
@@ -50,107 +113,36 @@ namespace DemoU2FSite.Services
 
             DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
             StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
-            user.AuthenticationRequest = new AuthenticationRequest
-                                         {
-                                             AppId = startedAuthentication.AppId,
-                                             Challenge = startedAuthentication.Challenge,
-                                             KeyHandle = startedAuthentication.KeyHandle
-                                         };
-            _dataContext.SaveChanges();
+
+            _userRepository.SaveUserAuthenticationRequest(userName, startedAuthentication.AppId, startedAuthentication.Challenge,
+                                                          startedAuthentication.KeyHandle);
+            
 
             return new ServerChallenge
-                   {
-                       AppId = startedAuthentication.AppId,
-                       Challenge = startedAuthentication.Challenge,
-                       KeyHandle = startedAuthentication.KeyHandle,
-                       Version = startedAuthentication.Version
-                   };
+            {
+                AppId = startedAuthentication.AppId,
+                Challenge = startedAuthentication.Challenge,
+                KeyHandle = startedAuthentication.KeyHandle,
+                Version = startedAuthentication.Version
+            };
         }
 
-        public bool HasChallengeForUser(string userName)
+        public bool IsValidUserNameAndPassword(string userName, string password)
         {
-            return _dataContext.Users.Any(w => w.Name.Equals(userName.Trim())
-                && w.DeviceRegistrations != null);
-        }
-
-        public bool AuthenticateUser(string userName, string deviceResponse)
-        {
-            var user = _dataContext.Users.FirstOrDefault(w => w.Name.Equals(userName));
-                
-            if(user == null)
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
                 return false;
 
-            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(deviceResponse);
-            byte[] keyHandle = Base64StringToByteArray(authenticateResponse.KeyHandle);
-            // TODO get matching keyhandle
-            var device = user.DeviceRegistrations.FirstOrDefault();
+            User user = _userRepository.FindUser(userName);
 
-            if (device == null || user.AuthenticationRequest == null)
+            if (user == null)
                 return false;
 
-            DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
-            
-            StartedAuthentication authentication = new StartedAuthentication(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId, user.AuthenticationRequest.KeyHandle);
-            
-            U2F.FinishAuthentication(authentication, authenticateResponse, registration);
-            
-            user.AuthenticationRequest = null;
-            _dataContext.SaveChanges();
-
-            return true;
-        }
-
-        public ServerRegisterResponse GenerateServerRegisteration(string userName, string password)
-        {
-            StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
             string hashedPassword = HashPassword(password);
-            _dataContext.Users.Add(new User
-                                   {
-                                       Name = userName,
-                                       Password = hashedPassword,
-                                       CreatedOn = DateTime.Now,
-                                       UpdatedOn = DateTime.Now,
-                                       AuthenticationRequest = new AuthenticationRequest
-                                                               {
-                                                                   AppId = startedRegistration.AppId,
-                                                                   Challenge = startedRegistration.Challenge,
-                                                                   Version = startedRegistration.Version
-                                                               }
-                                   });
-            _dataContext.SaveChanges();
 
-            return new ServerRegisterResponse
-                   {
-                       AppId = startedRegistration.AppId,
-                       Challenge = startedRegistration.Challenge,
-                       Version = startedRegistration.Version
-                   };
+            return user.Password.Equals(hashedPassword);
         }
 
-        public void CompleteRegisteration(string userName, string deviceResponse)
-        {
-            RegisterResponse registerResponse = RegisterResponse.FromJson(deviceResponse);
-
-            var user = _dataContext.Users.FirstOrDefault(w => w.Name.Equals(userName));
-
-            if (user == null && user.AuthenticationRequest == null)
-                return;
-
-            StartedRegistration startedRegistration = new StartedRegistration(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId);
-            DeviceRegistration registration = U2F.FinishRegistration(startedRegistration, registerResponse);
-
-            user.UpdatedOn = DateTime.Now;
-            user.AuthenticationRequest = null;
-            user.DeviceRegistrations.Add(new Repository.DeviceRegistration
-                                         {
-                                             AttestationCert = registration.AttestationCert,
-                                             Counter = registration.Counter,
-                                             CreatedOn = DateTime.Now,
-                                             KeyHandle = registration.KeyHandle,
-                                             PublicKey = registration.PublicKey
-                                         });
-            _dataContext.SaveChanges();
-        }
+        #endregion
 
         private byte[] Base64StringToByteArray(string input)
         {
@@ -164,6 +156,17 @@ namespace DemoU2FSite.Services
             }
 
             return Convert.FromBase64String(input);
+        }
+
+        private string HashPassword(string password)
+        {
+            // TODO salt password
+            byte[] bytes = new byte[password.Length * sizeof(char)];
+            Buffer.BlockCopy(password.ToCharArray(), 0, bytes, 0, bytes.Length);
+            var hasher = SHA256Managed.Create();
+            var results = hasher.ComputeHash(bytes);
+
+            return Convert.ToBase64String(results);
         }
     }
 }

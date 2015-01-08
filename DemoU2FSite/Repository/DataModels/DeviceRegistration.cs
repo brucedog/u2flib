@@ -12,6 +12,8 @@ namespace DemoU2FSite.Repository
 
         public DateTime CreatedOn { get; set; }
 
+        public DateTime UpdatedOn { get; set; }
+
         public byte[] KeyHandle { get; set; }
 
         public byte[] PublicKey { get; set; }

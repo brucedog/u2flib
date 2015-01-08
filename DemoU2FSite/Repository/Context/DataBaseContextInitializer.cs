@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 
-namespace DemoU2FSite.Repository
+namespace DemoU2FSite.Repository.Context
 {
     public class DataBaseContextInitializer : DropCreateDatabaseAlways<DataContext>    
     {

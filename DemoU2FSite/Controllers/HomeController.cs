@@ -34,7 +34,8 @@ namespace DemoU2FSite.Controllers
         public ActionResult BeginLogin(BeginLoginModel model)
         {
             if ((string.IsNullOrWhiteSpace(model.UserName) || string.IsNullOrWhiteSpace(model.Password))||
-                !_memeberShipService.IsUserRegistered(model.UserName.Trim(), model.Password.Trim()))
+                (!_memeberShipService.IsUserRegistered(model.UserName.Trim())
+                && !_memeberShipService.IsValidUserNameAndPassword(model.UserName.Trim(), model.Password.Trim())))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("CustomError", "User has not been registered");
@@ -69,7 +70,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CompletedLogin(CompleteLoginModel model)
         {
-            if (!_memeberShipService.IsUserRegistered(model.UserName.Trim(), string.Empty))
+            if (!_memeberShipService.IsUserRegistered(model.UserName.Trim()))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("", "User has not been registered");
@@ -109,7 +110,7 @@ namespace DemoU2FSite.Controllers
                 && !string.IsNullOrWhiteSpace(value.UserName)
                 && value.Password.Equals(value.ConfirmPassword))
             {
-                ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerRegisteration(value.UserName.Trim(), value.Password.Trim());
+                ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerRegistration(value.UserName.Trim(), value.Password.Trim());
                 CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
@@ -135,7 +136,7 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    _memeberShipService.CompleteRegisteration(value.UserName.Trim(), value.DeviceResponse.Trim());
+                    _memeberShipService.CompleteRegistration(value.UserName.Trim(), value.DeviceResponse.Trim());
 
                     return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName});
                 }

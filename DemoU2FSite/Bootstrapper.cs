@@ -1,6 +1,6 @@
 using System.Web.Mvc;
-using DemoU2FSite.Controllers;
 using DemoU2FSite.Repository;
+using DemoU2FSite.Repository.Context;
 using DemoU2FSite.Services;
 using Microsoft.Practices.Unity;
 using Unity.Mvc4;
@@ -31,7 +31,7 @@ namespace DemoU2FSite
         {
             container.RegisterType<IMemeberShipService, MemeberShipService>();
             container.RegisterType<IDataContext, DataContext>();
-
+            container.RegisterType<IUserRepository, UserRepository>();
         }
     }
 }
