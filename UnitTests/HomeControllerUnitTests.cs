@@ -4,7 +4,6 @@ using DemoU2FSite.Controllers;
 using DemoU2FSite.Models;
 using DemoU2FSite.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Org.BouncyCastle.Bcpg;
 using Rhino.Mocks;
 
 namespace UnitTests

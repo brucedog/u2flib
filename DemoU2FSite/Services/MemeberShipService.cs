@@ -65,7 +65,8 @@ namespace DemoU2FSite.Services
             AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(deviceResponse);
 
             byte[] keyHandle = Base64StringToByteArray(authenticateResponse.KeyHandle);
-            var device = user.DeviceRegistrations.FirstOrDefault(f => f.KeyHandle.Equals(keyHandle));
+
+            var device = user.DeviceRegistrations.FirstOrDefault();
 
             if (device == null || user.AuthenticationRequest == null)
                 return false;

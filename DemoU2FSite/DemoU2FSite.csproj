@@ -134,6 +134,11 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Migrations\201501090026319_InitialCreate.cs" />
+    <Compile Include="Migrations\201501090026319_InitialCreate.Designer.cs">
+      <DependentUpon>201501090026319_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ServerRegisterResponse.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Repository\DataModels\AuthenticationRequest.cs" />
@@ -224,6 +229,11 @@
       <Project>{98777070-04C9-442D-8E60-4E0B1E7FCDBF}</Project>
       <Name>u2flib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201501090026319_InitialCreate.resx">
+      <DependentUpon>201501090026319_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -114,6 +114,7 @@ namespace DemoU2FSite.Repository
                 AttestationCert = attestationCert,
                 Counter = counter,
                 CreatedOn = DateTime.Now,
+                UpdatedOn = DateTime.Now,
                 KeyHandle = keyHandle,
                 PublicKey = publicKey
             });
