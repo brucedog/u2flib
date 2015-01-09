@@ -279,7 +279,7 @@ namespace UnitTests
         public void HomeController_CompleteRegisterWithUsernameAndDeviceToken()
         {
             _memeberShipService.Expect(
-                e => e.CompleteRegistration(Arg<string>.Is.Equal("tester"), Arg<string>.Is.Equal("notreallydevicetoken")));
+                e => e.CompleteRegistration(Arg<string>.Is.Equal("tester"), Arg<string>.Is.Equal("notreallydevicetoken"))).Return(true);
             HomeController homeController = new HomeController(_memeberShipService);
             CompleteRegisterModel registerModel = new CompleteRegisterModel
                                                   {

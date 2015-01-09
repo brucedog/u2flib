@@ -17,7 +17,7 @@ namespace DemoU2FSite.Services
         /// </summary>
         /// <param name="userName">Name of the user.</param>
         /// <param name="deviceResponse">The device response.</param>
-        void CompleteRegistration(string userName, string deviceResponse);
+        bool CompleteRegistration(string userName, string deviceResponse);
 
         /// <summary>
         /// Authenticates the user.

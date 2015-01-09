@@ -23,6 +23,9 @@ namespace DemoU2FSite.Services
 
         public ServerRegisterResponse GenerateServerRegistration(string userName, string password)
         {
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
+                return null;
+
             StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
             string hashedPassword = HashPassword(password);
 
@@ -37,20 +40,25 @@ namespace DemoU2FSite.Services
             };
         }
 
-        public void CompleteRegistration(string userName, string deviceResponse)
+        public bool CompleteRegistration(string userName, string deviceResponse)
         {
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(deviceResponse))
+                return false;
+
             RegisterResponse registerResponse = RegisterResponse.FromJson(deviceResponse);
 
             var user = _userRepository.FindUser(userName);
 
             if (user == null || user.AuthenticationRequest == null)
-                return;
+                return false;
 
             StartedRegistration startedRegistration = new StartedRegistration(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId);
             DeviceRegistration registration = U2F.FinishRegistration(startedRegistration, registerResponse);
             
             _userRepository.RemoveUsersAuthenticationRequest(userName);
             _userRepository.AddDeviceRegistration(userName, registration.AttestationCert, registration.Counter, registration.KeyHandle, registration.PublicKey);
+
+            return true;
         }
 
         public bool AuthenticateUser(string userName, string deviceResponse)

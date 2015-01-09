@@ -1,8 +1,11 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using DemoU2FSite.Repository;
 using DemoU2FSite.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
+using u2flib.Data.Messages;
+using u2flib.Util;
 
 namespace UnitTests
 {
@@ -10,13 +13,40 @@ namespace UnitTests
     public class MemeberShipServiceUnitTests
     {
         private IUserRepository _userRepository;
-        private string RegisterResponseFromJson = "{\"registrationData\":\"WsSzzqUMR24NpaOPmQfiTX8nUMssX0XwruXEXWXq7iDQ106q196wMrNPIFLIclOPHkPiGuXaPCn77DQDiWE5xLb2QNhW2P_yJ4HBUaBqGl9svpLIN5zMYWnwgdDkeOzKfAu0f40QmMpBW2bdX5pRRK7frMKBDLUI0aWD8EbCVq4GnrgwggIbMIIBBaADAgECAgR1o_Z1MXsGCSqGSIb3DQEBCzAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwAwPJAwMFowKjEoMCYGA1UEAwwfWXViaWNvIFUyRiBFRSBTZXJpYWwgMTk3MzY3OTczMzBFMBMGByqGSM49AgEGCCqGSM49AwEHA0IABBmjfkNqa2mXzVh2ZxuES5coCvvENxDMDLmfd-0ACG0Fu7wR4ZTjKd9KAuidySpfona5csGmlM0Te_Zu35h_vvujEjAQMA4GCisGAQQBgsQKAQIEADALBgkqhkiG9w0BAQsDggEBAb0tuI0-CzSxIp4cAlyD6UyT4cKyJZGVhWdtPgj_mWepT3Tu9jXtdgA5F3jfZtTc2eGxuS-PPvqRAkZd40AXgM8A0YaXPwlT4s0RUTY9Y8aAQzQZeAHuZk3lKKd_PPCg5077dzdt90lC5eVTEduj6cOnHEqnOr2Cv75FuiQXX7QkGQxtoD-otgvhZ2Fjk29o7Iy9ik7ewHGXOfoVw_ruGWi0YfXBTuqEJ6H666vvMN4BZWHtzhC0k5ceQslB9Xdntky-GQgDqHGkBf32GKwAFT9JJrkO2BfsB-wfBrTiHr0AABYNTNKTceA5dtR3UVpI492VUWQbY3VwWUUfKTI7fM4wRAIgJsly62P1LFpNzXMU4Dq8aedEDXBFaZG0-J3kumgmK3cCIAF6S-1ZratDwLoCs8d4wgSAaoLU8yrKOmQ0La1riaxo\",\"challenge\":\"dQoKOvQ1Oq-oKHPawoaQrBJ-AfRu1o1l6v63Rz6CIq4\",\"version\":\"U2F_V2\",\"appId\":\"http://localhost:52701\",\"clientData\":\"eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZmluaXNoRW5yb2xsbWVudCIsImNoYWxsZW5nZSI6ImBb0hJdlExT3Etb0tIUGF3c2FRckJKLUFmUnAxbzFsNnY2M1J6NkhScTQiLCJvcmlnaW4iOiJodBJwOi8vbG9jCIxob3N0OjUyNzAxIiwiY2lkX3B1YmtleSI6IiJ9\"}";
-        private string AuthenticateResponseFromJson = "{\"keyHandle\":\"1jzoZLnuWs781OqcyS7dtCjTXkndq2Rm9803B_0EqjDyeJDVjN7ZZeWAz77347TsoRqKIxGLgux_20hs-PiRMQ\",\"clientData\":\"eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZ2V0QXNzZ1J0aW9uIiwiY2hhbGxlbmdlIjoiOTNXUDNzSGZmLTY4X3VVaDJCWkpCMmVZMXg2cERkVW5sMVNOTFVLeUQ1NCIsIm9yaWdVTiI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTI3MDEiLCJjaWRfcHVia2V5IjoiIn0\",\"signatureData\":\"AQNDACAwRAIgGZRu0ChUxDAXjtBpiQDgQdkBiI5RA5mCZswWuqBVT-sCIGksC1M8bVho0g2K06ikPOnmUmKR15MCxepEHGpIpPJE\"}";
-        
+        private RegisterResponse _registerResponse;
+        private RawRegisterResponse _rawAuthenticateResponse;
+        private u2flib.Data.DeviceRegistration _deviceRegistration;
+        private AuthenticateResponse _authenticateResponse;
+        private User _user;
+        private StartedRegistration _startedRegistration;
+        private StartedAuthentication _startedAuthentication;
+
         [TestInitialize]
         public void SetUp()
         {
+            CreateResponses();
             _userRepository = MockRepository.GenerateMock<IUserRepository>();
+            _user = new User
+                {
+                    Name = "test",
+                    Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=",
+                    DeviceRegistrations = new Collection<DeviceRegistration>
+                        {
+                            new DeviceRegistration
+                                {
+                                    KeyHandle = _deviceRegistration.KeyHandle,
+                                    PublicKey = _deviceRegistration.PublicKey,
+                                    AttestationCert = _deviceRegistration.AttestationCert,
+                                    Counter = _deviceRegistration.Counter
+                                }
+                        },
+                    AuthenticationRequest = new AuthenticationRequest
+                        {
+                            AppId = "test",
+                            KeyHandle = _authenticateResponse.KeyHandle,
+                            Challenge = _authenticateResponse.GetClientData().Challenge
+                        }
+                };
         }
 
         [TestMethod]
@@ -25,6 +55,151 @@ namespace UnitTests
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
 
             Assert.IsNotNull(memeberShipService);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerChallengeSucess()
+        {
+            _userRepository.Expect(e => e.FindUser("test")).Return(_user);
+            _userRepository.Expect(
+                e =>
+                e.SaveUserAuthenticationRequest(Arg<string>.Is.Equal("test"), Arg<string>.Is.Anything, Arg<string>.Is.Anything,
+                                                Arg<string>.Is.Anything));
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerChallenge("test");
+
+            Assert.IsNotNull(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerChallengeNoDeviceFound()
+        {
+            _userRepository.Expect(e => e.FindUser("test")).Return(new User { DeviceRegistrations = new Collection<DeviceRegistration>() });
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerChallenge("test");
+
+            Assert.IsNull(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerChallengeNoUserFound()
+        {
+            _userRepository.Expect(e => e.FindUser("test")).Return(null);
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerChallenge("test");
+
+            Assert.IsNull(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerChallengeNoUsername()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerChallenge("");
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerRegistration()
+        {
+            _userRepository.Expect(e => e.AddUser(Arg<string>.Is.Equal("test"), Arg<string>.Is.Anything));
+            _userRepository.Expect(e => e.AddAuthenticationRequest(Arg<string>.Is.Equal("test"), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerRegistration("test", "password");
+
+            Assert.IsNotNull(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerRegistrationNoPassword()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerRegistration("test", "");
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_GenerateServerRegistrationNoUserName()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.GenerateServerRegistration("", "password");
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_CompleteRegistrationSucess()
+        {
+            DeviceRegistration deviceRegistration = _user.DeviceRegistrations.First();
+            _user.AuthenticationRequest.Challenge = _startedRegistration.Challenge;
+            _user.AuthenticationRequest.AppId = _startedRegistration.AppId;
+            
+            _userRepository.Expect(e => e.FindUser("test")).Return(_user);
+            _userRepository.Expect(e => e.RemoveUsersAuthenticationRequest("test"));
+            _userRepository.AddDeviceRegistration("Test", deviceRegistration.AttestationCert, deviceRegistration.Counter, deviceRegistration.KeyHandle, deviceRegistration.PublicKey);
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.CompleteRegistration("test", _registerResponse.ToJson());
+
+            Assert.IsTrue(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_CompleteRegistrationNoUserFound()
+        {
+            _userRepository.Expect(e => e.FindUser("test")).Return(null);
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
+
+            Assert.IsFalse(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_CompleteRegistrationUserFoundWithNoAuthenticationRequest()
+        {
+            _userRepository.Expect(e => e.FindUser("test")).Return(new User());
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
+
+            Assert.IsFalse(result);
+            _userRepository.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_CompleteRegistrationNoDeviceResponse()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.CompleteRegistration("test", "");
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_CompleteRegistrationNoUserName()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.CompleteRegistration("", "nothing");
+
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
@@ -74,23 +249,106 @@ namespace UnitTests
             _userRepository.VerifyAllExpectations();
         }
 
-        [Ignore]
+        [TestMethod]
+        public void MemeberShipService_AuthenticateUserNoUserName()
+        {
+            CreateResponses();
+
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.AuthenticateUser("", _authenticateResponse.ToJson());
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_AuthenticateUserNoDeviceResponse()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.AuthenticateUser("test", null);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_AuthenticateUserNoUserFound()
+        {
+            _userRepository.Stub(s => s.FindUser(Arg<string>.Is.Equal("test"))).Return(null);
+
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_AuthenticateUserNoDeviceFound()
+        {
+            _userRepository.Stub(s => s.FindUser(Arg<string>.Is.Equal("test"))).Return(new User{DeviceRegistrations = new Collection<DeviceRegistration>()});
+
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_AuthenticateUserNoAuthenticationRequestFound()
+        {
+            _userRepository.Stub(s => s.FindUser(Arg<string>.Is.Equal("test"))).Return(new User
+            {
+                DeviceRegistrations = new Collection<DeviceRegistration>
+                            {
+                                new DeviceRegistration
+                                    {
+                                        KeyHandle = _deviceRegistration.KeyHandle,
+                                        PublicKey = _deviceRegistration.PublicKey,
+                                        AttestationCert = _deviceRegistration.AttestationCert,
+                                        Counter = _deviceRegistration.Counter
+                                    }
+                            }
+            });
+
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
+
+            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+
+            Assert.IsFalse(result);
+        }
+
         [TestMethod]
         public void MemeberShipService_AuthenticateUser()
         {
             _userRepository.Expect(e => e.FindUser(Arg<string>.Is.Equal("test"))).Return(
                 new User
-                {
-                    Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=",
-                    DeviceRegistrations = new Collection<DeviceRegistration>
-                                          {
-                                              new DeviceRegistration()
-                                          }
-                });
+                    {
+                        Name = "test",
+                        Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=",
+                        DeviceRegistrations = new Collection<DeviceRegistration>
+                            {
+                                new DeviceRegistration
+                                    {
+                                        KeyHandle = _deviceRegistration.KeyHandle,
+                                        PublicKey = _deviceRegistration.PublicKey,
+                                        AttestationCert = _deviceRegistration.AttestationCert,
+                                        Counter = _deviceRegistration.Counter
+                                    }
+                            },
+                        AuthenticationRequest = new AuthenticationRequest
+                            {
+                                AppId = "test",
+                                KeyHandle = _authenticateResponse.KeyHandle,
+                                Challenge = _authenticateResponse.GetClientData().Challenge
+                            }
+                    });
+            _userRepository.Expect(e => e.RemoveUsersAuthenticationRequest(Arg<string>.Is.Equal("test")));
             _userRepository.Expect(e => e.UpdateDeviceCounter(Arg<string>.Is.Equal("test"), Arg<byte[]>.Is.Anything, Arg<uint>.Is.Anything));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository);
 
-            var result = memeberShipService.AuthenticateUser("test", AuthenticateResponseFromJson);
+            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsTrue(result);
             _userRepository.VerifyAllExpectations();
@@ -140,6 +398,22 @@ namespace UnitTests
 
             Assert.IsFalse(result);
             _userRepository.VerifyAllExpectations();
+        }
+
+        private void CreateResponses()
+        {
+            _startedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
+            _registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
+                                                                     TestConts.CLIENT_DATA_REGISTER_BASE64);
+            _rawAuthenticateResponse = RawRegisterResponse.FromBase64(_registerResponse.RegistrationData);
+            _deviceRegistration = _rawAuthenticateResponse.CreateDevice();
+
+            _authenticateResponse = new AuthenticateResponse(TestConts.CLIENT_DATA_AUTHENTICATE_BASE64,
+                                                            TestConts.SIGN_RESPONSE_DATA_BASE64,
+                                                            TestConts.KEY_HANDLE_BASE64);
+
+            _startedAuthentication = new StartedAuthentication(TestConts.SERVER_CHALLENGE_SIGN_BASE64, TestConts.APP_ID_ENROLL,
+                                          TestConts.KEY_HANDLE_BASE64);
         }
     }
 }
