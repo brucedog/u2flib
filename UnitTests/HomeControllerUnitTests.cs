@@ -4,25 +4,25 @@ using DemoU2FSite.Controllers;
 using DemoU2FSite.Models;
 using DemoU2FSite.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
+using Moq;
 
 namespace UnitTests
 {
     [TestClass]
     public class HomeControllerUnitTests
     {
-        private IMemeberShipService _memeberShipService;
+        private Mock<IMemeberShipService> _memeberShipService;
 
         [TestInitialize]
         public void Setup()
         {
-            _memeberShipService = MockRepository.GenerateMock<IMemeberShipService>();
+            _memeberShipService = new Mock<IMemeberShipService>();
         }
 
         [TestMethod]
         public void HomeController_ConstructsProperly()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
 
             Assert.IsNotNull(homeController);
         }
@@ -30,7 +30,7 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_BeginLoginNoUsername()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             BeginLoginModel beginLoginModel = new BeginLoginModel();
 
             ViewResult result = homeController.BeginLogin(beginLoginModel) as ViewResult;
@@ -44,7 +44,7 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_BeginLoginNoPassword()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             BeginLoginModel beginLoginModel = new BeginLoginModel
                                               {
                                                   UserName = "tester"
@@ -61,8 +61,8 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_BeginLoginWithUsernameAndPassword()
         {
-            _memeberShipService.Stub(s => s.IsUserRegistered(Arg<string>.Is.Equal("tester"))).Return(true);
-            _memeberShipService.Expect(s => s.GenerateServerChallenge(Arg<string>.Is.Equal("tester"))).Return(new ServerChallenge
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.Is<string>(p => p == "tester"))).Returns(true);
+            _memeberShipService.Setup(s => s.GenerateServerChallenge(It.Is<string>(p => p == "tester"))).Returns(new ServerChallenge
                                                                                                             {
                                                                                                                 AppId = "unittests",
                                                                                                                 Challenge = "notrealchallenge",
@@ -70,7 +70,7 @@ namespace UnitTests
                                                                                                                 KeyHandle = "notreallykeyhandle"
                                                                                                             });
 
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             BeginLoginModel beginLoginModel = new BeginLoginModel
             {
                 UserName = "tester",
@@ -82,13 +82,13 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishLogin", result.ViewName);
-            _memeberShipService.VerifyAllExpectations();
+            
         }
 
         [TestMethod]
         public void HomeController_Register()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
 
             ViewResult result = homeController.Register() as ViewResult;
 
@@ -99,10 +99,10 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_BeginLoginExceptionThrown()
         {
-            _memeberShipService.Stub(s => s.GenerateServerChallenge(Arg<string>.Is.Anything)).Throw(new Exception());
-            _memeberShipService.Stub(s => s.IsUserRegistered(Arg<string>.Is.Anything)).Return(true);
+            _memeberShipService.Setup(s => s.GenerateServerChallenge(It.IsAny<string>())).Throws(new Exception());
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.IsAny<string>())).Returns(true);
 
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             BeginLoginModel beginLoginModel = new BeginLoginModel { UserName = "UserName", Password = "Password"};
 
             ViewResult result = homeController.BeginLogin(beginLoginModel) as ViewResult;
@@ -115,10 +115,10 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompletedLoginExceptionThrown()
         {
-            _memeberShipService.Expect(s => s.AuthenticateUser(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
-            _memeberShipService.Stub(s => s.IsUserRegistered(Arg<string>.Is.Anything)).Return(true);
+            _memeberShipService.Setup(s => s.AuthenticateUser(It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.IsAny<string>())).Returns(true);
 
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteLoginModel beginLoginModel = new CompleteLoginModel { UserName = "UserName" };
 
             ViewResult result = homeController.CompletedLogin(beginLoginModel) as ViewResult;
@@ -131,9 +131,9 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompletedLoginNoUsername()
         {
-            _memeberShipService.Expect(s => s.IsUserRegistered(Arg<string>.Is.Anything)).Return(false);
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.IsAny<string>())).Returns(false);
 
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteLoginModel beginLoginModel = new CompleteLoginModel{UserName = string.Empty};
 
             ViewResult result = homeController.CompletedLogin(beginLoginModel) as ViewResult;
@@ -141,16 +141,16 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsFalse(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishLogin", result.ViewName);
-            _memeberShipService.VerifyAllExpectations();
+            
         }
 
         [TestMethod]
         public void HomeController_CompletedLoginWithUsername()
         {
-            _memeberShipService.Stub(s => s.IsUserRegistered(Arg<string>.Is.Equal("tester"))).Return(true);
-            _memeberShipService.Expect(s => s.AuthenticateUser(Arg<string>.Is.Equal("tester"), Arg<string>.Is.Equal("notrealdeviceresponse"))).Return(true);
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.Is<string>(p => p == "tester"))).Returns(true);
+            _memeberShipService.Setup(s => s.AuthenticateUser(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "notrealdeviceresponse"))).Returns(true);
 
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteLoginModel beginLoginModel = new CompleteLoginModel
                                                  {
                                                      UserName = "tester",
@@ -162,13 +162,13 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("CompletedLogin", result.ViewName);
-            _memeberShipService.VerifyAllExpectations();
+            
         }
 
         [TestMethod]
         public void HomeController_BeginRegisterNoPasswordOrUsername()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             RegisterModel registerModel = new RegisterModel();
 
             ViewResult result = homeController.BeginRegister(registerModel) as ViewResult;
@@ -181,7 +181,7 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_BeginRegisterBadMatchPasswordsAndUsername()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             RegisterModel registerModel = new RegisterModel
                                           {
                                               UserName = "tester",
@@ -199,10 +199,10 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_BeginRegisterPasswordsAndUsername()
         {
-            _memeberShipService.Expect(
-                e => e.GenerateServerRegistration(Arg<string>.Is.Equal("tester"), Arg<string>.Is.Equal("password")))
-                .Return(new ServerRegisterResponse());
-            HomeController homeController = new HomeController(_memeberShipService);
+            _memeberShipService.Setup(
+                e => e.GenerateServerRegistration(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "password")))
+                .Returns(new ServerRegisterResponse());
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             RegisterModel registerModel = new RegisterModel
             {
                 UserName = "tester",
@@ -215,13 +215,13 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishRegister", result.ViewName);
-            _memeberShipService.VerifyAllExpectations();
+            
         }
 
         [TestMethod]
         public void HomeController_CompleteRegisterNoDeviceTokenOrUsername()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteRegisterModel registerModel = new CompleteRegisterModel();
 
             ViewResult result = homeController.CompleteRegister(registerModel) as ViewResult;
@@ -234,8 +234,8 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompleteRegisterExceptionThrown()
         {
-            _memeberShipService.Expect(s => s.CompleteRegistration(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
-            HomeController homeController = new HomeController(_memeberShipService);
+            _memeberShipService.Setup(s => s.CompleteRegistration(It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteRegisterModel registerModel = new CompleteRegisterModel
                                                   {
                                                       UserName = "username",
@@ -252,7 +252,7 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompleteRegisterWithDeviceTokenNoUsername()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteRegisterModel registerModel = new CompleteRegisterModel{DeviceResponse = "notrealdevicetoken"};
 
             ViewResult result = homeController.CompleteRegister(registerModel) as ViewResult;
@@ -265,7 +265,7 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompleteRegisterWithUsernameNoDeviceToken()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteRegisterModel registerModel = new CompleteRegisterModel { UserName = "tester" };
 
             ViewResult result = homeController.CompleteRegister(registerModel) as ViewResult;
@@ -278,9 +278,9 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_CompleteRegisterWithUsernameAndDeviceToken()
         {
-            _memeberShipService.Expect(
-                e => e.CompleteRegistration(Arg<string>.Is.Equal("tester"), Arg<string>.Is.Equal("notreallydevicetoken"))).Return(true);
-            HomeController homeController = new HomeController(_memeberShipService);
+            _memeberShipService.Setup(
+                e => e.CompleteRegistration(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "notreallydevicetoken"))).Returns(true);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             CompleteRegisterModel registerModel = new CompleteRegisterModel
                                                   {
                                                       UserName = "tester",
@@ -292,13 +292,13 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("CompletedRegister", result.ViewName);
-            _memeberShipService.VerifyAllExpectations();
+            
         }
 
         [TestMethod]
         public void HomeController_Index()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             ViewResult result = homeController.Index() as ViewResult;
 
             Assert.IsNotNull(result);
@@ -308,7 +308,7 @@ namespace UnitTests
         [TestMethod]
         public void HomeController_Login()
         {
-            HomeController homeController = new HomeController(_memeberShipService);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
             ViewResult result = homeController.Login() as ViewResult;
 
             Assert.IsNotNull(result);
