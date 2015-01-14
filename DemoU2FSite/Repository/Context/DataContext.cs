@@ -38,10 +38,10 @@ namespace DemoU2FSite.Repository
             }
         }
 
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
-        public DbSet<DeviceRegistration> Devices { get; set; }
+        public virtual DbSet<DeviceRegistration> Devices { get; set; }
 
-        public DbSet<AuthenticationRequest> AuthenticationRequests { get; set; }
+        public virtual DbSet<AuthenticationRequest> AuthenticationRequests { get; set; }
     }
 }

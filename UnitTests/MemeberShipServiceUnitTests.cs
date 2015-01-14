@@ -70,6 +70,10 @@ namespace UnitTests
             var result = memeberShipService.GenerateServerChallenge("test");
 
             Assert.IsNotNull(result);
+            _userRepository.Verify(
+                e =>
+                e.SaveUserAuthenticationRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -81,6 +85,7 @@ namespace UnitTests
             var result = memeberShipService.GenerateServerChallenge("test");
 
             Assert.IsNull(result);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -92,6 +97,7 @@ namespace UnitTests
             var result = memeberShipService.GenerateServerChallenge("test");
 
             Assert.IsNull(result);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -114,6 +120,7 @@ namespace UnitTests
             var result = memeberShipService.GenerateServerRegistration("test", "password");
 
             Assert.IsNotNull(result);
+            _userRepository.Verify(e => e.AddAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -151,7 +158,8 @@ namespace UnitTests
             var result = memeberShipService.CompleteRegistration("test", _registerResponse.ToJson());
 
             Assert.IsTrue(result);
-             
+            _userRepository.Verify(e => e.RemoveUsersAuthenticationRequest("test"), Times.Once);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -163,7 +171,7 @@ namespace UnitTests
             var result = memeberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
-             
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -175,7 +183,7 @@ namespace UnitTests
             var result = memeberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
-             
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -213,7 +221,7 @@ namespace UnitTests
             var result = memeberShipService.IsUserRegistered("test");
 
             Assert.IsTrue(result);
-             
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -231,6 +239,7 @@ namespace UnitTests
             var result = memeberShipService.IsUserRegistered("");
 
             Assert.IsFalse(result);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Never);
         }
 
         [TestMethod]
@@ -242,7 +251,7 @@ namespace UnitTests
             var result = memeberShipService.IsUserRegistered("test");
 
             Assert.IsFalse(result);
-             
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -277,6 +286,7 @@ namespace UnitTests
             var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -289,6 +299,7 @@ namespace UnitTests
             var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -313,6 +324,7 @@ namespace UnitTests
             var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
@@ -347,7 +359,8 @@ namespace UnitTests
             var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsTrue(result);
-             
+            _userRepository.Verify(e => e.FindUser("test"), Times.Once);
+            _userRepository.Verify(e => e.RemoveUsersAuthenticationRequest(It.Is<string>(p => p == "test")), Times.Once);
         }
 
         [TestMethod]
@@ -369,7 +382,7 @@ namespace UnitTests
             var result = memeberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
 
             Assert.IsTrue(result);
-             
+            _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);
         }
 
         [TestMethod]
@@ -381,7 +394,7 @@ namespace UnitTests
             var result = memeberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
 
             Assert.IsFalse(result);
-             
+            _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);
         }
 
         [TestMethod]
@@ -393,6 +406,7 @@ namespace UnitTests
             var result = memeberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
 
             Assert.IsFalse(result);
+            _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);
              
         }
 
