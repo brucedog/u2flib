@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
-using DemoU2FSite.Repository.Context;
+using DataModels;
 
-namespace DemoU2FSite.Repository
+namespace Repositories.Context
 {
     public class DataContext : DbContext, IDataContext
     {

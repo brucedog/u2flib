@@ -1,4 +1,6 @@
-﻿namespace DemoU2FSite.Repository
+﻿using DataModels;
+
+namespace Repositories
 {
     public interface IUserRepository
     {

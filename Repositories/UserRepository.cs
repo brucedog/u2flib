@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using DemoU2FSite.Repository.Context;
+using DataModels;
+using Repositories.Context;
 
-namespace DemoU2FSite.Repository
+namespace Repositories
 {
     public class UserRepository : IUserRepository
     {

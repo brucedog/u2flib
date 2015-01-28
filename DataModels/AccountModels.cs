@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DemoU2FSite.Models
+namespace DataModels
 {    
     public class BeginLoginModel
     {

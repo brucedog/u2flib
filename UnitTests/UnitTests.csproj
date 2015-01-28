@@ -40,10 +40,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />	
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
-	</Reference>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -72,9 +72,21 @@
     <Compile Include="UserRepositoryUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataModels\DataModels.csproj">
+      <Project>{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}</Project>
+      <Name>DataModels</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DemoU2FSite\DemoU2FSite.csproj">
       <Project>{F74640A0-E24E-4ECB-B25F-F87160F11EAC}</Project>
       <Name>DemoU2FSite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repositories\Repositories.csproj">
+      <Project>{A58F53C9-A51D-4548-A70C-3A08AA635A71}</Project>
+      <Name>Repositories</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{5D7F3587-39D8-4CC1-B693-049327688022}</Project>
+      <Name>Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\u2flib\u2flib.csproj">
       <Project>{98777070-04C9-442D-8E60-4E0B1E7FCDBF}</Project>

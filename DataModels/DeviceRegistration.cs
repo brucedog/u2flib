@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DemoU2FSite.Repository
+namespace DataModels
 {
     public class DeviceRegistration
     {

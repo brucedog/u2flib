@@ -3,7 +3,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using DemoU2FSite.Repository.Context;
+using Repositories.Context;
 
 namespace DemoU2FSite
 {

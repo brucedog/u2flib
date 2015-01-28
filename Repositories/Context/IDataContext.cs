@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
+using DataModels;
 
-namespace DemoU2FSite.Repository.Context
+namespace Repositories.Context
 {
     public interface IDataContext
     {

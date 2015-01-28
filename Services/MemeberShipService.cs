@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
-using DemoU2FSite.Models;
-using DemoU2FSite.Repository;
+using DataModels;
+using Repositories;
 using u2flib;
 using u2flib.Data.Messages;
 using DeviceRegistration = u2flib.Data.DeviceRegistration;
 
-namespace DemoU2FSite.Services
+namespace Services
 {
     public class MemeberShipService : IMemeberShipService
     {

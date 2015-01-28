@@ -1,6 +1,6 @@
-﻿using DemoU2FSite.Models;
+﻿using DataModels;
 
-namespace DemoU2FSite.Services
+namespace Services
 {
     public interface IMemeberShipService
     {

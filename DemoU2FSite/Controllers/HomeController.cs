@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Web.Http;
 using System.Web.Mvc;
-using DemoU2FSite.Models;
-using DemoU2FSite.Services;
+using DataModels;
+using Services;
 
 namespace DemoU2FSite.Controllers
 {

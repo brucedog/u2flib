@@ -1,8 +1,8 @@
 using System.Web.Mvc;
-using DemoU2FSite.Repository;
-using DemoU2FSite.Repository.Context;
-using DemoU2FSite.Services;
 using Microsoft.Practices.Unity;
+using Repositories;
+using Repositories.Context;
+using Services;
 using Unity.Mvc4;
 
 namespace DemoU2FSite

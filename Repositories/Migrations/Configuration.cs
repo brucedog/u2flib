@@ -1,11 +1,9 @@
-namespace DemoU2FSite.Migrations
-{
-    using System;
-    using System.Data.Entity;
-    using System.Data.Entity.Migrations;
-    using System.Linq;
+using System.Data.Entity.Migrations;
+using Repositories.Context;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<DemoU2FSite.Repository.DataContext>
+namespace Repositories.Migrations
+{
+    internal sealed class Configuration : DbMigrationsConfiguration<DataContext>
     {
         public Configuration()
         {
@@ -13,7 +11,7 @@ namespace DemoU2FSite.Migrations
             ContextKey = "DemoU2FSite.Repository.DataContext";
         }
 
-        protected override void Seed(DemoU2FSite.Repository.DataContext context)
+        protected override void Seed(DataContext context)
         {
             //  This method will be called after migrating to the latest version.
 

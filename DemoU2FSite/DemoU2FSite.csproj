@@ -45,10 +45,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
+	<Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -134,28 +135,10 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Migrations\201501090026319_InitialCreate.cs" />
-    <Compile Include="Migrations\201501090026319_InitialCreate.Designer.cs">
-      <DependentUpon>201501090026319_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\ServerRegisterResponse.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Repository\DataModels\AuthenticationRequest.cs" />
-    <Compile Include="Repository\Context\DataBaseContextInitializer.cs" />
-    <Compile Include="Repository\Context\DataContext.cs" />
-    <Compile Include="Repository\DataModels\DeviceRegistration.cs" />
-    <Compile Include="Repository\Context\IDataContext.cs" />
-    <Compile Include="Repository\DataModels\User.cs" />
-    <Compile Include="Repository\IUserRepository.cs" />
-    <Compile Include="Repository\UserRepository.cs" />
-    <Compile Include="Services\IMemeberShipService.cs" />
-    <Compile Include="Services\MemeberShipService.cs" />
-    <Compile Include="Models\ServerChallenge.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -225,15 +208,22 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataModels\DataModels.csproj">
+      <Project>{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}</Project>
+      <Name>DataModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repositories\Repositories.csproj">
+      <Project>{A58F53C9-A51D-4548-A70C-3A08AA635A71}</Project>
+      <Name>Repositories</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{5D7F3587-39D8-4CC1-B693-049327688022}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\u2flib\u2flib.csproj">
       <Project>{98777070-04C9-442D-8E60-4E0B1E7FCDBF}</Project>
       <Name>u2flib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201501090026319_InitialCreate.resx">
-      <DependentUpon>201501090026319_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

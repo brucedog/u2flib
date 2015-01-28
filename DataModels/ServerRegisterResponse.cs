@@ -1,4 +1,4 @@
-namespace DemoU2FSite.Models
+namespace DataModels
 {
     public class ServerRegisterResponse
     {

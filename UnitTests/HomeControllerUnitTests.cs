@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Web.Mvc;
+using DataModels;
 using DemoU2FSite.Controllers;
-using DemoU2FSite.Models;
-using DemoU2FSite.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Services;
 
 namespace UnitTests
 {
