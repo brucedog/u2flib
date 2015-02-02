@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Web.Http;
 using System.Web.Mvc;
+using BaseLibrary;
 using DataModels;
-using Services;
 
 namespace DemoU2FSite.Controllers
 {
     public class HomeController : Controller
     {
-        private const string DemoAppId = "http://localhost:52701";
         private readonly IMemeberShipService _memeberShipService;
 
         public HomeController(IMemeberShipService memeberShipService)
@@ -136,7 +135,7 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    _memeberShipService.CompleteRegistration(value.UserName.Trim(), value.DeviceResponse.Trim());
+                     _memeberShipService.CompleteRegistration(value.UserName.Trim(), value.DeviceResponse.Trim());
 
                     return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName});
                 }

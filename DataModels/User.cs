@@ -19,7 +19,7 @@ namespace DataModels
 
         public DateTime UpdatedOn { get; set; }
 
-        public virtual ICollection<DeviceRegistration> DeviceRegistrations { get; set; }
+        public virtual ICollection<Device> DeviceRegistrations { get; set; }
 
         public virtual AuthenticationRequest AuthenticationRequest { get; set; }
     }

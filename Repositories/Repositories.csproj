@@ -45,8 +45,6 @@
   <ItemGroup>
     <Compile Include="Context\DataBaseContextInitializer.cs" />
     <Compile Include="Context\DataContext.cs" />
-    <Compile Include="Context\IDataContext.cs" />
-    <Compile Include="IUserRepository.cs" />
     <Compile Include="Migrations\201501090026319_InitialCreate.cs" />
     <Compile Include="Migrations\201501090026319_InitialCreate.Designer.cs">
       <DependentUpon>201501090026319_InitialCreate.cs</DependentUpon>
@@ -61,6 +59,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseLibrary\BaseLibrary.csproj">
+      <Project>{dccef63c-d4ad-4a0d-afb8-c4ae1ac693dc}</Project>
+      <Name>BaseLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataModels\DataModels.csproj">
       <Project>{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}</Project>
       <Name>DataModels</Name>

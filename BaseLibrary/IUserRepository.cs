@@ -1,6 +1,6 @@
 ﻿using DataModels;
 
-namespace Repositories
+namespace BaseLibrary
 {
     public interface IUserRepository
     {

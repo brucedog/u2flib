@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="AccountModels.cs" />
     <Compile Include="AuthenticationRequest.cs" />
-    <Compile Include="DeviceRegistration.cs" />
+    <Compile Include="Device.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerChallenge.cs" />
     <Compile Include="ServerRegisterResponse.cs" />

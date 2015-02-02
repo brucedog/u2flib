@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataModels", "DataModels\DataModels.csproj", "{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseLibrary", "BaseLibrary\BaseLibrary.csproj", "{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = u2flib.vsmdi
@@ -64,6 +66,10 @@ Global
 		{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{A58F53C9-A51D-4548-A70C-3A08AA635A71} = {EA5C2005-D8FA-4465-AE7F-A01E7D657EAD}
 		{5D7F3587-39D8-4CC1-B693-049327688022} = {EA5C2005-D8FA-4465-AE7F-A01E7D657EAD}
 		{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D} = {EA5C2005-D8FA-4465-AE7F-A01E7D657EAD}
+		{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC} = {EA5C2005-D8FA-4465-AE7F-A01E7D657EAD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data.Entity;
-using DataModels;
+﻿using System.Data.Entity;
 
 namespace Repositories.Context
 {
@@ -8,8 +6,7 @@ namespace Repositories.Context
     {
         protected override void Seed(DataContext context)
         {
-            context.Users.Add(new User {Name = "Bryce", CreatedOn = DateTime.Now, UpdatedOn = DateTime.Now});
-            context.SaveChanges();
+            // TODO  add default user here
         }
     }
 }

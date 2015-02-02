@@ -72,6 +72,10 @@
     <Compile Include="UserRepositoryUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseLibrary\BaseLibrary.csproj">
+      <Project>{DCCEF63C-D4AD-4A0D-AFB8-C4AE1AC693DC}</Project>
+      <Name>BaseLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataModels\DataModels.csproj">
       <Project>{152FABFB-DEC9-412C-AF1C-D3231EA4AF3D}</Project>
       <Name>DataModels</Name>

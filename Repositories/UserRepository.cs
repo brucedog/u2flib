@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using BaseLibrary;
 using DataModels;
-using Repositories.Context;
 
 namespace Repositories
 {
@@ -28,7 +28,7 @@ namespace Repositories
 
             if (user != null)
             {
-                DeviceRegistration device = user.DeviceRegistrations.FirstOrDefault(w => w.PublicKey.Equals(devicePublicKey));
+                Device device = user.DeviceRegistrations.FirstOrDefault(w => w.PublicKey.Equals(devicePublicKey));
 
                 if (device != null)
                 {
@@ -110,7 +110,7 @@ namespace Repositories
 
             user.UpdatedOn = DateTime.Now;
             user.AuthenticationRequest = null;
-            user.DeviceRegistrations.Add(new DeviceRegistration
+            user.DeviceRegistrations.Add(new Device
             {
                 AttestationCert = attestationCert,
                 Counter = counter,

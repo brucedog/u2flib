@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
+using BaseLibrary;
 using DataModels;
 
 namespace Repositories.Context
@@ -40,7 +41,7 @@ namespace Repositories.Context
 
         public virtual DbSet<User> Users { get; set; }
 
-        public virtual DbSet<DeviceRegistration> Devices { get; set; }
+        public virtual DbSet<Device> Devices { get; set; }
 
         public virtual DbSet<AuthenticationRequest> AuthenticationRequests { get; set; }
     }

@@ -2,13 +2,13 @@
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
+using BaseLibrary;
 using DataModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Repositories;
-using Repositories.Context;
+using u2flib.Data;
 using u2flib.Data.Messages;
-using DeviceRegistration = u2flib.Data.DeviceRegistration;
 
 namespace UnitTests
 {
@@ -34,9 +34,9 @@ namespace UnitTests
                         {
                             Name = "UserComplete",
                             Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=",
-                            DeviceRegistrations = new Collection<DataModels.DeviceRegistration>
+                            DeviceRegistrations = new Collection<Device>
                                 {
-                                    new  DataModels.DeviceRegistration
+                                    new  Device
                                         {
                                             KeyHandle = _deviceRegistration.KeyHandle,
                                             PublicKey = _deviceRegistration.PublicKey,

@@ -19,7 +19,7 @@ namespace Repositories.Migrations
                 .PrimaryKey(t => t.Id);
             
             CreateTable(
-                "dbo.DeviceRegistrations",
+                "dbo.Devices",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
@@ -53,12 +53,12 @@ namespace Repositories.Migrations
         
         public override void Down()
         {
-            DropForeignKey("dbo.DeviceRegistrations", "User_Id", "dbo.Users");
+            DropForeignKey("dbo.Devices", "User_Id", "dbo.Users");
             DropForeignKey("dbo.Users", "AuthenticationRequest_Id", "dbo.AuthenticationRequests");
             DropIndex("dbo.Users", new[] { "AuthenticationRequest_Id" });
-            DropIndex("dbo.DeviceRegistrations", new[] { "User_Id" });
+            DropIndex("dbo.Devices", new[] { "User_Id" });
             DropTable("dbo.Users");
-            DropTable("dbo.DeviceRegistrations");
+            DropTable("dbo.Devices");
             DropTable("dbo.AuthenticationRequests");
         }
     }

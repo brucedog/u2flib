@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
 using DataModels;
 
-namespace Repositories.Context
+namespace BaseLibrary
 {
     public interface IDataContext
     {
@@ -9,7 +9,7 @@ namespace Repositories.Context
 
         DbSet<User> Users { get; set; }
         
-        DbSet<DeviceRegistration> Devices { get; set; }
+        DbSet<Device> Devices { get; set; }
 
         DbSet<AuthenticationRequest> AuthenticationRequests { get; set; }
     }

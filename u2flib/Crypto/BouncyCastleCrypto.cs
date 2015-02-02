@@ -12,7 +12,6 @@
 
 using System;
 using System.Security.Cryptography;
-using Org.BouncyCastle.Asn1.Nist;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -80,7 +79,6 @@ namespace u2flib.Crypto
                 throw new U2fException(ErrorDecodingPublicKey, e);
             }
         }
-
 
         public byte[] Hash(byte[] bytes)
         {

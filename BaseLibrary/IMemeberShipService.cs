@@ -1,6 +1,6 @@
 ﻿using DataModels;
 
-namespace Services
+namespace BaseLibrary
 {
     public interface IMemeberShipService
     {

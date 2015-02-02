@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using BaseLibrary;
 using DataModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Repositories;
 using Services;
 using u2flib.Data.Messages;
 using DeviceRegistration = u2flib.Data.DeviceRegistration;
@@ -31,9 +31,9 @@ namespace UnitTests
                 {
                     Name = "test",
                     Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=",
-                    DeviceRegistrations = new Collection<DataModels.DeviceRegistration>
+                    DeviceRegistrations = new Collection<Device>
                         {
-                            new DataModels.DeviceRegistration
+                            new Device
                                 {
                                     KeyHandle = _deviceRegistration.KeyHandle,
                                     PublicKey = _deviceRegistration.PublicKey,
@@ -80,7 +80,7 @@ namespace UnitTests
         [TestMethod]
         public void MemeberShipService_GenerateServerChallengeNoDeviceFound()
         {
-            _userRepository.Setup(e => e.FindUser("test")).Returns(new User { DeviceRegistrations = new Collection<DataModels.DeviceRegistration>() });
+            _userRepository.Setup(e => e.FindUser("test")).Returns(new User { DeviceRegistrations = new Collection<Device>() });
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.GenerateServerChallenge("test");
@@ -147,13 +147,13 @@ namespace UnitTests
         [TestMethod]
         public void MemeberShipService_CompleteRegistrationSucess()
         {
-            DataModels.DeviceRegistration deviceRegistration = _user.DeviceRegistrations.First();
+            Device device = _user.DeviceRegistrations.First();
             _user.AuthenticationRequest.Challenge = _startedRegistration.Challenge;
             _user.AuthenticationRequest.AppId = _startedRegistration.AppId;
             
             _userRepository.Setup(e => e.FindUser("test")).Returns(_user);
             _userRepository.Setup(e => e.RemoveUsersAuthenticationRequest("test"));
-            _userRepository.Setup(e => e.AddDeviceRegistration("Test", deviceRegistration.AttestationCert, deviceRegistration.Counter, deviceRegistration.KeyHandle, deviceRegistration.PublicKey));
+            _userRepository.Setup(e => e.AddDeviceRegistration("Test", device.AttestationCert, device.Counter, device.KeyHandle, device.PublicKey));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.CompleteRegistration("test", _registerResponse.ToJson());
@@ -212,9 +212,9 @@ namespace UnitTests
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(new User
                 {
-                    DeviceRegistrations = new Collection<DataModels.DeviceRegistration>
+                    DeviceRegistrations = new Collection<Device>
                         {
-                            new DataModels.DeviceRegistration()
+                            new Device()
                         }
                 });
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
@@ -230,9 +230,9 @@ namespace UnitTests
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(new User
             {
-                DeviceRegistrations = new Collection<DataModels.DeviceRegistration>
+                DeviceRegistrations = new Collection<Device>
                         {
-                            new DataModels.DeviceRegistration()
+                            new Device()
                         }
             });
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
@@ -293,7 +293,7 @@ namespace UnitTests
         [TestMethod]
         public void MemeberShipService_AuthenticateUserNoDeviceFound()
         {
-            _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "test"))).Returns(new User { DeviceRegistrations = new Collection<DataModels.DeviceRegistration>() });
+            _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "test"))).Returns(new User { DeviceRegistrations = new Collection<Device>() });
 
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
@@ -308,9 +308,9 @@ namespace UnitTests
         {
             _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "test"))).Returns(new User
             {
-                DeviceRegistrations = new Collection<DataModels.DeviceRegistration>
+                DeviceRegistrations = new Collection<Device>
                             {
-                                new DataModels.DeviceRegistration
+                                new Device
                                     {
                                         KeyHandle = _deviceRegistration.KeyHandle,
                                         PublicKey = _deviceRegistration.PublicKey,
@@ -336,9 +336,9 @@ namespace UnitTests
                     {
                         Name = "test",
                         Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=",
-                        DeviceRegistrations = new Collection<DataModels.DeviceRegistration>
+                        DeviceRegistrations = new Collection<Device>
                             {
-                                new DataModels.DeviceRegistration
+                                new Device
                                     {
                                         KeyHandle = _deviceRegistration.KeyHandle,
                                         PublicKey = _deviceRegistration.PublicKey,

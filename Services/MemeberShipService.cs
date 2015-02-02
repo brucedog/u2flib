@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
+using BaseLibrary;
 using DataModels;
-using Repositories;
 using u2flib;
+using u2flib.Data;
 using u2flib.Data.Messages;
-using DeviceRegistration = u2flib.Data.DeviceRegistration;
 
 namespace Services
 {
