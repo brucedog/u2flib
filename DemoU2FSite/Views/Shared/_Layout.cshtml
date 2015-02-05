@@ -40,6 +40,16 @@
             @Html.ValidationMessage("CustomError")
         </div>
         <br/>
+        <div class="app_hide alert alert-danger" style="display: none;">
+            <p>This demo requires the Google U2F Extension for Chrome!</p>
+            <div class="not_chrome" style="display: none;">
+                <p><strong>Your current browser is not yet supported.</strong></p>
+                <a class="btn" href="https://www.google.com/chrome/browser/">Get Chrome</a>
+            </div>
+            <div class="chrome" style="display: none;">
+                <a class="btn" href="https://chrome.google.com/webstore/detail/fido-u2f-universal-2nd-fa/pfboblefjcgdjicmnffhdgionmgcdmne">Download here</a>
+            </div>
+        </div>
 
         @RenderSection("featured", required: false)
         @RenderBody()
@@ -54,8 +64,23 @@
         </footer>
 
         @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/browser")
         @Scripts.Render("~/bundles/bootstrap")
 
         @RenderSection("scripts", required: false)
+        
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!bowser.chrome) {
+                    $(".app_hide").show();
+                    $('.not_chrome').show();
+                }
+
+                if (window.u2f === undefined) {
+                    $(".app_hide").show();
+                    $(".chrome").show();
+                }
+            });
+    </script>
     </body>
 </html>
