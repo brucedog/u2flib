@@ -1,7 +1,8 @@
-using System.Data.Entity.Migrations;
-
 namespace Repositories.Migrations
 {
+    using System;
+    using System.Data.Entity.Migrations;
+    
     public partial class InitialCreate : DbMigration
     {
         public override void Up()
@@ -53,12 +54,12 @@ namespace Repositories.Migrations
         
         public override void Down()
         {
-            DropForeignKey("dbo.Devices", "User_Id", "dbo.Users");
+            DropForeignKey("dbo.DeviceRegistrations", "User_Id", "dbo.Users");
             DropForeignKey("dbo.Users", "AuthenticationRequest_Id", "dbo.AuthenticationRequests");
             DropIndex("dbo.Users", new[] { "AuthenticationRequest_Id" });
-            DropIndex("dbo.Devices", new[] { "User_Id" });
+            DropIndex("dbo.DeviceRegistrations", new[] { "User_Id" });
             DropTable("dbo.Users");
-            DropTable("dbo.Devices");
+            DropTable("dbo.DeviceRegistrations");
             DropTable("dbo.AuthenticationRequests");
         }
     }
