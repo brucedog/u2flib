@@ -87,7 +87,7 @@ namespace Services
             
             _userRepository.RemoveUsersAuthenticationRequest(user.Name);
             _userRepository.UpdateDeviceCounter(user.Name, device.PublicKey, registration.Counter);
-           
+
             return true;
         }
 

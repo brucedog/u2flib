@@ -32,18 +32,12 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginLogin(BeginLoginModel model)
         {
-            if ((string.IsNullOrWhiteSpace(model.UserName) 
-                || string.IsNullOrWhiteSpace(model.Password))
-                || !_memeberShipService.IsUserRegistered(model.UserName.Trim()))
+            if ((string.IsNullOrWhiteSpace(model.UserName) || string.IsNullOrWhiteSpace(model.Password))||
+                (!_memeberShipService.IsUserRegistered(model.UserName.Trim())
+                && !_memeberShipService.IsValidUserNameAndPassword(model.UserName.Trim(), model.Password.Trim())))
             {
                 // If we got this far, something failed, redisplay form
-                ModelState.AddModelError("CustomError", "User has not been registered.");
-                return View("Login", model);
-            }
-
-            if (!_memeberShipService.IsValidUserNameAndPassword(model.UserName.Trim(), model.Password.Trim()))
-            {
-                ModelState.AddModelError("CustomError", "User/Password is not invalid.");
+                ModelState.AddModelError("CustomError", "User has not been registered");
                 return View("Login", model);
             }
 
@@ -78,17 +72,16 @@ namespace DemoU2FSite.Controllers
             if (!_memeberShipService.IsUserRegistered(model.UserName.Trim()))
             {
                 // If we got this far, something failed, redisplay form
-                ModelState.AddModelError("", "User has not been registered.");
+                ModelState.AddModelError("", "User has not been registered");
                 return View("FinishLogin", model);
             }
 
             try
             {
-                model.DeviceResponse = _memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()) 
-                    ? "Authentication was successful." 
-                    : "Authentication failed.";
-
-                return View("CompletedLogin", model);
+                if (_memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
+                {
+                    return View("CompletedLogin", model);
+                }
             }
             catch (Exception e)
             {
@@ -97,6 +90,8 @@ namespace DemoU2FSite.Controllers
                 ModelState.AddModelError("", "Error finding challenge");
                 return View("FinishLogin", model);
             }
+
+            return View("FinishLogin", model);
         }
 
         [System.Web.Mvc.AllowAnonymous]
@@ -140,18 +135,14 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    value.DeviceResponse = _memeberShipService.CompleteRegistration(value.UserName.Trim(),
-                        value.DeviceResponse.Trim())
-                        ? "Registration was successful."
-                        : "Registration failed.";
+                     _memeberShipService.CompleteRegistration(value.UserName.Trim(), value.DeviceResponse.Trim());
 
-                    return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName, DeviceResponse = value.DeviceResponse});
+                    return View("CompletedRegister", new CompleteRegisterModel{UserName = value.UserName});
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                     ModelState.AddModelError("CustomError", e.Message);
-
                     return View("FinishRegister", value);
                 }
             }

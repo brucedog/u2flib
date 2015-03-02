@@ -68,8 +68,7 @@ namespace UnitTests
                                                                                                                 Challenge = "notrealchallenge",
                                                                                                                 Version = "U2F_V2",
                                                                                                                 KeyHandle = "notreallykeyhandle"
-                                                                                                            }).Verifiable();
-            _memeberShipService.Setup(s => s.IsValidUserNameAndPassword(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "password"))).Returns(true).Verifiable();
+                                                                                                            });
 
             HomeController homeController = new HomeController(_memeberShipService.Object);
             BeginLoginModel beginLoginModel = new BeginLoginModel
@@ -83,7 +82,7 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishLogin", result.ViewName);
-            _memeberShipService.VerifyAll();
+            
         }
 
         [TestMethod]
