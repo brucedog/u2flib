@@ -161,7 +161,7 @@ namespace u2flib.Data.Messages
             if (GetType() != obj.GetType())
                 return false;
             RawRegisterResponse other = (RawRegisterResponse) obj;
-            if (!_attestationCertificate.Equals(other._attestationCertificate))
+            if (!Arrays.AreEqual(_attestationCertificate, other._attestationCertificate))
                 return false;
             if (!Arrays.AreEqual(_keyHandle, other._keyHandle))
                 return false;
