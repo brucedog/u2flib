@@ -76,17 +76,28 @@ namespace u2flib.Data.Messages
         /// <returns></returns>
         public static RawAuthenticateResponse FromBase64(String rawDataBase64)
         {
-            byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64);
+            byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64);              
             Stream stream = new MemoryStream(bytes);
             BinaryReader binaryReader = new BinaryReader(stream);
+
+            byte userPresence = binaryReader.ReadByte();
+            byte[] counterBytes = binaryReader.ReadBytes(4);
+
+            //counter has to be reversed if its little endian encoded
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(counterBytes);
+
+            uint counter = BitConverter.ToUInt32(counterBytes, 0);
+
+            long size = binaryReader.BaseStream.Length - binaryReader.BaseStream.Position;
+            byte[] signature = binaryReader.ReadBytes((int)size);
 
             try
             {
                 return new RawAuthenticateResponse(
-                    userPresence: binaryReader.ReadByte(),
-                    counter: binaryReader.ReadUInt32(),
-                    signature: Utils.ReadAllBytes(binaryReader)
-                    );
+                    userPresence,
+                    counter,
+                    signature);
             }
             finally
             {
@@ -127,7 +138,7 @@ namespace u2flib.Data.Messages
         public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, uint counter, byte[] challengeHash)
         {
             // covert the counter to a byte array in case the int is to big for a single byte
-            byte[] byteArray = BitConverter.GetBytes(counter);
+            byte[] byteArray = BitConverter.GetBytes(counter);            
             List<byte> someBytes = new List<byte>();
             someBytes.AddRange(appIdHash);
             someBytes.Add(userPresence);
