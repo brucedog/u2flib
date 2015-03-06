@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
 using u2flib.Crypto;
+using u2flib.Util;
 
 namespace UnitTests
 {
@@ -34,14 +40,14 @@ namespace UnitTests
             + "\"," + "\"cid_pubkey\":" + CHANNEL_ID_STRING + "," + "\"origin\":\"" + ORIGIN + "\"}";
 
         public static String CLIENT_DATA_REGISTER_BASE64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(CLIENT_DATA_REGISTER));
-
+        
         public static byte[] CLIENT_DATA_ENROLL_SHA256 = crypto.Hash(Encoding.UTF8.GetBytes(CLIENT_DATA_REGISTER));
 
         public static String CLIENT_DATA_AUTHENTICATE = "{\"typ\":\"navigator.id.getAssertion\"," + "\"challenge\":\"" + SERVER_CHALLENGE_SIGN_BASE64
             + "\"," + "\"cid_pubkey\":" + CHANNEL_ID_STRING + "," + "\"origin\":\"" + ORIGIN + "\"}";
 
         public static String CLIENT_DATA_AUTHENTICATE_BASE64 =
-            Convert.ToBase64String(Encoding.UTF8.GetBytes(CLIENT_DATA_AUTHENTICATE));
+            "eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZ2V0QXNzZXJ0aW9uIiwiY2hhbGxlbmdlIjoib3BzWHFVaWZEcmlBQW1XY2xpbmZiUzBlLVVTWTBDZ3lKSGVfT3RkN3o4byIsImNpZF9wdWJrZXkiOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJIelF3bGZYWDdRNFM1TXRDQ25aVU5CdzNSTXpQTzl0T3lXakJxUmw0dEo4IiwieSI6IlhWZ3VHRkxJWngxZlhnM3dOcWZkYm43NWhpNC1fNy1CeGhNbGp3NDJIdDQifSwib3JpZ2luIjoiaHR0cDovL2V4YW1wbGUuY29tIn0";
 
         public static byte[] CLIENT_DATA_AUTHENTICATE_SHA256 = StringToByteArray(
             "ccd6ee2e47baef244d49a222db496bad0ef5b6f93aa7cc4d30c4821b3b9dbc57");
@@ -65,18 +71,19 @@ namespace UnitTests
         public static byte[] KEY_HANDLE = StringToByteArray(
             "2a552dfdb7477ed65fd84133f86196010b2215b57da75d315b7b9e8fe2e3925a6019551bab61d16591659cbaf00b4950f7abfe6660e2e006f76868b772d70c25");
 
-        public static String KEY_HANDLE_BASE64 = Convert.ToBase64String(KEY_HANDLE);
+        public static string KEY_HANDLE_BASE64 = "KlUt_bdHftZf2EEz-GGWAQsiFbV9p10xW3uej-LjklpgGVUbq2HRZZFlnLrwC0lQ96v-ZmDi4Ab3aGi3ctcMJQ";
+
+        public static byte[] KEY_HANDLE_BASE64_BYTE = Utils.Base64StringToByteArray("KlUt_bdHftZf2EEz-GGWAQsiFbV9p10xW3uej-LjklpgGVUbq2HRZZFlnLrwC0lQ96v-ZmDi4Ab3aGi3ctcMJQ");
 
         public static byte[] USER_PUBLIC_KEY_REGISTER_HEX = StringToByteArray(
             "04b174bc49c7ca254b70d2e5c207cee9cf174820ebd77ea3c65508c26da51b657c1cc6b952f8621697936482da0a6d3d3826a59095daf6cd7c03e2e60385d2f6d9");
 
-        public static byte[] USER_PUBLIC_KEY_AUTHENTICATE_HEX = StringToByteArray(
-            "04d368f1b665bade3c33a20f1e429c7750d5033660c019119d29aa4ba7abc04aa7c80a46bbe11ca8cb5674d74f31f8a903f6bad105fb6ab74aefef4db8b0025e1d");
+        public static byte[] USER_PUBLIC_KEY_AUTHENTICATE_HEX = Utils.Base64StringToByteArray("BNNo8bZlut48M6IPHkKcd1DVAzZgwBkRnSmqS6erwEqnyApGu-EcqMtWdNdPMfipA_a60QX7ardK7-9NuLACXh0");
 
         public static byte[] AUTHENTICATE_RESPONSE_DATA = StringToByteArray(
             "0100000001304402204b5f0cd17534cedd8c34ee09570ef542a353df4436030ce43d406de870b847780220267bb998fac9b7266eb60e7cb0b5eabdfd5ba9614f53c7b22272ec10047a923f");
 
-        public static String SIGN_RESPONSE_DATA_BASE64 = Convert.ToBase64String(AUTHENTICATE_RESPONSE_DATA);
+        public static String SIGN_RESPONSE_DATA_BASE64 = "AQAAAAEwRAIgS18M0XU0zt2MNO4JVw71QqNT30Q2AwzkPUBt6HC4R3gCICZ7uZj6ybcmbrYOfLC16r39W6lhT1PHsiJy7BAEepI_";
 
         public static byte[] EXPECTED_REGISTER_SIGNED_BYTES = StringToByteArray(
             "00f0e6a6a97042a4f1f1c87f5f7d44315b2d852c2df5c7991cc66241bf7072d1c44142d21c00d94ffb9d504ada8f99b721f4b191ae4e37ca0140f696b6983cfa"
@@ -92,6 +99,9 @@ namespace UnitTests
         public static byte[] SIGNATURE_AUTHENTICATE = StringToByteArray(
             "304402204b5f0cd17534cedd8c34ee09570ef542a353df4436030ce43d406de870b847780220267bb998fac9b7266eb60e7cb0b5eabdfd5ba9614f53c7b22272ec10047a923f");
 
+        public static byte[] ATTESTATION_CERTIFICATE = Utils.Base64StringToByteArray("MIIBPDCB5KADAgECAgpHkBKAABFVlXNSMAoGCCqGSM49BAMCMBcxFTATBgNVBAMTDEdudWJieSBQaWxvdDAeFw0xMjA4MTQxODI5MzJaFw0xMzA4MTQxODI5MzJaMDExLzAtBgNVBAMTJlBpbG90R251YmJ5LTAuNC4xLTQ3OTAxMjgwMDAxMTU1OTU3MzUyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEjWF-ZclQjmS8xWc6yCpnmdo8FEZoLCWMRj__31jf0vo-bDeLU9eVxKTf-0GZ7deGLyOrrwIDtLiRG6BWmZThATAKBggqhkjOPQQDAgNHADBEAiBgzbYGHpwiJi0arB2W2McIKbI2ZTHdomiDLLg2vNMN-gIgYxsUWfCeYzAFVyLI2Jt_SIg7kIm4jWDR2XlZArMEEN8");
+
+  
         public static byte[] StringToByteArray(string hex)
         {
             int numberChars = hex.Length;
