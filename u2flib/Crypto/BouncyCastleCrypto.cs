@@ -46,7 +46,10 @@ namespace u2flib.Crypto
                 _signer.Init(false, getPublicKey);
                 _signer.BlockUpdate(signedBytes, 0, signedBytes.Length);
 
-                return _signer.VerifySignature(signature);
+                if(_signer.VerifySignature(signature))
+                    throw new U2fException(SignatureError);
+
+                return true;
             }
             catch (InvalidKeyException e)
             {

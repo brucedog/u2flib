@@ -64,13 +64,12 @@ namespace UnitTests
             Assert.IsNotNull(results.Version);
         }
 
-        [Ignore]
         [TestMethod]
         public void U2F_FinishAuthentication()
         {
             StartedAuthentication startedAuthentication = new StartedAuthentication(
                 TestConts.SERVER_CHALLENGE_SIGN_BASE64,
-                TestConts.APP_ID_SIGN,
+                TestConts.APP_ID_ENROLL,
                 TestConts.KEY_HANDLE_BASE64);
 
             AuthenticateResponse authenticateResponse = new AuthenticateResponse(
