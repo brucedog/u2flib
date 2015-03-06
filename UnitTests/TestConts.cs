@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.X509;
 using u2flib.Crypto;
 using u2flib.Util;
 
@@ -22,7 +16,6 @@ namespace UnitTests
         public static String APP_ID_ENROLL = "http://example.com";
         public static byte[] APP_ID_ENROLL_SHA256 = crypto.Hash(APP_ID_ENROLL);
         public static String APP_ID_SIGN = "https://gstatic.com/securitykey/a/example.com";
-        public static byte[] APP_ID_SIGN_SHA256 = crypto.Hash(APP_ID_SIGN);
         public static String ORIGIN = "http://example.com";
 
         public static String SERVER_CHALLENGE_REGISTER_BASE64 =
@@ -46,8 +39,8 @@ namespace UnitTests
         public static String CLIENT_DATA_AUTHENTICATE = "{\"typ\":\"navigator.id.getAssertion\"," + "\"challenge\":\"" + SERVER_CHALLENGE_SIGN_BASE64
             + "\"," + "\"cid_pubkey\":" + CHANNEL_ID_STRING + "," + "\"origin\":\"" + ORIGIN + "\"}";
 
-        public static String CLIENT_DATA_AUTHENTICATE_BASE64 =
-            "eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZ2V0QXNzZXJ0aW9uIiwiY2hhbGxlbmdlIjoib3BzWHFVaWZEcmlBQW1XY2xpbmZiUzBlLVVTWTBDZ3lKSGVfT3RkN3o4byIsImNpZF9wdWJrZXkiOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJIelF3bGZYWDdRNFM1TXRDQ25aVU5CdzNSTXpQTzl0T3lXakJxUmw0dEo4IiwieSI6IlhWZ3VHRkxJWngxZlhnM3dOcWZkYm43NWhpNC1fNy1CeGhNbGp3NDJIdDQifSwib3JpZ2luIjoiaHR0cDovL2V4YW1wbGUuY29tIn0";
+        public static String CLIENT_DATA_AUTHENTICATE_BASE64 = Utils.ByteArrayToBase64String(Utils.GetBytes(CLIENT_DATA_AUTHENTICATE));
+            //"eyJ0eXAiOiJuYXZpZ2F0b3IuaWQuZ2V0QXNzZXJ0aW9uIiwiY2hhbGxlbmdlIjoib3BzWHFVaWZEcmlBQW1XY2xpbmZiUzBlLVVTWTBDZ3lKSGVfT3RkN3o4byIsImNpZF9wdWJrZXkiOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJIelF3bGZYWDdRNFM1TXRDQ25aVU5CdzNSTXpQTzl0T3lXakJxUmw0dEo4IiwieSI6IlhWZ3VHRkxJWngxZlhnM3dOcWZkYm43NWhpNC1fNy1CeGhNbGp3NDJIdDQifSwib3JpZ2luIjoiaHR0cDovL2V4YW1wbGUuY29tIn0";
 
         public static byte[] CLIENT_DATA_AUTHENTICATE_SHA256 = StringToByteArray(
             "ccd6ee2e47baef244d49a222db496bad0ef5b6f93aa7cc4d30c4821b3b9dbc57");

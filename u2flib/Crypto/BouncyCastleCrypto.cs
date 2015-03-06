@@ -12,13 +12,14 @@
 
 using System;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.X509;
 using u2flib.Exceptions;
 
 namespace u2flib.Crypto
@@ -27,12 +28,15 @@ namespace u2flib.Crypto
     {
         private readonly SHA256Managed _sha256Managed = new SHA256Managed();
         private readonly ISigner _signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-        public const string SignatureError = "Error when verifying signature";
-        public const string ErrorDecodingPublicKey = "Error when decoding public key";
+        private readonly DerObjectIdentifier _curve = SecObjectIdentifiers.SecP256r1;
+        private const string SignatureError = "Error when verifying signature";
+        private const string ErrorDecodingPublicKey = "Error when decoding public key";
 
-        public bool CheckSignature(X509Certificate attestationCertificate, byte[] signedBytes, byte[] signature)
+        public bool CheckSignature(X509Certificate2 attestationCertificate, byte[] signedBytes, byte[] signature)
         {
-            return CheckSignature(attestationCertificate.GetPublicKey(), signedBytes, signature);
+            var x509 = DotNetUtilities.FromX509Certificate(attestationCertificate);
+
+            return CheckSignature(x509.GetPublicKey(), signedBytes, signature);
         }
 
         public bool CheckSignature(ICipherParameters getPublicKey, byte[] signedBytes, byte[] signature)
@@ -54,25 +58,22 @@ namespace u2flib.Crypto
             }
         }
 
-        public ECPublicKeyParameters DecodePublicKey(byte[] encodedPublicKey)
+        public ICipherParameters DecodePublicKey(byte[] encodedPublicKey)
         {
             try
             {
-                X9ECParameters curve = SecNamedCurves.GetByName("secp256r1");
-                ECPoint point;
                 try
                 {
-                    point = curve.Curve.DecodePoint(encodedPublicKey);
+                    X9ECParameters curve = SecNamedCurves.GetByOid(_curve);
+                    ECPoint point = curve.Curve.DecodePoint(encodedPublicKey);
+                    ECDomainParameters ecP = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+
+                    return new ECPublicKeyParameters(point, ecP);
                 }
                 catch (Exception e)
                 {
                     throw new U2fException("Could not parse user public key", e);
                 }
-
-                ECPublicKeyParameters xxpk = new ECPublicKeyParameters("ECDSA", point,
-                                                                       SecObjectIdentifiers.SecP256r1);
-
-                return xxpk;
             }
             catch (InvalidKeySpecException e)
             {

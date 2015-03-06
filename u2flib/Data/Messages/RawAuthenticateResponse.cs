@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Org.BouncyCastle.Utilities;
 using u2flib.Exceptions;
 using u2flib.Util;
@@ -115,16 +116,15 @@ namespace u2flib.Data.Messages
         public void CheckSignature(String appId, String clientData, byte[] publicKey)
         {
             byte[] signedBytes = PackBytesToSign(
-                U2F.Crypto.Hash(appId),
+                U2F.Crypto.Hash(Encoding.ASCII.GetBytes(appId)),
                 UserPresence,
                 Counter,
-                U2F.Crypto.Hash(clientData)
-                );
+                U2F.Crypto.Hash(Encoding.ASCII.GetBytes(clientData)));
+
             U2F.Crypto.CheckSignature(
                 U2F.Crypto.DecodePublicKey(publicKey),
                 signedBytes,
-                Signature
-                );
+                Signature);
         }
 
         /// <summary>
@@ -138,11 +138,15 @@ namespace u2flib.Data.Messages
         public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, uint counter, byte[] challengeHash)
         {
             // covert the counter to a byte array in case the int is to big for a single byte
-            byte[] byteArray = BitConverter.GetBytes(counter);            
+            byte[] counterBytes = BitConverter.GetBytes(counter);
+
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(counterBytes);
+
             List<byte> someBytes = new List<byte>();
             someBytes.AddRange(appIdHash);
             someBytes.Add(userPresence);
-            someBytes.AddRange(byteArray);
+            someBytes.AddRange(counterBytes);
             someBytes.AddRange(challengeHash);
 
             return someBytes.ToArray();

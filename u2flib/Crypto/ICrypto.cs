@@ -8,9 +8,8 @@
  */
 
 using System;
+using System.Security.Cryptography.X509Certificates;
 using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.X509;
 
 namespace u2flib.Crypto
 {
@@ -32,14 +31,14 @@ namespace u2flib.Crypto
         /// <param name="signedBytes">The signed bytes.</param>
         /// <param name="signature">The signature.</param>
         /// <returns></returns>
-        bool CheckSignature(X509Certificate attestationCertificate, byte[] signedBytes, byte[] signature);
+        bool CheckSignature(X509Certificate2 attestationCertificate, byte[] signedBytes, byte[] signature);
 
         /// <summary>
         /// Decodes the public key.
         /// </summary>
         /// <param name="encodedPublicKey">The encoded public key.</param>
         /// <returns></returns>
-        ECPublicKeyParameters DecodePublicKey(byte[] encodedPublicKey);
+        ICipherParameters DecodePublicKey(byte[] encodedPublicKey);
 
         /// <summary>
         /// Hashes the specified bytes.

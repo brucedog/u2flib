@@ -14,9 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Org.BouncyCastle.Security.Certificates;
 using Org.BouncyCastle.Utilities;
-using Org.BouncyCastle.X509;
 using u2flib.Exceptions;
 using u2flib.Util;
 
@@ -37,7 +38,8 @@ namespace u2flib.Data.Messages
          * A handle that allows the U2F token to identify the generated key pair.
          */
         private readonly byte[] _keyHandle;
-        private readonly X509Certificate _attestationCertificate;
+        
+        private readonly byte[] _attestationCertificate;
 
         /** A ECDSA signature (on P-256) */
         private readonly byte[] _signature;
@@ -50,7 +52,7 @@ namespace u2flib.Data.Messages
         /// <param name="attestationCertificate">The attestation certificate.</param>
         /// <param name="signature">The signature.</param>
         public RawRegisterResponse(byte[] userPublicKey, byte[] keyHandle,
-                                   X509Certificate attestationCertificate, byte[] signature)
+                                   byte[] attestationCertificate, byte[] signature)
         {
             _userPublicKey = userPublicKey;
             _keyHandle = keyHandle;
@@ -63,7 +65,7 @@ namespace u2flib.Data.Messages
             byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64); 
 
             Stream stream = new MemoryStream(bytes);
-            var binaryReader = new BinaryReader(stream);
+            BinaryReader binaryReader = new BinaryReader(stream);
 
             byte reservedByte = binaryReader.ReadByte();
             if (reservedByte != RegistrationReservedByteValue)
@@ -77,15 +79,22 @@ namespace u2flib.Data.Messages
             {
                 byte[] publicKey = binaryReader.ReadBytes(65);
                 byte[] keyHandle = binaryReader.ReadBytes(binaryReader.ReadByte());
-                X509CertificateParser x509CertificateParser = new X509CertificateParser();
-                var x509Certificate = x509CertificateParser.ReadCertificate(stream);
+                long certificatePosition = binaryReader.BaseStream.Position;
+                int size = (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position);
+                byte[] certBytes = binaryReader.ReadBytes(size);
+                X509Certificate2 attestationCertificate = new X509Certificate2(certBytes);
 
-                var rawRegisterResponse = new RawRegisterResponse(
+                binaryReader.BaseStream.Position = certificatePosition + attestationCertificate.Export(X509ContentType.Cert).Length;
+
+                size = (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position);
+
+                byte[] signature = binaryReader.ReadBytes(size);
+
+                RawRegisterResponse rawRegisterResponse = new RawRegisterResponse(
                     publicKey,
                     keyHandle,
-                    x509Certificate,
-                    Utils.ReadAllBytes(binaryReader)
-                    );
+                    attestationCertificate.RawData,
+                    signature);
 
                 return rawRegisterResponse;
             }
@@ -102,9 +111,13 @@ namespace u2flib.Data.Messages
 
         public void CheckSignature(String appId, String clientData)
         {
-            byte[] signedBytes = PackBytesToSign(U2F.Crypto.Hash(appId), U2F.Crypto.Hash(clientData), _keyHandle,
-                                                 _userPublicKey);
-            U2F.Crypto.CheckSignature(_attestationCertificate, signedBytes, _signature);
+            byte[] signedBytes = PackBytesToSign(
+                U2F.Crypto.Hash(Encoding.ASCII.GetBytes(appId)), 
+                U2F.Crypto.Hash(Encoding.ASCII.GetBytes(clientData)), 
+                _keyHandle,
+                _userPublicKey);
+
+            U2F.Crypto.CheckSignature(new X509Certificate2(_attestationCertificate), signedBytes, _signature);
         }
 
         public static byte[] PackBytesToSign(byte[] appIdHash, byte[] clientDataHash, byte[] keyHandle,
@@ -125,7 +138,7 @@ namespace u2flib.Data.Messages
             return new DeviceRegistration(
                 _keyHandle,
                 _userPublicKey,
-                _attestationCertificate.GetEncoded(),
+                _attestationCertificate,
                 DeviceRegistration.INITIAL_COUNTER_VALUE
                 );
         }
