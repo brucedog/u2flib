@@ -116,10 +116,10 @@ namespace u2flib.Data.Messages
         public void CheckSignature(String appId, String clientData, byte[] publicKey)
         {
             byte[] signedBytes = PackBytesToSign(
-                U2F.Crypto.Hash(Encoding.ASCII.GetBytes(appId)),
+                U2F.Crypto.Hash(appId),
                 UserPresence,
                 Counter,
-                U2F.Crypto.Hash(Encoding.ASCII.GetBytes(clientData)));
+                U2F.Crypto.Hash(clientData));
 
             U2F.Crypto.CheckSignature(
                 U2F.Crypto.DecodePublicKey(publicKey),
