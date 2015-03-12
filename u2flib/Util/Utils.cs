@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Text;
 
 namespace u2flib.Util
@@ -42,12 +41,12 @@ namespace u2flib.Util
 
         public static byte[] GetBytes(string str)
         {
-            return Encoding.ASCII.GetBytes(str);
+            return Encoding.UTF8.GetBytes(str);
         }
 
         public static string GetString(byte[] bytes)
         {
-            return Encoding.ASCII.GetString(bytes);
+            return Encoding.UTF8.GetString(bytes);
         }
     }
 }

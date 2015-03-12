@@ -45,7 +45,7 @@ namespace Services
             if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(deviceResponse))
                 return false;
 
-            RegisterResponse registerResponse = RegisterResponse.FromJson(deviceResponse);
+            RegisterResponse registerResponse = RegisterResponse.FromJson<RegisterResponse>(deviceResponse);
 
             var user = _userRepository.FindUser(userName);
 
@@ -70,10 +70,8 @@ namespace Services
             if (user == null)
                 return false;
 
-            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(deviceResponse);
-
-            byte[] keyHandle = Base64StringToByteArray(authenticateResponse.KeyHandle);
-
+            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson<AuthenticateResponse>(deviceResponse);
+            
             var device = user.DeviceRegistrations.FirstOrDefault();
 
             if (device == null || user.AuthenticationRequest == null)
@@ -152,21 +150,7 @@ namespace Services
         }
 
         #endregion
-
-        private byte[] Base64StringToByteArray(string input)
-        {
-            input = input.Replace('-', '+');
-            input = input.Replace('_', '/');
-
-            int mod4 = input.Length % 4;
-            if (mod4 > 0)
-            {
-                input += new string('=', 4 - mod4);
-            }
-
-            return Convert.FromBase64String(input);
-        }
-
+        
         private string HashPassword(string password)
         {
             // TODO salt password

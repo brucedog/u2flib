@@ -12,12 +12,12 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace u2flib.Data.Messages
 {
     public class RegisterResponse : DataObject
     {
+        private readonly ClientData _clientDataRef;
         /// <summary>
         /// Initializes a new instance of the <see cref="RegisterResponse"/> class.
         /// </summary>
@@ -27,6 +27,7 @@ namespace u2flib.Data.Messages
         {
             RegistrationData = registrationData;
             ClientData = clientData;
+            _clientDataRef = new ClientData(ClientData);
         }
 
         /// <summary>
@@ -47,12 +48,12 @@ namespace u2flib.Data.Messages
 
         public ClientData GetClientData()
         {
-            return new ClientData(ClientData);
+            return _clientDataRef;
         }
 
-        public static RegisterResponse FromJson(String json)
+        public String GetRequestId()
         {
-            return JsonConvert.DeserializeObject<RegisterResponse>(json);
+            return GetClientData().Challenge;
         }
 
         public override int GetHashCode()

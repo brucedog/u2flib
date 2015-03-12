@@ -21,5 +21,7 @@ namespace DataModels
         public byte[] AttestationCert { get; set; }
 
         public uint Counter { get; set; }
+
+        public bool IsCompromised { get; set; }
     }
 }

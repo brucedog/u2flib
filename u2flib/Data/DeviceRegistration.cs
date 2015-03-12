@@ -13,7 +13,6 @@
 using System;
 using System.Linq;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Security.Certificates;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
 using u2flib.Exceptions;
@@ -22,8 +21,7 @@ namespace u2flib.Data
 {
     public class DeviceRegistration : DataObject
     {
-        private long serialVersionUID = -142942195464329902L;
-        public static uint INITIAL_COUNTER_VALUE = 0;
+        public const uint InitialCounterValue = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceRegistration"/> class.
@@ -32,22 +30,25 @@ namespace u2flib.Data
         /// <param name="publicKey">The public key.</param>
         /// <param name="attestationCert">The attestation cert.</param>
         /// <param name="counter">The counter.</param>
+        /// <param name="isCompromised"></param>
         /// <exception cref="U2fException">Invalid attestation certificate</exception>
-        public DeviceRegistration(byte[] keyHandle, byte[] publicKey, byte[] attestationCert, uint counter)
+        public DeviceRegistration(byte[] keyHandle, byte[] publicKey, byte[] attestationCert, uint counter, bool isCompromised = false)
         {
             KeyHandle = keyHandle;
             PublicKey = publicKey;
             Counter = counter;
-
+            IsCompromised = isCompromised;
             try
             {
                 AttestationCert = attestationCert;
             }
-            catch (CertificateEncodingException e)
+            catch (Exception exception)
             {
-                throw new U2fException("Invalid attestation certificate", e);
+                throw new U2fException("Malformed attestation certificate", exception);
             }
         }
+
+        public bool IsCompromised { get; private set; }
 
         /// <summary>
         /// Gets the key handle.
@@ -83,19 +84,12 @@ namespace u2flib.Data
 
         public X509Certificate GetAttestationCertificate()
         {
+            if (AttestationCert == null) 
+                throw new U2fException("Missing Attestation Certificate.");
+
             X509CertificateParser x509CertificateParser = new X509CertificateParser();
 
             return x509CertificateParser.ReadCertificate(AttestationCert);
-        }
-
-        /// <summary>
-        /// Froms the json.
-        /// </summary>
-        /// <param name="json">The json.</param>
-        /// <returns></returns>
-        public static DeviceRegistration FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<DeviceRegistration>(json);
         }
 
         /// <summary>
@@ -104,7 +98,7 @@ namespace u2flib.Data
         /// <returns></returns>
         public String ToJsonWithOutAttestionCert()
         {
-            return JsonConvert.SerializeObject(new DeviceWithoutCertificate(KeyHandle, PublicKey, Counter));
+            return JsonConvert.SerializeObject(new DeviceWithoutCertificate(KeyHandle, PublicKey, Counter, IsCompromised));
         }
 
         /// <summary>
@@ -116,6 +110,7 @@ namespace u2flib.Data
         {
             if (clientCounter <= Counter)
             {
+                IsCompromised = true;
                 throw new U2fException("Counter value smaller than expected!");
             }
             Counter = clientCounter;
@@ -140,17 +135,21 @@ namespace u2flib.Data
             return Arrays.AreEqual(KeyHandle, that.KeyHandle)
                    && Arrays.AreEqual(PublicKey, that.PublicKey)
                    && Arrays.AreEqual(AttestationCert, that.AttestationCert);
+            return true;
         }
     }
 
     internal class DeviceWithoutCertificate
     {
-        internal DeviceWithoutCertificate(byte[] keyHandle, byte[] publicKey, uint counter)
+        internal DeviceWithoutCertificate(byte[] keyHandle, byte[] publicKey, uint counter, bool isCompromised)
         {
             KeyHandle = keyHandle;
             PublicKey = publicKey;
             Counter = counter;
+            IsCompromised = isCompromised;
         }
+
+        public bool IsCompromised { get; set; }
 
         public byte[] PublicKey { get; private set; }
 

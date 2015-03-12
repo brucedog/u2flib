@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Org.BouncyCastle.Utilities;
 using u2flib.Exceptions;
 using u2flib.Util;
@@ -23,7 +22,7 @@ namespace u2flib.Data.Messages
 {
     public class RawAuthenticateResponse
     {
-        public static byte UserPresentFlag = 0x01;
+        private const byte UserPresentFlag = 0x01;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RawAuthenticateResponse"/> class.
@@ -77,7 +76,8 @@ namespace u2flib.Data.Messages
         /// <returns></returns>
         public static RawAuthenticateResponse FromBase64(String rawDataBase64)
         {
-            byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64);              
+            byte[] bytes = Utils.Base64StringToByteArray(rawDataBase64);   
+           
             Stream stream = new MemoryStream(bytes);
             BinaryReader binaryReader = new BinaryReader(stream);
 
@@ -139,10 +139,7 @@ namespace u2flib.Data.Messages
         {
             // covert the counter to a byte array in case the int is to big for a single byte
             byte[] counterBytes = BitConverter.GetBytes(counter);
-
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(counterBytes);
-
+            
             List<byte> someBytes = new List<byte>();
             someBytes.AddRange(appIdHash);
             someBytes.Add(userPresence);

@@ -26,7 +26,7 @@ namespace UnitTests.Messages
         [TestMethod]
         public void StartedRegistration_FromJson()
         {
-            StartedRegistration startedRegistration = StartedRegistration.FromJson(JsonData);
+            StartedRegistration startedRegistration = StartedRegistration.FromJson<StartedRegistration>(JsonData);
 
             Assert.IsNotNull(startedRegistration);
             Assert.IsNotNull(startedRegistration.Version);
@@ -41,7 +41,7 @@ namespace UnitTests.Messages
         [TestMethod]
         public void StartedRegistration_Equals()
         {
-            StartedRegistration startedRegistration = StartedRegistration.FromJson(JsonData);
+            StartedRegistration startedRegistration = StartedRegistration.FromJson<StartedRegistration>(JsonData);
             StartedRegistration sameStartedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
 
             Assert.IsTrue(startedRegistration.Equals(sameStartedRegistration));

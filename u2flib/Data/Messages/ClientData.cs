@@ -24,10 +24,10 @@ namespace u2flib.Data.Messages
         private const String ChallengeParam = "challenge";
         private const String OriginParam = "origin";
 
-        public string Type { get; private set; }
-        public string Challenge { get; private set; }
-        public string Origin { get; private set; }
-        public string RawClientData { get; private set; }
+        public String Type { get; private set; }
+        public String Challenge { get; private set; }
+        public String Origin { get; private set; }
+        public String RawClientData { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientData"/> class.
@@ -36,31 +36,38 @@ namespace u2flib.Data.Messages
         /// <exception cref="U2fException">ClientData has wrong format</exception>
         public ClientData(String clientData)
         {
-            RawClientData = Utils.GetString(Utils.Base64StringToByteArray(clientData));
+            try
+            {
+                RawClientData = Utils.GetString(Utils.Base64StringToByteArray(clientData));
 
-			JObject element = JObject.Parse(RawClientData);
-            if (element == null)
-                throw new U2fException("ClientData has wrong format");
+                JObject element = JObject.Parse(RawClientData);
+                if (element == null)
+                    throw new U2fException("ClientData has wrong format");
 
-            JToken theType, theChallenge, theOrgin;
-            if (!element.TryGetValue(TypeParam, out theType))
-                throw new U2fException("Bad clientData: missing 'typ' param");
-            if (!element.TryGetValue(ChallengeParam, out theChallenge))
-                throw new U2fException("Bad clientData: missing 'challenge' param");
+                JToken theType, theChallenge, theOrgin;
+                if (!element.TryGetValue(TypeParam, out theType))
+                    throw new U2fException("Bad clientData: missing 'typ' param");
+                if (!element.TryGetValue(ChallengeParam, out theChallenge))
+                    throw new U2fException("Bad clientData: missing 'challenge' param");
 
-            Type = theType.ToString();
-            Challenge = theChallenge.ToString();
-            if (element.TryGetValue(OriginParam, out theOrgin))
-                Origin = theOrgin.ToString();
+                Type = theType.ToString();
+                Challenge = theChallenge.ToString();
+                if (element.TryGetValue(OriginParam, out theOrgin))
+                    Origin = theOrgin.ToString();
+            }
+            catch (Exception exception)
+            {
+                throw new U2fException("Invalid clientData format.: " + exception.Message);
+            }
         }
 
         public void CheckContent(String type, String challenge, HashSet<String> facets)
         {
-            if (!type.Equals(this.Type))
+            if (!type.Equals(Type))
             {
                 throw new U2fException("Bad clientData: bad type " + type);
             }
-            if (!challenge.Equals(this.Challenge))
+            if (!challenge.Equals(Challenge))
             {
                 throw new U2fException("Wrong challenge signed in clientData");
             }
@@ -75,7 +82,7 @@ namespace u2flib.Data.Messages
             return RawClientData;
         }
 
-        private static void VerifyOrigin(String origin, HashSet<String> allowedOrigins)
+        private void VerifyOrigin(String origin, HashSet<String> allowedOrigins)
         {
             if (!allowedOrigins.Contains(CanonicalizeOrigin(origin)))
             {
@@ -84,7 +91,7 @@ namespace u2flib.Data.Messages
             }
         }
 
-        public static HashSet<String> CanonicalizeOrigins(HashSet<String> origins)
+        private HashSet<String> CanonicalizeOrigins(HashSet<String> origins)
         {
             HashSet<String> result = new HashSet<string>();
             foreach (string orgin in origins)
@@ -94,11 +101,14 @@ namespace u2flib.Data.Messages
             return result;
         }
 
-        public static String CanonicalizeOrigin(String url)
+        private String CanonicalizeOrigin(String url)
         {
             try
             {
                 Uri uri = new Uri(url);
+                if (string.IsNullOrWhiteSpace(uri.Authority))                
+                    return url;
+                
                 return uri.Scheme + "://" + uri.Authority;
             }
             catch (UriFormatException e)

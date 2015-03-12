@@ -12,28 +12,35 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace u2flib.Data.Messages
 {
     public class AuthenticateResponse : DataObject
     {
+        private readonly ClientData _clientDataRef;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticateResponse"/> class.
         /// </summary>
         /// <param name="clientData">The client data.</param>
         /// <param name="signatureData">The signature data.</param>
         /// <param name="keyHandle">The key handle.</param>
-        public AuthenticateResponse(String clientData, String signatureData, String keyHandle)
+        public AuthenticateResponse(string clientData, string signatureData, string keyHandle)
         {
             ClientData = clientData;
             SignatureData = signatureData;
             KeyHandle = keyHandle;
+            _clientDataRef = new ClientData(ClientData);
         }
 
         public ClientData GetClientData()
         {
-            return new ClientData(ClientData);
+            return _clientDataRef;
+        }
+
+        public String GetRequestId()
+        {
+            return GetClientData().Challenge;
         }
 
         /// <summary>
@@ -60,13 +67,7 @@ namespace u2flib.Data.Messages
         /// The key handle.
         /// </value>
         public String KeyHandle { get; private set; }
-
-
-        public static AuthenticateResponse FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<AuthenticateResponse>(json);
-        }
-
+        
         public override int GetHashCode()
         {
             int hash = ClientData.Sum(c => c + 31);

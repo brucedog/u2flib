@@ -28,7 +28,7 @@ namespace UnitTests.Messages
         [TestMethod]
         public void StartedAuthentication_FromJson()
         {
-            StartedAuthentication startedAuthentication = StartedAuthentication.FromJson(JsonData);
+            StartedAuthentication startedAuthentication = StartedAuthentication.FromJson<StartedAuthentication>(JsonData);
 
             Assert.IsNotNull(startedAuthentication);
             Assert.IsNotNull(startedAuthentication.Version);
@@ -46,7 +46,7 @@ namespace UnitTests.Messages
                 TestConts.SERVER_CHALLENGE_SIGN_BASE64, 
                 TestConts.APP_ID_ENROLL,
                 TestConts.KEY_HANDLE_BASE64);
-            StartedAuthentication startedAuthentication = StartedAuthentication.FromJson(JsonData);
+            StartedAuthentication startedAuthentication = StartedAuthentication.FromJson<StartedAuthentication>(JsonData);
 
             Assert.IsTrue(startedAuthentication.Equals(sameStartedAuthentication));
         }

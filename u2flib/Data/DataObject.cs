@@ -21,5 +21,10 @@ namespace u2flib.Data
         {
             return JsonConvert.SerializeObject(this);
         }
+
+        public static T FromJson<T>(String json)
+        {
+            return JsonConvert.DeserializeObject<T>(json);
+        }
     }
 }

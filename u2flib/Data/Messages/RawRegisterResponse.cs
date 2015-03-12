@@ -12,12 +12,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using Org.BouncyCastle.Security.Certificates;
 using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.X509;
 using u2flib.Exceptions;
 using u2flib.Util;
 
@@ -25,8 +25,8 @@ namespace u2flib.Data.Messages
 {
     public class RawRegisterResponse
     {
-        public const byte RegistrationReservedByteValue = 0x05;
-        public const byte RegistrationSignedReservedByteValue = 0x00;
+        private const byte RegistrationReservedByteValue = 0x05;
+        private const byte RegistrationSignedReservedByteValue = 0x00;
 
         /**
          * The (uncompressed) x,y-representation of a curve point on the P-256
@@ -39,7 +39,7 @@ namespace u2flib.Data.Messages
          */
         private readonly byte[] _keyHandle;
         
-        private readonly byte[] _attestationCertificate;
+        private readonly X509Certificate _attestationCertificate;
 
         /** A ECDSA signature (on P-256) */
         private readonly byte[] _signature;
@@ -52,7 +52,7 @@ namespace u2flib.Data.Messages
         /// <param name="attestationCertificate">The attestation certificate.</param>
         /// <param name="signature">The signature.</param>
         public RawRegisterResponse(byte[] userPublicKey, byte[] keyHandle,
-                                   byte[] attestationCertificate, byte[] signature)
+                                   X509Certificate attestationCertificate, byte[] signature)
         {
             _userPublicKey = userPublicKey;
             _keyHandle = keyHandle;
@@ -66,34 +66,28 @@ namespace u2flib.Data.Messages
 
             Stream stream = new MemoryStream(bytes);
             BinaryReader binaryReader = new BinaryReader(stream);
-
-            byte reservedByte = binaryReader.ReadByte();
-            if (reservedByte != RegistrationReservedByteValue)
-            {
-                throw new U2fException(String.Format(
-                    "Incorrect value of reserved byte. Expected: {0}. Was: {1}",
-                    RegistrationReservedByteValue, reservedByte));
-            }
-
+            
             try
             {
+                byte reservedByte = binaryReader.ReadByte();
+                if (reservedByte != RegistrationReservedByteValue)
+                {
+                    throw new U2fException(String.Format("Incorrect value of reserved byte. Expected: {0}. Was: {1}",
+                        RegistrationReservedByteValue, reservedByte));
+                }
+
                 byte[] publicKey = binaryReader.ReadBytes(65);
                 byte[] keyHandle = binaryReader.ReadBytes(binaryReader.ReadByte());
-                long certificatePosition = binaryReader.BaseStream.Position;
+                X509CertificateParser x509CertificateParser = new X509CertificateParser();
+                X509Certificate attestationCertificate = x509CertificateParser.ReadCertificate(stream);
                 int size = (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position);
-                byte[] certBytes = binaryReader.ReadBytes(size);
-                X509Certificate2 attestationCertificate = new X509Certificate2(certBytes);
-
-                binaryReader.BaseStream.Position = certificatePosition + attestationCertificate.Export(X509ContentType.Cert).Length;
-
-                size = (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position);
-
+                
                 byte[] signature = binaryReader.ReadBytes(size);
 
                 RawRegisterResponse rawRegisterResponse = new RawRegisterResponse(
                     publicKey,
                     keyHandle,
-                    attestationCertificate.RawData,
+                    attestationCertificate,
                     signature);
 
                 return rawRegisterResponse;
@@ -117,7 +111,7 @@ namespace u2flib.Data.Messages
                 _keyHandle,
                 _userPublicKey);
 
-            U2F.Crypto.CheckSignature(new X509Certificate2(_attestationCertificate), signedBytes, _signature);
+            U2F.Crypto.CheckSignature(_attestationCertificate, signedBytes, _signature);
         }
 
         public static byte[] PackBytesToSign(byte[] appIdHash, byte[] clientDataHash, byte[] keyHandle,
@@ -129,7 +123,7 @@ namespace u2flib.Data.Messages
             someBytes.AddRange(clientDataHash);
             someBytes.AddRange(keyHandle);
             someBytes.AddRange(userPublicKey);
-
+            
             return someBytes.ToArray();
         }
 
@@ -138,9 +132,8 @@ namespace u2flib.Data.Messages
             return new DeviceRegistration(
                 _keyHandle,
                 _userPublicKey,
-                _attestationCertificate,
-                DeviceRegistration.INITIAL_COUNTER_VALUE
-                );
+                _attestationCertificate.GetEncoded(),
+                DeviceRegistration.InitialCounterValue);
         }
 
         public override int GetHashCode()
@@ -161,7 +154,7 @@ namespace u2flib.Data.Messages
             if (GetType() != obj.GetType())
                 return false;
             RawRegisterResponse other = (RawRegisterResponse) obj;
-            if (!Arrays.AreEqual(_attestationCertificate, other._attestationCertificate))
+            if (!_attestationCertificate.Equals(other._attestationCertificate))
                 return false;
             if (!Arrays.AreEqual(_keyHandle, other._keyHandle))
                 return false;

@@ -12,7 +12,7 @@
 
 using System;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+//using System.Security.Cryptography.X509Certificates;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
@@ -20,33 +20,32 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
 using u2flib.Exceptions;
+using u2flib.Util;
 
 namespace u2flib.Crypto
 {
     public class BouncyCastleCrypto : ICrypto
     {
-        private readonly SHA256Managed _sha256Managed = new SHA256Managed();
-        private readonly ISigner _signer = SignerUtilities.GetSigner("SHA-256withECDSA");
         private readonly DerObjectIdentifier _curve = SecObjectIdentifiers.SecP256r1;
         private const string SignatureError = "Error when verifying signature";
         private const string ErrorDecodingPublicKey = "Error when decoding public key";
 
-        public bool CheckSignature(X509Certificate2 attestationCertificate, byte[] signedBytes, byte[] signature)
+        public bool CheckSignature(X509Certificate attestationCertificate, byte[] signedBytes, byte[] signature)
         {
-            var x509 = DotNetUtilities.FromX509Certificate(attestationCertificate);
-
-            return CheckSignature(x509.GetPublicKey(), signedBytes, signature);
+            return CheckSignature(attestationCertificate.GetPublicKey(), signedBytes, signature);
         }
 
         public bool CheckSignature(ICipherParameters getPublicKey, byte[] signedBytes, byte[] signature)
         {
             try
             {
-                _signer.Init(false, getPublicKey);
-                _signer.BlockUpdate(signedBytes, 0, signedBytes.Length);
+                ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
+                signer.Init(false, getPublicKey);
+                signer.BlockUpdate(signedBytes, 0, signedBytes.Length);
 
-                if(_signer.VerifySignature(signature))
+                if(signer.VerifySignature(signature))
                     throw new U2fException(SignatureError);
 
                 return true;
@@ -65,22 +64,19 @@ namespace u2flib.Crypto
         {
             try
             {
-                try
-                {
-                    X9ECParameters curve = SecNamedCurves.GetByOid(_curve);
-                    ECPoint point = curve.Curve.DecodePoint(encodedPublicKey);
-                    ECDomainParameters ecP = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+                X9ECParameters curve = SecNamedCurves.GetByOid(_curve);
+                ECPoint point = curve.Curve.DecodePoint(encodedPublicKey);
+                ECDomainParameters ecP = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
 
-                    return new ECPublicKeyParameters(point, ecP);
-                }
-                catch (Exception e)
-                {
-                    throw new U2fException("Could not parse user public key", e);
-                }
+                return new ECPublicKeyParameters(point, ecP);
             }
             catch (InvalidKeySpecException e)
             {
                 throw new U2fException(ErrorDecodingPublicKey, e);
+            }
+            catch (Exception e)
+            {
+                throw new U2fException("Could not parse user public key", e);
             }
         }
 
@@ -88,7 +84,11 @@ namespace u2flib.Crypto
         {
             try
             {
-                return _sha256Managed.ComputeHash(bytes);
+                return SHA256Cng.Create().ComputeHash(bytes);
+
+//                var mySHA256 = SHA256Cng.Create();
+//                var hash = mySHA256.ComputeHash(bytes);
+//                return hash;
             }
             catch (Exception e)
             {
@@ -98,10 +98,7 @@ namespace u2flib.Crypto
 
         public byte[] Hash(string str)
         {
-            byte[] bytes = new byte[str.Length*sizeof (char)];
-            Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-
-            return Hash(bytes);
+            return Hash(Utils.GetBytes(str));
         }
     }
 }

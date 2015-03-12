@@ -27,7 +27,7 @@ namespace UnitTests.Messages
         [TestMethod]
         public void AuthenticateResponse_FromJson()
         {
-            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(JsonData);
+            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson<AuthenticateResponse>(JsonData);
 
             Assert.IsNotNull(authenticateResponse);
             Assert.AreEqual(authenticateResponse.GetType(), typeof(AuthenticateResponse));
@@ -36,7 +36,7 @@ namespace UnitTests.Messages
         [TestMethod]
         public void AuthenticateResponse_Equals()
         {
-            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson(JsonData);
+            AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson<AuthenticateResponse>(JsonData);
             AuthenticateResponse sameAuthenticateResponse = new AuthenticateResponse(
                 TestConts.CLIENT_DATA_AUTHENTICATE_BASE64, 
                 TestConts.SIGN_RESPONSE_DATA_BASE64,

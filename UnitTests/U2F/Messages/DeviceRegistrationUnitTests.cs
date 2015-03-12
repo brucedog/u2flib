@@ -14,7 +14,7 @@ namespace UnitTests.Messages
         [TestMethod]
         public void DeviceRegistration_FromJson()
         {
-            DeviceRegistration deviceRegistration = DeviceRegistration.FromJson(JsonData);
+            DeviceRegistration deviceRegistration = DeviceRegistration.FromJson<DeviceRegistration>(JsonData);
 
             Assert.IsNotNull(deviceRegistration);
             Assert.IsNotNull(deviceRegistration.KeyHandle);

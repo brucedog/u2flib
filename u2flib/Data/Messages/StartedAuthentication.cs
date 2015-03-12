@@ -73,11 +73,6 @@ namespace u2flib.Data.Messages
         /// </value>
         public String AppId { get; private set; }
 
-        public static StartedAuthentication FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<StartedAuthentication>(json);
-        }
-
         public override int GetHashCode()
         {
             int hash = 23 + Version.Sum(c => c + 31);

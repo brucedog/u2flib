@@ -12,7 +12,6 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace u2flib.Data.Messages
 {
@@ -60,11 +59,6 @@ namespace u2flib.Data.Messages
         /// The application identifier.
         /// </value>
         public String AppId { get; private set; }
-
-        public static StartedRegistration FromJson(String json)
-        {
-            return JsonConvert.DeserializeObject<StartedRegistration>(json);
-        }
 
         public override int GetHashCode()
         {
