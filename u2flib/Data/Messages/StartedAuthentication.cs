@@ -12,7 +12,6 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace u2flib.Data.Messages
 {

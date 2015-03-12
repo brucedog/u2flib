@@ -38,6 +38,7 @@ namespace u2flib.Data
             PublicKey = publicKey;
             Counter = counter;
             IsCompromised = isCompromised;
+
             try
             {
                 AttestationCert = attestationCert;
@@ -48,6 +49,12 @@ namespace u2flib.Data
             }
         }
 
+        /// <summary>
+        /// Gets if the device has been compromised.
+        /// </summary>
+        /// <value>
+        /// If the device has been compromised.
+        /// </value>
         public bool IsCompromised { get; private set; }
 
         /// <summary>
@@ -93,7 +100,7 @@ namespace u2flib.Data
         }
 
         /// <summary>
-        /// To the json with out attestion cert.
+        /// To the json with out attestation cert.
         /// </summary>
         /// <returns></returns>
         public String ToJsonWithOutAttestionCert()
@@ -128,14 +135,14 @@ namespace u2flib.Data
         public override bool Equals(Object obj)
         {
             if (!(obj is DeviceRegistration))
-            {
                 return false;
-            }
+            
             DeviceRegistration that = (DeviceRegistration)obj;
+
             return Arrays.AreEqual(KeyHandle, that.KeyHandle)
                    && Arrays.AreEqual(PublicKey, that.PublicKey)
-                   && Arrays.AreEqual(AttestationCert, that.AttestationCert);
-            return true;
+                   && Arrays.AreEqual(AttestationCert, that.AttestationCert)
+                   && (IsCompromised == that.IsCompromised);
         }
     }
 

@@ -12,7 +12,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Org.BouncyCastle.Security.Certificates;
@@ -114,19 +113,6 @@ namespace u2flib.Data.Messages
             U2F.Crypto.CheckSignature(_attestationCertificate, signedBytes, _signature);
         }
 
-        public static byte[] PackBytesToSign(byte[] appIdHash, byte[] clientDataHash, byte[] keyHandle,
-                                             byte[] userPublicKey)
-        {
-            List<byte> someBytes = new List<byte>();
-            someBytes.Add(RegistrationSignedReservedByteValue);
-            someBytes.AddRange(appIdHash);
-            someBytes.AddRange(clientDataHash);
-            someBytes.AddRange(keyHandle);
-            someBytes.AddRange(userPublicKey);
-            
-            return someBytes.ToArray();
-        }
-
         public DeviceRegistration CreateDevice()
         {
             return new DeviceRegistration(
@@ -134,6 +120,19 @@ namespace u2flib.Data.Messages
                 _userPublicKey,
                 _attestationCertificate.GetEncoded(),
                 DeviceRegistration.InitialCounterValue);
+        }
+
+        public byte[] PackBytesToSign(byte[] appIdHash, 
+            byte[] clientDataHash, byte[] keyHandle,byte[] userPublicKey)
+        {
+            List<byte> someBytes = new List<byte>();
+            someBytes.Add(RegistrationSignedReservedByteValue);
+            someBytes.AddRange(appIdHash);
+            someBytes.AddRange(clientDataHash);
+            someBytes.AddRange(keyHandle);
+            someBytes.AddRange(userPublicKey);
+
+            return someBytes.ToArray();
         }
 
         public override int GetHashCode()

@@ -39,11 +39,21 @@ namespace u2flib.Util
             return Convert.FromBase64String(input); 
         }
 
-        public static byte[] GetBytes(string str)
+        /// <summary>
+        /// Convert string into UTF8 byte[]
+        /// </summary>
+        /// <param name="stringToConvert">The string to convert.</param>
+        /// <returns>UTF8 encoded byte[]</returns>
+        public static byte[] GetBytes(string stringToConvert)
         {
-            return Encoding.UTF8.GetBytes(str);
+            return Encoding.UTF8.GetBytes(stringToConvert);
         }
 
+        /// <summary>
+        /// Converts byte[] to UTF8 encoded string
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns>UTF8 encoded string</returns>
         public static string GetString(byte[] bytes)
         {
             return Encoding.UTF8.GetString(bytes);

@@ -120,7 +120,7 @@ namespace u2flib.Data.Messages
                 UserPresence,
                 Counter,
                 U2F.Crypto.Hash(clientData));
-
+            
             U2F.Crypto.CheckSignature(
                 U2F.Crypto.DecodePublicKey(publicKey),
                 signedBytes,
@@ -135,7 +135,7 @@ namespace u2flib.Data.Messages
         /// <param name="counter">The counter.</param>
         /// <param name="challengeHash">The challenge hash.</param>
         /// <returns></returns>
-        public static byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, uint counter, byte[] challengeHash)
+        public byte[] PackBytesToSign(byte[] appIdHash, byte userPresence, uint counter, byte[] challengeHash)
         {
             // covert the counter to a byte array in case the int is to big for a single byte
             byte[] counterBytes = BitConverter.GetBytes(counter);

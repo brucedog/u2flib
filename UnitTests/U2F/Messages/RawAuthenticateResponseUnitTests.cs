@@ -45,7 +45,7 @@ namespace UnitTests.Messages
         {
             RawAuthenticateResponse rawAuthenticateResponse = RawAuthenticateResponse.FromBase64(_authenticateResponse.SignatureData);
 
-            byte[] signedBytes = RawAuthenticateResponse.PackBytesToSign(
+            byte[] signedBytes = rawAuthenticateResponse.PackBytesToSign(
                U2F.Crypto.Hash("testid"),
                rawAuthenticateResponse.UserPresence,
                rawAuthenticateResponse.Counter,

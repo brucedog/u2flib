@@ -24,10 +24,9 @@ namespace u2flib
         public const String U2FVersion = "U2F_V2";
         private static readonly IChallengeGenerator ChallengeGenerator = new RandomChallengeGenerator();
         public static readonly ICrypto Crypto = new BouncyCastleCrypto();
-        public const String AuthenticateTyp = "navigator.id.getAssertion";
-        public const String RegisterType = "navigator.id.finishEnrollment";
-
-
+        private const String AuthenticateTyp = "navigator.id.getAssertion";
+        private const String RegisterType = "navigator.id.finishEnrollment";
+        
         /**
          * Initiates the registration of a device.
          *

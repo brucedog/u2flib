@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using u2flib;
 using u2flib.Data.Messages;
+using u2flib.Util;
 
 namespace UnitTests.Messages
 {
@@ -25,6 +27,22 @@ namespace UnitTests.Messages
             RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
 
             Assert.IsTrue(rawAuthenticateResponse.Equals(rawAuthenticateResponse1));
+        }
+
+        [TestMethod]
+        public void RawRegisterResponse_PackBytesToSign()
+        {
+            RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
+            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
+
+            byte[] packedBytes = rawAuthenticateResponse.PackBytesToSign(
+                U2F.Crypto.Hash("appid"),
+                Utils.Base64StringToByteArray(TestConts.CLIENT_DATA_REGISTER),
+                TestConts.KEY_HANDLE_BASE64_BYTE,
+                TestConts.USER_PUBLIC_KEY_AUTHENTICATE_HEX);
+
+            Assert.IsNotNull(packedBytes);
+            Assert.IsTrue(packedBytes.Length > 0);
         }
     }
 }
