@@ -11,9 +11,9 @@ http://bfoster.net/U2F.mvc
 https://github.com/Yubico/java-u2flib-server
 
 ## Useful links
-https://www.yubico.com/products/yubikey-hardware/fido-u2f-security-key/
-https://developers.yubico.com/U2F/
-https://fidoalliance.org/
+- https://www.yubico.com/products/yubikey-hardware/fido-u2f-security-key/
+- https://developers.yubico.com/U2F/
+- https://fidoalliance.org/
 
 ## License
 The project is free software: you can redistribute it and/or modify
