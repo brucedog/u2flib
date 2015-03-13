@@ -37,7 +37,7 @@ namespace UnitTests.Messages
 
             byte[] packedBytes = rawAuthenticateResponse.PackBytesToSign(
                 U2F.Crypto.Hash("appid"),
-                Utils.Base64StringToByteArray(TestConts.CLIENT_DATA_REGISTER),
+                U2F.Crypto.Hash(TestConts.CLIENT_DATA_REGISTER),
                 TestConts.KEY_HANDLE_BASE64_BYTE,
                 TestConts.USER_PUBLIC_KEY_AUTHENTICATE_HEX);
 
