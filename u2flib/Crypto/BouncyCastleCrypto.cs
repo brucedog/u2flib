@@ -84,11 +84,10 @@ namespace u2flib.Crypto
         {
             try
             {
-                return SHA256Cng.Create().ComputeHash(bytes);
+                SHA256 mySHA256 = SHA256Cng.Create();
+                byte[] hash = mySHA256.ComputeHash(bytes);
 
-//                var mySHA256 = SHA256Cng.Create();
-//                var hash = mySHA256.ComputeHash(bytes);
-//                return hash;
+                return hash;
             }
             catch (Exception e)
             {
