@@ -12,7 +12,6 @@
 
 using System;
 using System.Security.Cryptography;
-//using System.Security.Cryptography.X509Certificates;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
@@ -46,7 +45,7 @@ namespace u2flib.Crypto
                 signer.Init(false, getPublicKey);
                 signer.BlockUpdate(signedBytes, 0, signedBytes.Length);
 
-                if(!signer.VerifySignature(signature))
+                if (!signer.VerifySignature(signature))
                     throw new U2fException(SignatureError);
 
                 return true;
