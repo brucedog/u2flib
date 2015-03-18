@@ -29,6 +29,7 @@ namespace u2flib.Crypto
     public class BouncyCastleCrypto : ICrypto
     {
         private readonly DerObjectIdentifier _curve = SecObjectIdentifiers.SecP256r1;
+        private readonly SHA256Managed _sha256 = new SHA256Managed();
         private const string SignatureError = "Error when verifying signature";
         private const string ErrorDecodingPublicKey = "Error when decoding public key";
 
@@ -45,7 +46,7 @@ namespace u2flib.Crypto
                 signer.Init(false, getPublicKey);
                 signer.BlockUpdate(signedBytes, 0, signedBytes.Length);
 
-                if(signer.VerifySignature(signature))
+                if(!signer.VerifySignature(signature))
                     throw new U2fException(SignatureError);
 
                 return true;
@@ -84,8 +85,7 @@ namespace u2flib.Crypto
         {
             try
             {
-                SHA256 mySHA256 = SHA256Cng.Create();
-                byte[] hash = mySHA256.ComputeHash(bytes);
+                byte[] hash = _sha256.ComputeHash(bytes);
 
                 return hash;
             }
