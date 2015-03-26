@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Org.BouncyCastle.X509;
 using u2flib;
 using u2flib.Data;
 using u2flib.Data.Messages;
+using u2flib.Util;
 
 namespace UnitTests
 {
@@ -64,12 +66,13 @@ namespace UnitTests
             Assert.IsNotNull(results.Version);
         }
 
+        [Ignore]
         [TestMethod]
         public void U2F_FinishAuthentication()
         {
             StartedAuthentication startedAuthentication = new StartedAuthentication(
                 TestConts.SERVER_CHALLENGE_SIGN_BASE64,
-                TestConts.APP_ID_ENROLL,
+                TestConts.APP_SIGN_ID,
                 TestConts.KEY_HANDLE_BASE64);
 
             AuthenticateResponse authenticateResponse = new AuthenticateResponse(
@@ -77,9 +80,10 @@ namespace UnitTests
                 TestConts.SIGN_RESPONSE_DATA_BASE64,
                 TestConts.KEY_HANDLE_BASE64);
 
-            RegisterResponse registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64, TestConts.CLIENT_DATA_REGISTER_BASE64);
-            RawRegisterResponse rawAuthenticateResponse = RawRegisterResponse.FromBase64(registerResponse.RegistrationData);
-            DeviceRegistration deviceRegistration = rawAuthenticateResponse.CreateDevice();
+
+            DeviceRegistration deviceRegistration = new DeviceRegistration(TestConts.KEY_HANDLE_BASE64_BYTE, TestConts.USER_PUBLIC_KEY_AUTHENTICATE_HEX,
+                Utils.Base64StringToByteArray(TestConts.ATTESTATION_CERTIFICATE), 0);
+
             uint orginalValue = deviceRegistration.Counter;
 
             U2F.FinishAuthentication(startedAuthentication, authenticateResponse, deviceRegistration);

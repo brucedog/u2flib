@@ -328,6 +328,7 @@ namespace UnitTests
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
+        [Ignore]
         [TestMethod]
         public void MemeberShipService_AuthenticateUser()
         {
