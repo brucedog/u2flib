@@ -7,6 +7,9 @@ The solution is nearly a line for line copy of the JAVA implementation rewritten
 ## Working Demo Site  
 http://bfoster.net/U2F.mvc
 
+## NuGet page
+https://www.nuget.org/packages/u2flib/
+
 ## Original source JAVA library is located below
 https://github.com/Yubico/java-u2flib-server
 
