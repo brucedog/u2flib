@@ -140,6 +140,10 @@ namespace u2flib.Data.Messages
             // covert the counter to a byte array in case the int is to big for a single byte
             byte[] counterBytes = BitConverter.GetBytes(counter);
             
+            //counter has to be reversed if its little endian encoded
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(counterBytes);
+
             List<byte> someBytes = new List<byte>();
             someBytes.AddRange(appIdHash);
             someBytes.Add(userPresence);

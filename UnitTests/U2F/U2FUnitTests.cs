@@ -66,7 +66,6 @@ namespace UnitTests
             Assert.IsNotNull(results.Version);
         }
 
-        [Ignore]
         [TestMethod]
         public void U2F_FinishAuthentication()
         {
