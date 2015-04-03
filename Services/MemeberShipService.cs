@@ -6,6 +6,7 @@ using DataModels;
 using u2flib;
 using u2flib.Data;
 using u2flib.Data.Messages;
+using u2flib.Util;
 
 namespace Services
 {
@@ -71,8 +72,10 @@ namespace Services
                 return false;
 
             AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson<AuthenticateResponse>(deviceResponse);
-            
-            var device = user.DeviceRegistrations.FirstOrDefault();
+
+            byte[] keyHandle = Utils.Base64StringToByteArray(authenticateResponse.KeyHandle);
+
+            var device = user.DeviceRegistrations.FirstOrDefault(f => f.KeyHandle.SequenceEqual(keyHandle));
 
             if (device == null || user.AuthenticationRequest == null)
                 return false;
