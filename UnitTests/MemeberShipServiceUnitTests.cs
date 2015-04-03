@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Services;
 using u2flib.Data.Messages;
+using u2flib.Util;
 using DeviceRegistration = u2flib.Data.DeviceRegistration;
 
 namespace UnitTests
@@ -328,7 +329,6 @@ namespace UnitTests
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
-        [Ignore]
         [TestMethod]
         public void MemeberShipService_AuthenticateUser()
         {
@@ -349,9 +349,9 @@ namespace UnitTests
                             },
                         AuthenticationRequest = new AuthenticationRequest
                             {
-                                AppId = "test",
-                                KeyHandle = _authenticateResponse.KeyHandle,
-                                Challenge = _authenticateResponse.GetClientData().Challenge
+                                AppId = _startedAuthentication.AppId,
+                                KeyHandle = _startedAuthentication.KeyHandle,
+                                Challenge = _startedAuthentication.Challenge
                             }
                     });
             _userRepository.Setup(e => e.RemoveUsersAuthenticationRequest(It.Is<string>(p => p == "test")));
@@ -417,15 +417,24 @@ namespace UnitTests
             _startedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
             _registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
                                                                      TestConts.CLIENT_DATA_REGISTER_BASE64);
+
             _rawAuthenticateResponse = RawRegisterResponse.FromBase64(_registerResponse.RegistrationData);
-            _deviceRegistration = _rawAuthenticateResponse.CreateDevice();
 
-            _authenticateResponse = new AuthenticateResponse(TestConts.CLIENT_DATA_AUTHENTICATE_BASE64,
-                                                            TestConts.SIGN_RESPONSE_DATA_BASE64,
-                                                            TestConts.KEY_HANDLE_BASE64);
+            _deviceRegistration = new DeviceRegistration(
+                TestConts.KEY_HANDLE_BASE64_BYTE, 
+                TestConts.USER_PUBLIC_KEY_AUTHENTICATE_HEX,
+                Utils.Base64StringToByteArray(TestConts.ATTESTATION_CERTIFICATE), 
+                0);
 
-            _startedAuthentication = new StartedAuthentication(TestConts.SERVER_CHALLENGE_SIGN_BASE64, TestConts.APP_ID_ENROLL,
-                                          TestConts.KEY_HANDLE_BASE64);
+            _authenticateResponse = new AuthenticateResponse(
+                TestConts.CLIENT_DATA_AUTHENTICATE_BASE64,
+                TestConts.SIGN_RESPONSE_DATA_BASE64,
+                TestConts.KEY_HANDLE_BASE64);
+
+            _startedAuthentication = new StartedAuthentication(
+                    TestConts.SERVER_CHALLENGE_SIGN_BASE64,
+                    TestConts.APP_SIGN_ID,
+                    TestConts.KEY_HANDLE_BASE64);
         }
     }
 }
