@@ -16,7 +16,6 @@ namespace UnitTests
     {
         private Mock<IUserRepository> _userRepository;
         private RegisterResponse _registerResponse;
-        private RawRegisterResponse _rawAuthenticateResponse;
         private DeviceRegistration _deviceRegistration;
         private AuthenticateResponse _authenticateResponse;
         private User _user;
@@ -259,8 +258,6 @@ namespace UnitTests
         [TestMethod]
         public void MemeberShipService_AuthenticateUserNoUserName()
         {
-            CreateResponses();
-
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.AuthenticateUser("", _authenticateResponse.ToJson());
@@ -409,17 +406,15 @@ namespace UnitTests
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);
-             
         }
 
         private void CreateResponses()
         {
             _startedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
+
             _registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
                                                                      TestConts.CLIENT_DATA_REGISTER_BASE64);
-
-            _rawAuthenticateResponse = RawRegisterResponse.FromBase64(_registerResponse.RegistrationData);
-
+            
             _deviceRegistration = new DeviceRegistration(
                 TestConts.KEY_HANDLE_BASE64_BYTE, 
                 TestConts.USER_PUBLIC_KEY_AUTHENTICATE_HEX,
