@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
 using BaseLibrary;
 using DataModels;
@@ -62,13 +63,17 @@ namespace UnitTests
         public void HomeController_BeginLoginWithUsernameAndPassword()
         {
             _memeberShipService.Setup(s => s.IsUserRegistered(It.Is<string>(p => p == "tester"))).Returns(true);
-            _memeberShipService.Setup(s => s.GenerateServerChallenge(It.Is<string>(p => p == "tester"))).Returns(new ServerChallenge
-                                                                                                            {
-                                                                                                                AppId = "unittests",
-                                                                                                                Challenge = "notrealchallenge",
-                                                                                                                Version = "U2F_V2",
-                                                                                                                KeyHandle = "notreallykeyhandle"
-                                                                                                            }).Verifiable();
+            _memeberShipService.Setup(s => s.GenerateServerChallenge(It.Is<string>(p => p == "tester")))
+                .Returns(new List<ServerChallenge>
+            {
+                new ServerChallenge
+                {
+                    appId = "unittests",
+                    challenge = "notrealchallenge",
+                    version = "U2F_V2",
+                    keyHandle = "notreallykeyhandle",
+                }
+            }).Verifiable();
             _memeberShipService.Setup(s => s.IsValidUserNameAndPassword(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "password"))).Returns(true).Verifiable();
 
             HomeController homeController = new HomeController(_memeberShipService.Object);
