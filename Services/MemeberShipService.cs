@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using BaseLibrary;
@@ -105,7 +106,7 @@ namespace Services
             return user.DeviceRegistrations.Count > 0;
         }
 
-        public ServerChallenge GenerateServerChallenge(string userName)
+        public List<ServerChallenge> GenerateServerChallenge(string userName)
         {
             if (string.IsNullOrWhiteSpace(userName))
                 return null;
@@ -115,26 +116,30 @@ namespace Services
             if (user == null)
                 return null;
 
-            // TODO  this would have to change 
-            var device = user.DeviceRegistrations.FirstOrDefault();
+            var device = user.DeviceRegistrations;
 
-            if (device == null)
+            if (device == null || device.Count == 0)
                 return null;
 
-            DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
-            StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
-
-            _userRepository.SaveUserAuthenticationRequest(userName, startedAuthentication.AppId, startedAuthentication.Challenge,
-                                                          startedAuthentication.KeyHandle);
-            
-
-            return new ServerChallenge
+            List<ServerChallenge> serverChallenges = new List<ServerChallenge>();
+            foreach (var registeredDevice in device)
             {
-                AppId = startedAuthentication.AppId,
-                Challenge = startedAuthentication.Challenge,
-                KeyHandle = startedAuthentication.KeyHandle,
-                Version = startedAuthentication.Version
-            };
+                DeviceRegistration registration = new DeviceRegistration(registeredDevice.KeyHandle, registeredDevice.PublicKey, registeredDevice.AttestationCert, registeredDevice.Counter);
+                StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
+
+                serverChallenges.Add(new ServerChallenge
+                {
+                    appId = startedAuthentication.AppId,
+                    challenge = startedAuthentication.Challenge,
+                    keyHandle = startedAuthentication.KeyHandle,
+                    version = startedAuthentication.Version
+                });
+
+                _userRepository.SaveUserAuthenticationRequest(userName, startedAuthentication.AppId, startedAuthentication.Challenge,
+                                                              startedAuthentication.KeyHandle);
+            }
+
+            return serverChallenges;
         }
 
         public bool IsValidUserNameAndPassword(string userName, string password)
