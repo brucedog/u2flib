@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DataModels;
+﻿using DataModels;
 
 namespace BaseLibrary
 {
@@ -40,7 +39,7 @@ namespace BaseLibrary
         /// </summary>
         /// <param name="userName">Name of the user.</param>
         /// <returns></returns>
-        List<ServerChallenge> GenerateServerChallenge(string userName);
+        ServerChallenge GenerateServerChallenge(string userName);
 
         /// <summary>
         /// Determines whether [is valid user name and password] [the specified user name].

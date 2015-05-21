@@ -1,30 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DataModels
-{
-    public class UserViewModel
-    {
-        [Required]
-        [Display(Name = "User name")]
-        public string UserName { get; set; }
-
-        [Required]
-        public int Id { get; set; }
-
-        [Required]
-        [Display(Name = "Updated on")]
-        public DateTime UpdatedOn { get; set; }
-
-        [Required]
-        [Display(Name = "Created on")]
-        public DateTime CreatedOn { get; set; }
-
-        [Required]
-        public ICollection<Device> Devices { get; set; }
-    }
-
+{    
     public class BeginLoginModel
     {
         [Required]
@@ -47,6 +24,10 @@ namespace DataModels
         public string AppId { get; set; }
 
         [Required]
+        [Display(Name = "Key Handel")]
+        public string KeyHandle { get; set; }
+
+        [Required]
         [Display(Name = "Version")]
         public string Version { get; set; }
 
@@ -54,8 +35,9 @@ namespace DataModels
         [Display(Name = "Device Response")]
         public string DeviceResponse { get; set; }
 
-        [Display(Name = "Challenges")]
-        public string Challenges { get; set; }
+        [Required]
+        [Display(Name = "Challenge")]
+        public string Challenge { get; set; }
     }
 
     public class RegisterModel

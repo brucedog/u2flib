@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using BaseLibrary;
@@ -106,7 +105,7 @@ namespace Services
             return user.DeviceRegistrations.Count > 0;
         }
 
-        public List<ServerChallenge> GenerateServerChallenge(string userName)
+        public ServerChallenge GenerateServerChallenge(string userName)
         {
             if (string.IsNullOrWhiteSpace(userName))
                 return null;
@@ -116,30 +115,26 @@ namespace Services
             if (user == null)
                 return null;
 
-            var device = user.DeviceRegistrations;
+            // TODO  this would have to change 
+            var device = user.DeviceRegistrations.FirstOrDefault();
 
-            if (device == null || device.Count == 0)
+            if (device == null)
                 return null;
 
-            List<ServerChallenge> serverChallenges = new List<ServerChallenge>();
-            foreach (var registeredDevice in device)
+            DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
+            StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
+
+            _userRepository.SaveUserAuthenticationRequest(userName, startedAuthentication.AppId, startedAuthentication.Challenge,
+                                                          startedAuthentication.KeyHandle);
+            
+
+            return new ServerChallenge
             {
-                DeviceRegistration registration = new DeviceRegistration(registeredDevice.KeyHandle, registeredDevice.PublicKey, registeredDevice.AttestationCert, registeredDevice.Counter);
-                StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
-
-                serverChallenges.Add(new ServerChallenge
-                {
-                    appId = startedAuthentication.AppId,
-                    challenge = startedAuthentication.Challenge,
-                    keyHandle = startedAuthentication.KeyHandle,
-                    version = startedAuthentication.Version
-                });
-
-                _userRepository.SaveUserAuthenticationRequest(userName, startedAuthentication.AppId, startedAuthentication.Challenge,
-                                                              startedAuthentication.KeyHandle);
-            }
-
-            return serverChallenges;
+                AppId = startedAuthentication.AppId,
+                Challenge = startedAuthentication.Challenge,
+                KeyHandle = startedAuthentication.KeyHandle,
+                Version = startedAuthentication.Version
+            };
         }
 
         public bool IsValidUserNameAndPassword(string userName, string password)

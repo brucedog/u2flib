@@ -2,9 +2,9 @@ namespace DataModels
 {
     public class ServerChallenge
     {
-        public string challenge { get; set; }
-        public string version { get; set; }
-        public string appId { get; set; }
-        public string keyHandle { get; set; }
+        public string AppId { get; set; }
+        public string KeyHandle { get; set; }
+        public string Version { get; set; }
+        public string Challenge { get; set; }
     }
 }

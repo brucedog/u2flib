@@ -1,12 +1,11 @@
-﻿@using Microsoft.Ajax.Utilities;
-@model DataModels.CompleteLoginModel
+﻿@model DataModels.CompleteLoginModel
 
 @{
     ViewBag.Title = "FinishAuthentication";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Finish Authentication</h2>
+<h2>FinishAuthentication</h2>
 @using (Html.BeginForm("CompletedLogin", "Home", FormMethod.Post, new { id = "loginForm" }))
 {
     @Html.AntiForgeryToken()
@@ -44,6 +43,23 @@
             </div>
         </div>
 
+        <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+            <div class=".col-xs-6 .col-sm-4">
+                @Html.LabelFor(m => m.Challenge)
+            </div>
+            <div class=".col-xs-6 .col-sm-4">
+                <input data-val="true" name="challenege" readonly="True" type="text" value="@Model.Challenge" />
+            </div>
+        </div>
+
+        <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+            <div class=".col-xs-6 .col-sm-4">
+                @Html.LabelFor(m => m.KeyHandle)
+            </div>
+            <div class=".col-xs-6 .col-sm-4">
+                <input data-val="true" name="keyHandle" readonly="True" type="text" value="@Model.KeyHandle" />
+            </div>
+        </div>
 
         <div class=".col-xs-12 .col-sm-6 .col-lg-8">
                 <div class=".col-xs-6 .col-sm-4">
@@ -86,12 +102,20 @@
             4: 'The device is already registered, please login',
             5: 'Authentication timed out. Please reload to try again.'
         };
+        var request = { "keyHandle": "@Model.KeyHandle", "version": "@Model.Version", "challenge": "@Model.Challenge", "appId": "@Model.AppId" };
+        console.log("sign: ", request);
         $('#promptModal').modal('show');
 
+
         setTimeout(function() {
-            window.u2f.sign(
-                @Html.Raw(JSON.Validate(Model.Challenges).Replace("\"", "'"))
-            , function (data) {
+            window.u2f.sign([
+                {
+                    challenge: "@Model.Challenge",
+                    version: "@Model.Version",
+                    appId: "@Model.AppId",
+                    keyHandle: "@Model.KeyHandle"
+                }
+            ], function(data) {
                 console.log("call back data: ", data);
 
                 if (data.errorCode) {
