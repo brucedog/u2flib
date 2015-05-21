@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using System.Web.Mvc;
 using BaseLibrary;
 using DataModels;
+using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 
 namespace DemoU2FSite.Controllers
 {
@@ -49,15 +53,18 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                ServerChallenge serverChallenge = _memeberShipService.GenerateServerChallenge(model.UserName.Trim());
+                List<ServerChallenge> serverChallenge = _memeberShipService.GenerateServerChallenge(model.UserName.Trim());
 
+                if(serverChallenge == null || serverChallenge.Count == 0)
+                    throw new Exception("No server challenges were generated.");
+
+                var challenges = JsonConvert.SerializeObject(serverChallenge);
                 CompleteLoginModel loginModel = new CompleteLoginModel
                                                 {
-                                                    AppId = serverChallenge.AppId,
-                                                    KeyHandle = serverChallenge.KeyHandle,
-                                                    Version = serverChallenge.Version,
-                                                    Challenge = serverChallenge.Challenge,
-                                                    UserName = model.UserName.Trim()
+                                                    AppId = serverChallenge.First().appId,
+                                                    Version = serverChallenge.First().version,
+                                                    UserName = model.UserName.Trim(),
+                                                    Challenges = challenges
                                                 };
                 return View("FinishLogin", loginModel);
             }
@@ -158,6 +165,18 @@ namespace DemoU2FSite.Controllers
             
             ModelState.AddModelError("CustomError", "bad username/device response");
             return View("FinishRegister", value);
+        }
+
+        private UserViewModel CreateUserViewModel(User user)
+        {
+            return new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.Name,
+                UpdatedOn = user.UpdatedOn,
+                CreatedOn = user.CreatedOn,
+                Devices = user.DeviceRegistrations
+            };
         }
     }
 }
