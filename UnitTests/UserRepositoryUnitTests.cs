@@ -16,12 +16,10 @@ namespace UnitTests
     public class UserRepositoryUnitTests
     {
         private Mock<IDataContext> _mockContext;
-        private StartedRegistration _startedRegistration;
         private RegisterResponse _registerResponse;
         private RawRegisterResponse _rawAuthenticateResponse;
         private DeviceRegistration _deviceRegistration;
         private AuthenticateResponse _authenticateResponse;
-        private StartedAuthentication _startedAuthentication;
 
         [TestInitialize]
         public void Setup()
@@ -217,7 +215,6 @@ namespace UnitTests
 
         private void CreateResponses()
         {
-            _startedRegistration = new StartedRegistration(TestConts.SERVER_CHALLENGE_REGISTER_BASE64, TestConts.APP_ID_ENROLL);
             _registerResponse = new RegisterResponse(TestConts.REGISTRATION_RESPONSE_DATA_BASE64,
                                                                      TestConts.CLIENT_DATA_REGISTER_BASE64);
             _rawAuthenticateResponse = RawRegisterResponse.FromBase64(_registerResponse.RegistrationData);
@@ -226,9 +223,6 @@ namespace UnitTests
             _authenticateResponse = new AuthenticateResponse(TestConts.CLIENT_DATA_AUTHENTICATE_BASE64,
                                                             TestConts.SIGN_RESPONSE_DATA_BASE64,
                                                             TestConts.KEY_HANDLE_BASE64);
-
-            _startedAuthentication = new StartedAuthentication(TestConts.SERVER_CHALLENGE_SIGN_BASE64, TestConts.APP_ID_ENROLL,
-                                          TestConts.KEY_HANDLE_BASE64);
         }
     }
 }
