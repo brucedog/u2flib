@@ -106,11 +106,13 @@
                         $('#promptModal').modal('hide');
                         return alert(errorMap[data.errorCode]);
                     }
-                    console.log("Register callback", data);
-                    $('#promptModal').modal('hide');
-                    $('#DeviceResponse').val(JSON.stringify(data));
-                    $('#registerForm').submit();
-                });
+                console.log("Register callback", data);
+                $('#promptModal').modal('hide');
+                $('#DeviceResponse').val(JSON.stringify(data));
+                $('#registerForm').submit();
+
+                return false;
+            });
         }, 1000);
     </script>
 }

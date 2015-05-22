@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Mvc;
+using System.Web.Security;
 using BaseLibrary;
 using DataModels;
 using Microsoft.Ajax.Utilities;
@@ -91,17 +92,16 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                model.DeviceResponse = _memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()) 
-                    ? "Authentication was successful." 
-                    : "Authentication failed.";
+                if (!_memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
+                    throw new Exception("Device response did not work with user.");
 
-                return View("CompletedLogin", model);
+                return RedirectToAction("Index", "Profile", new {userName = model.UserName});
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
 
-                ModelState.AddModelError("", "Error finding challenge");
+                ModelState.AddModelError("", "Error authenticating");
                 return View("FinishLogin", model);
             }
         }
