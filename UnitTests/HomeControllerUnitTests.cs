@@ -147,7 +147,6 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsFalse(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishLogin", result.ViewName);
-            
         }
 
         [TestMethod]
@@ -166,9 +165,6 @@ namespace UnitTests
             ViewResult result = homeController.CompletedLogin(beginLoginModel) as ViewResult;
 
             Assert.IsNotNull(result);
-            Assert.IsTrue(homeController.ModelState.IsValid);
-            Assert.AreEqual("CompletedLogin", result.ViewName);
-            
         }
 
         [TestMethod]
@@ -221,7 +217,6 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishRegister", result.ViewName);
-            
         }
 
         [TestMethod]
@@ -298,7 +293,6 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("CompletedRegister", result.ViewName);
-            
         }
 
         [TestMethod]
