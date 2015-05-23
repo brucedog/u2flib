@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.Mvc;
 using BaseLibrary;
 using DataModels;
@@ -162,9 +163,10 @@ namespace UnitTests
                                                      DeviceResponse = "notrealdeviceresponse"
                                                  };
 
-            ViewResult result = homeController.CompletedLogin(beginLoginModel) as ViewResult;
-
+            var result = homeController.CompletedLogin(beginLoginModel) as RedirectToRouteResult;
+            
             Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.RouteValues["action"] as string);
         }
 
         [TestMethod]
