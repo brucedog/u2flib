@@ -40,15 +40,21 @@ namespace Repositories
             }
         }
 
-        public void RemoveUsersAuthenticationRequest(string userName)
+        public void RemoveUsersAuthenticationRequests(string userName)
         {
             User user = _dataContext.Users.FirstOrDefault(f => f.Name.Equals(userName.Trim()));
 
             if (user != null)
             {
-                user.AuthenticationRequest = null;
+                var list = user.AuthenticationRequest.ToList();
+                int i = 0;
+                while (user.AuthenticationRequest.Count > 0)
+                {
+                    user.AuthenticationRequest.Remove(list[i]);
+                }
+
                 user.UpdatedOn = DateTime.Now;
-                
+
                 _dataContext.SaveChanges();
             }
         }
@@ -60,11 +66,14 @@ namespace Repositories
             if(user == null)
                 return;
 
-            user.AuthenticationRequest = new AuthenticationRequest
+            user.AuthenticationRequest = new[]
             {
-                AppId = appId,
-                Challenge = challenge,
-                KeyHandle = keyHandle
+                new AuthenticationRequest
+                {
+                    AppId = appId,
+                    Challenge = challenge,
+                    KeyHandle = keyHandle
+                }
             };
 
             _dataContext.SaveChanges();
@@ -79,24 +88,6 @@ namespace Repositories
                 CreatedOn = DateTime.Now,
                 UpdatedOn = DateTime.Now
             });
-
-            _dataContext.SaveChanges();
-        }
-
-        public void AddAuthenticationRequest(string userName, string appId, string challenge, string version)
-        {
-            User user = _dataContext.Users.FirstOrDefault(f => f.Name.Equals(userName));
-
-            if(user == null)
-                return;
-
-            user.UpdatedOn = DateTime.Now;
-            user.AuthenticationRequest = new AuthenticationRequest
-                {
-                    AppId = appId,
-                    Challenge = challenge,
-                    Version = version
-                };
 
             _dataContext.SaveChanges();
         }

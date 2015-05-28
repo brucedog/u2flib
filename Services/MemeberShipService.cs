@@ -7,12 +7,15 @@ using DataModels;
 using u2flib;
 using u2flib.Data;
 using u2flib.Data.Messages;
+using u2flib.Util;
 
 namespace Services
 {
     public class MemeberShipService : IMemeberShipService
     {
         private readonly IUserRepository _userRepository;
+
+        // NOTE: THIS HAS TO BE UPDATED TO MATCH YOUR SITE/EXAMPLE
         private const string DemoAppId = "http://localhost:52701";
 
         public MemeberShipService(IUserRepository userRepository)
@@ -31,7 +34,7 @@ namespace Services
             string hashedPassword = HashPassword(password);
 
             _userRepository.AddUser(userName, hashedPassword);
-            _userRepository.AddAuthenticationRequest(userName, startedRegistration.AppId, startedRegistration.Challenge, startedRegistration.Version);
+            _userRepository.SaveUserAuthenticationRequest(userName, startedRegistration.AppId, startedRegistration.Challenge, startedRegistration.Version);
 
             return new ServerRegisterResponse
             {
@@ -49,14 +52,19 @@ namespace Services
             RegisterResponse registerResponse = RegisterResponse.FromJson<RegisterResponse>(deviceResponse);
 
             var user = _userRepository.FindUser(userName);
-
-            if (user == null || user.AuthenticationRequest == null)
+            
+            if (user == null 
+                || user.AuthenticationRequest == null 
+                || user.AuthenticationRequest.Count == 0)
                 return false;
 
-            StartedRegistration startedRegistration = new StartedRegistration(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId);
+            // When the user is registration they should only ever have one auth request.
+            AuthenticationRequest authenticationRequest = user.AuthenticationRequest.First();
+
+            StartedRegistration startedRegistration = new StartedRegistration(authenticationRequest.Challenge, authenticationRequest.AppId);
             DeviceRegistration registration = U2F.FinishRegistration(startedRegistration, registerResponse);
             
-            _userRepository.RemoveUsersAuthenticationRequest(userName);
+            _userRepository.RemoveUsersAuthenticationRequests(userName);
             _userRepository.AddDeviceRegistration(userName, registration.AttestationCert, registration.Counter, registration.KeyHandle, registration.PublicKey);
 
             return true;
@@ -73,18 +81,20 @@ namespace Services
 
             AuthenticateResponse authenticateResponse = AuthenticateResponse.FromJson<AuthenticateResponse>(deviceResponse);
             
-            var device = user.DeviceRegistrations.FirstOrDefault();
-
+            var device = user.DeviceRegistrations.FirstOrDefault(f=> f.KeyHandle.SequenceEqual(Utils.Base64StringToByteArray(authenticateResponse.KeyHandle)));
+            
             if (device == null || user.AuthenticationRequest == null)
                 return false;
 
+            // User will have a authentication request for each device they have registered so get the one that matches the device key handle
+            AuthenticationRequest authenticationRequest = user.AuthenticationRequest.First(f => f.KeyHandle.Equals(authenticateResponse.KeyHandle));
             DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
 
-            StartedAuthentication authentication = new StartedAuthentication(user.AuthenticationRequest.Challenge, user.AuthenticationRequest.AppId, user.AuthenticationRequest.KeyHandle);
+            StartedAuthentication authentication = new StartedAuthentication(authenticationRequest.Challenge, authenticationRequest.AppId, authenticationRequest.KeyHandle);
 
             U2F.FinishAuthentication(authentication, authenticateResponse, registration);
             
-            _userRepository.RemoveUsersAuthenticationRequest(user.Name);
+            _userRepository.RemoveUsersAuthenticationRequests(user.Name);
             _userRepository.UpdateDeviceCounter(user.Name, device.PublicKey, registration.Counter);
            
             return true;
@@ -113,9 +123,10 @@ namespace Services
             if (user == null)
                 return null;
 
-            var device = user.DeviceRegistrations;
+            // We only want to generate challenges for un-compromised devices
+            List<Device> device = user.DeviceRegistrations.Where(w => w.IsCompromised == false).ToList();
 
-            if (device == null || device.Count == 0)
+            if (device.Count == 0)
                 return null;
 
             List<ServerChallenge> serverChallenges = new List<ServerChallenge>();

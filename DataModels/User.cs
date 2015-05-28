@@ -21,6 +21,6 @@ namespace DataModels
 
         public virtual ICollection<Device> DeviceRegistrations { get; set; }
 
-        public virtual AuthenticationRequest AuthenticationRequest { get; set; }
+        public virtual ICollection<AuthenticationRequest> AuthenticationRequest { get; set; }
     }
 }

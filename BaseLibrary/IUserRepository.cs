@@ -23,7 +23,7 @@ namespace BaseLibrary
         /// Removes the users authentication request.
         /// </summary>
         /// <param name="userName">Name of the user.</param>
-        void RemoveUsersAuthenticationRequest(string userName);
+        void RemoveUsersAuthenticationRequests(string userName);
 
         /// <summary>
         /// Saves the user authentication request.
@@ -40,15 +40,6 @@ namespace BaseLibrary
         /// <param name="userName">Name of the user.</param>
         /// <param name="hashedPassword">The hashed password.</param>
         void AddUser(string userName, string hashedPassword);
-
-        /// <summary>
-        /// Adds the authentication request.
-        /// </summary>
-        /// <param name="userName">Name of the user.</param>
-        /// <param name="appId">The application identifier.</param>
-        /// <param name="challenge">The challenge.</param>
-        /// <param name="version">The version.</param>
-        void AddAuthenticationRequest(string userName, string appId, string challenge, string version);
 
         /// <summary>
         /// Adds the device registration.

@@ -29,14 +29,16 @@ namespace BaseLibrary
         bool AuthenticateUser(string userName, string deviceResponse);
 
         /// <summary>
-        /// Determines whether [is user registered] [the specified user name].
+        /// Determines whether [is user registered] [the specified user name] is completed registered.
+        /// NOTE: method checks if use also registered a device to return true
         /// </summary>
         /// <param name="userName">Name of the user.</param>
         /// <returns></returns>
         bool IsUserRegistered(string userName);
 
         /// <summary>
-        /// Generates the server challenge.
+        /// Generates the server challenge for each device a user has registered.
+        /// NOTE: challenges will not be issued for compromised devices. 
         /// </summary>
         /// <param name="userName">Name of the user.</param>
         /// <returns></returns>

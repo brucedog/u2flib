@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BaseLibrary;
 using DataModels;
@@ -41,12 +42,15 @@ namespace UnitTests
                                     Counter = _deviceRegistration.Counter
                                 }
                         },
-                    AuthenticationRequest = new AuthenticationRequest
+                    AuthenticationRequest = new List<AuthenticationRequest>
+                    {
+                        new AuthenticationRequest
                         {
                             AppId = "test",
                             KeyHandle = _authenticateResponse.KeyHandle,
                             Challenge = _authenticateResponse.GetClientData().Challenge
                         }
+                    }
                 };
         }
 
@@ -115,13 +119,13 @@ namespace UnitTests
         public void MemeberShipService_GenerateServerRegistration()
         {
             _userRepository.Setup(e => e.AddUser(It.Is<string>(p => p == "test"), It.IsAny<string>()));
-            _userRepository.Setup(e => e.AddAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+            _userRepository.Setup(e => e.SaveUserAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.GenerateServerRegistration("test", "password");
 
             Assert.IsNotNull(result);
-            _userRepository.Verify(e => e.AddAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _userRepository.Verify(e => e.SaveUserAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -148,18 +152,18 @@ namespace UnitTests
         public void MemeberShipService_CompleteRegistrationSucess()
         {
             Device device = _user.DeviceRegistrations.First();
-            _user.AuthenticationRequest.Challenge = _startedRegistration.Challenge;
-            _user.AuthenticationRequest.AppId = _startedRegistration.AppId;
+            _user.AuthenticationRequest.First().Challenge = _startedRegistration.Challenge;
+            _user.AuthenticationRequest.First().AppId = _startedRegistration.AppId;
             
             _userRepository.Setup(e => e.FindUser("test")).Returns(_user);
-            _userRepository.Setup(e => e.RemoveUsersAuthenticationRequest("test"));
+            _userRepository.Setup(e => e.RemoveUsersAuthenticationRequests("test"));
             _userRepository.Setup(e => e.AddDeviceRegistration("Test", device.AttestationCert, device.Counter, device.KeyHandle, device.PublicKey));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.CompleteRegistration("test", _registerResponse.ToJson());
 
             Assert.IsTrue(result);
-            _userRepository.Verify(e => e.RemoveUsersAuthenticationRequest("test"), Times.Once);
+            _userRepository.Verify(e => e.RemoveUsersAuthenticationRequests("test"), Times.Once);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
@@ -344,14 +348,17 @@ namespace UnitTests
                                         Counter = _deviceRegistration.Counter
                                     }
                             },
-                        AuthenticationRequest = new AuthenticationRequest
+                        AuthenticationRequest = new[]
+                        {
+                            new AuthenticationRequest
                             {
                                 AppId = _startedAuthentication.AppId,
                                 KeyHandle = _startedAuthentication.KeyHandle,
                                 Challenge = _startedAuthentication.Challenge
                             }
+                        }
                     });
-            _userRepository.Setup(e => e.RemoveUsersAuthenticationRequest(It.Is<string>(p => p == "test")));
+            _userRepository.Setup(e => e.RemoveUsersAuthenticationRequests(It.Is<string>(p => p == "test")));
             _userRepository.Setup(e => e.UpdateDeviceCounter(It.Is<string>(p => p == "test"), It.IsAny<byte[]>(), It.IsAny<uint>()));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
@@ -359,7 +366,7 @@ namespace UnitTests
 
             Assert.IsTrue(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
-            _userRepository.Verify(e => e.RemoveUsersAuthenticationRequest(It.Is<string>(p => p == "test")), Times.Once);
+            _userRepository.Verify(e => e.RemoveUsersAuthenticationRequests(It.Is<string>(p => p == "test")), Times.Once);
         }
 
         [TestMethod]

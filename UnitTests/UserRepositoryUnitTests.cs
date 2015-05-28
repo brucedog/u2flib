@@ -42,12 +42,15 @@ namespace UnitTests
                                             Counter = _deviceRegistration.Counter
                                         }
                                 },
-                            AuthenticationRequest = new AuthenticationRequest
+                            AuthenticationRequest = new List<AuthenticationRequest>
+                            {
+                                new AuthenticationRequest
                                 {
                                     AppId = "test",
                                     KeyHandle = _authenticateResponse.KeyHandle,
                                     Challenge = _authenticateResponse.GetClientData().Challenge
                                 }
+                            }
                         },
                     new User {Name = "AAA"},
                 }.AsQueryable();
@@ -138,7 +141,7 @@ namespace UnitTests
         {
             UserRepository userRepository = new UserRepository(_mockContext.Object);
 
-            userRepository.RemoveUsersAuthenticationRequest("NoUser");
+            userRepository.RemoveUsersAuthenticationRequests("NoUser");
 
             _mockContext.Verify(v => v.SaveChanges(), Times.Never);
         }
@@ -148,7 +151,7 @@ namespace UnitTests
         {
             UserRepository userRepository = new UserRepository(_mockContext.Object);
 
-            userRepository.RemoveUsersAuthenticationRequest("UserComplete");
+            userRepository.RemoveUsersAuthenticationRequests("UserComplete");
 
             _mockContext.Verify(v => v.SaveChanges(), Times.Once);
         }
@@ -169,26 +172,6 @@ namespace UnitTests
             UserRepository userRepository = new UserRepository(_mockContext.Object);
 
             userRepository.SaveUserAuthenticationRequest("UserComplete", "appId", "challenge", "keyHandle");
-
-            _mockContext.Verify(v => v.SaveChanges(), Times.Once);
-        }
-
-        [TestMethod]
-        public void UserRepository_AddAuthenticationRequesttNoUser()
-        {
-            UserRepository userRepository = new UserRepository(_mockContext.Object);
-
-            userRepository.AddAuthenticationRequest("NoUser", "appId", "challenge", "keyHandle");
-
-            _mockContext.Verify(v => v.SaveChanges(), Times.Never);
-        }
-
-        [TestMethod]
-        public void UserRepository_AddAuthenticationRequest()
-        {
-            UserRepository userRepository = new UserRepository(_mockContext.Object);
-
-            userRepository.AddAuthenticationRequest("UserComplete", "appId", "challenge", "keyHandle");
 
             _mockContext.Verify(v => v.SaveChanges(), Times.Once);
         }

@@ -70,6 +70,7 @@
     <Compile Include="U2F\U2FUnitTests.cs" />
     <Compile Include="U2F\UtilsUnitTests.cs" />
     <Compile Include="MemeberShipServiceUnitTests.cs" />
+    <Compile Include="ProfileControllerUnitTests.cs" />
     <Compile Include="UserRepositoryUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
