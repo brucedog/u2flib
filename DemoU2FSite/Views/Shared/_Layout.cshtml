@@ -6,7 +6,7 @@
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />   
         @Styles.Render("~/Content/bootstrap")
-        <script src="chrome-extension://pfboblefjcgdjicmnffhdgionmgcdmne/u2f-api.js"></script>
+        <script src="@Url.Content("~/Scripts/u2f-api.js")"></script>
         @RenderSection("specialJS", required: false)
     </head>
     <body>
@@ -41,13 +41,13 @@
         </div>
         <br/>
         <div class="app_hide alert alert-danger" style="display: none;">
-            <p>This demo requires the Google U2F Extension for Chrome!</p>
+            <p>This demo requires Chrome 44+!</p>
             <div class="not_chrome" style="display: none;">
                 <p><strong>Your current browser is not yet supported.</strong></p>
                 <a class="btn" href="https://www.google.com/chrome/browser/">Get Chrome</a>
             </div>
             <div class="chrome" style="display: none;">
-                <a class="btn" href="https://chrome.google.com/webstore/detail/fido-u2f-universal-2nd-fa/pfboblefjcgdjicmnffhdgionmgcdmne">Download here</a>
+                Update your chrome friend
             </div>
         </div>
 
@@ -81,6 +81,6 @@
                     $(".chrome").show();
                 }
             });
-    </script>
+        </script>
     </body>
 </html>
