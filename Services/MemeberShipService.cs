@@ -13,7 +13,7 @@ namespace Services
     public class MemeberShipService : IMemeberShipService
     {
         private readonly IUserRepository _userRepository;
-        private const string DemoAppId = "http://localhost:52701";
+        private const string DemoAppId = "https://localhost:44301";
 
         public MemeberShipService(IUserRepository userRepository)
         {
