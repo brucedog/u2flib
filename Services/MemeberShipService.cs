@@ -14,7 +14,6 @@ namespace Services
     public class MemeberShipService : IMemeberShipService
     {
         private readonly IUserRepository _userRepository;
-
         // NOTE: THIS HAS TO BE UPDATED TO MATCH YOUR SITE/EXAMPLE
         private const string DemoAppId = "https://localhost:44301";
 
