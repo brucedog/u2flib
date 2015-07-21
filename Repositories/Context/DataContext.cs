@@ -8,7 +8,7 @@ namespace Repositories.Context
 {
     public class DataContext : DbContext, IDataContext
     {
-        public DataContext() : base("DataContext"){}
+        public DataContext() : base("DefaultConnection") { }
 
         public override int SaveChanges()
         {
