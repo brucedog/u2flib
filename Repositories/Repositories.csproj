@@ -59,6 +59,10 @@
     <Compile Include="Migrations\201504031847338_UpdatedDeviceDataModel.Designer.cs">
       <DependentUpon>201504031847338_UpdatedDeviceDataModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507170044204_MultiDeviesForUsers.cs" />
+    <Compile Include="Migrations\201507170044204_MultiDeviesForUsers.Designer.cs">
+      <DependentUpon>201507170044204_MultiDeviesForUsers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserRepository.cs" />
@@ -83,6 +87,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201504031847338_UpdatedDeviceDataModel.resx">
       <DependentUpon>201504031847338_UpdatedDeviceDataModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507170044204_MultiDeviesForUsers.resx">
+      <DependentUpon>201507170044204_MultiDeviesForUsers.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

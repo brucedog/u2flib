@@ -1,9 +1,9 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using BaseLibrary;
 
 namespace DemoU2FSite.Controllers
 {
+    [LegacyAuthorize]
     public class ProfileController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -13,17 +13,12 @@ namespace DemoU2FSite.Controllers
             _userRepository = userRepository;
         }
 
+        [Authorize]
         public ActionResult Index(string username)
         {
-            var user = _userRepository.FindUser(username);
-           
-            return View("Index", user);
-        }
+            var user = _userRepository.FindUser(HttpContext.User.Identity.Name);
 
-        public void DeleteDevice(int id)
-        {
-            // TODO
-            Console.Write(id);
+            return View("Index", user);
         }
     }
 }

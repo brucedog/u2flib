@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using System.Web.Security;
 using BaseLibrary;
 using DataModels;
-using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 
 namespace DemoU2FSite.Controllers
@@ -95,6 +94,7 @@ namespace DemoU2FSite.Controllers
                 if (!_memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
                     throw new Exception("Device response did not work with user.");
 
+                FormsAuthentication.SetAuthCookie(model.UserName, true);
                 return RedirectToAction("Index", "Profile", new {userName = model.UserName});
             }
             catch (Exception e)
