@@ -46,13 +46,7 @@ namespace Repositories
 
             if (user != null)
             {
-                var list = user.AuthenticationRequest.ToList();
-                int i = 0;
-                while (user.AuthenticationRequest.Count > 0)
-                {
-                    user.AuthenticationRequest.Remove(list[i]);
-                }
-
+                user.AuthenticationRequest.Clear();
                 user.UpdatedOn = DateTime.Now;
 
                 _dataContext.SaveChanges();
@@ -66,16 +60,15 @@ namespace Repositories
             if(user == null)
                 return;
 
-            user.AuthenticationRequest = new[]
-            {
+            user.AuthenticationRequest.Add(
                 new AuthenticationRequest
                 {
                     AppId = appId,
                     Challenge = challenge,
                     KeyHandle = keyHandle
-                }
-            };
+                });
 
+            user.UpdatedOn = DateTime.Now;
             _dataContext.SaveChanges();
         }
 
@@ -100,7 +93,7 @@ namespace Repositories
                 return;
 
             user.UpdatedOn = DateTime.Now;
-            user.AuthenticationRequest = null;
+            user.AuthenticationRequest.Clear();
             user.DeviceRegistrations.Add(new Device
             {
                 AttestationCert = attestationCert,
