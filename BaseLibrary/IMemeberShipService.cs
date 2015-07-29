@@ -41,8 +41,8 @@ namespace BaseLibrary
         /// NOTE: challenges will not be issued for compromised devices. 
         /// </summary>
         /// <param name="userName">Name of the user.</param>
-        /// <returns></returns>
-        List<ServerChallenge> GenerateServerChallenge(string userName);
+        /// <returns>List a challenge for each device a user has.</returns>
+        List<ServerChallenge> GenerateServerChallenges(string userName);
 
         /// <summary>
         /// Determines whether [is valid user name and password] [the specified user name].

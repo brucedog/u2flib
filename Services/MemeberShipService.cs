@@ -127,7 +127,7 @@ namespace Services
 
             User user = _userRepository.FindUser(userName);
 
-            return user?.DeviceRegistrations.Count > 0;
+            return user != null && user.DeviceRegistrations.Count > 0;
         }
 
         public List<ServerChallenge> GenerateServerChallenges(string userName)
