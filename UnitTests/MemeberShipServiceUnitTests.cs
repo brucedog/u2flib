@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using BaseLibrary;
@@ -39,7 +40,7 @@ namespace UnitTests
                                     KeyHandle = _deviceRegistration.KeyHandle,
                                     PublicKey = _deviceRegistration.PublicKey,
                                     AttestationCert = _deviceRegistration.AttestationCert,
-                                    Counter = _deviceRegistration.Counter
+                                    Counter = (int) _deviceRegistration.Counter
                                 }
                         },
                     AuthenticationRequest = new List<AuthenticationRequest>
@@ -72,7 +73,7 @@ namespace UnitTests
                                                 It.IsAny<string>()));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenge("test");
+            var result = memeberShipService.GenerateServerChallenges("test");
 
             Assert.IsNotNull(result);
             _userRepository.Verify(
@@ -87,7 +88,7 @@ namespace UnitTests
             _userRepository.Setup(e => e.FindUser("test")).Returns(new User { DeviceRegistrations = new Collection<Device>() });
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenge("test");
+            var result = memeberShipService.GenerateServerChallenges("test");
 
             Assert.IsNull(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
@@ -99,7 +100,7 @@ namespace UnitTests
             _userRepository.Setup(e => e.FindUser("test"));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenge("test");
+            var result = memeberShipService.GenerateServerChallenges("test");
 
             Assert.IsNull(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
@@ -110,7 +111,7 @@ namespace UnitTests
         {
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenge("");
+            var result = memeberShipService.GenerateServerChallenges("");
 
             Assert.IsNull(result);
         }
@@ -157,7 +158,7 @@ namespace UnitTests
             
             _userRepository.Setup(e => e.FindUser("test")).Returns(_user);
             _userRepository.Setup(e => e.RemoveUsersAuthenticationRequests("test"));
-            _userRepository.Setup(e => e.AddDeviceRegistration("Test", device.AttestationCert, device.Counter, device.KeyHandle, device.PublicKey));
+            _userRepository.Setup(e => e.AddDeviceRegistration("Test", device.AttestationCert, Convert.ToUInt32(device.Counter), device.KeyHandle, device.PublicKey));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.CompleteRegistration("test", _registerResponse.ToJson());
@@ -317,7 +318,7 @@ namespace UnitTests
                                         KeyHandle = _deviceRegistration.KeyHandle,
                                         PublicKey = _deviceRegistration.PublicKey,
                                         AttestationCert = _deviceRegistration.AttestationCert,
-                                        Counter = _deviceRegistration.Counter
+                                        Counter = (int) _deviceRegistration.Counter
                                     }
                             }
             });
@@ -345,7 +346,7 @@ namespace UnitTests
                                         KeyHandle = _deviceRegistration.KeyHandle,
                                         PublicKey = _deviceRegistration.PublicKey,
                                         AttestationCert = _deviceRegistration.AttestationCert,
-                                        Counter = _deviceRegistration.Counter
+                                        Counter = (int) _deviceRegistration.Counter
                                     }
                             },
                         AuthenticationRequest = new[]

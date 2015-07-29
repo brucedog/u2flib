@@ -23,10 +23,31 @@ namespace Services
         }
 
         #region IMemeberShipService methods
+        
+        public ServerRegisterResponse GenerateNewDeviceRegistration(string username, string password)
+        {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                return null;
+
+
+            StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
+
+            _userRepository.SaveUserAuthenticationRequest(username, startedRegistration.AppId, startedRegistration.Challenge, startedRegistration.Version);
+
+            return new ServerRegisterResponse
+            {
+                AppId = startedRegistration.AppId,
+                Challenge = startedRegistration.Challenge,
+                Version = startedRegistration.Version
+            };
+        }
 
         public ServerRegisterResponse GenerateServerRegistration(string userName, string password)
         {
             if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
+                return null;
+
+            if (_userRepository.FindUser(userName) != null)
                 return null;
 
             StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
@@ -87,7 +108,7 @@ namespace Services
 
             // User will have a authentication request for each device they have registered so get the one that matches the device key handle
             AuthenticationRequest authenticationRequest = user.AuthenticationRequest.First(f => f.KeyHandle.Equals(authenticateResponse.KeyHandle));
-            DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, device.Counter);
+            DeviceRegistration registration = new DeviceRegistration(device.KeyHandle, device.PublicKey, device.AttestationCert, Convert.ToUInt32(device.Counter));
 
             StartedAuthentication authentication = new StartedAuthentication(authenticationRequest.Challenge, authenticationRequest.AppId, authenticationRequest.KeyHandle);
 
@@ -106,13 +127,10 @@ namespace Services
 
             User user = _userRepository.FindUser(userName);
 
-            if (user == null)
-                return false;
-
-            return user.DeviceRegistrations.Count > 0;
+            return user?.DeviceRegistrations.Count > 0;
         }
 
-        public List<ServerChallenge> GenerateServerChallenge(string userName)
+        public List<ServerChallenge> GenerateServerChallenges(string userName)
         {
             if (string.IsNullOrWhiteSpace(userName))
                 return null;
@@ -128,10 +146,12 @@ namespace Services
             if (device.Count == 0)
                 return null;
 
+            _userRepository.RemoveUsersAuthenticationRequests(userName);
+
             List<ServerChallenge> serverChallenges = new List<ServerChallenge>();
             foreach (var registeredDevice in device)
             {
-                DeviceRegistration registration = new DeviceRegistration(registeredDevice.KeyHandle, registeredDevice.PublicKey, registeredDevice.AttestationCert, registeredDevice.Counter);
+                DeviceRegistration registration = new DeviceRegistration(registeredDevice.KeyHandle, registeredDevice.PublicKey, registeredDevice.AttestationCert, Convert.ToUInt32(registeredDevice.Counter));
                 StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
 
                 serverChallenges.Add(new ServerChallenge

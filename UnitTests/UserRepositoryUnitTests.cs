@@ -39,7 +39,7 @@ namespace UnitTests
                                             KeyHandle = _deviceRegistration.KeyHandle,
                                             PublicKey = _deviceRegistration.PublicKey,
                                             AttestationCert = _deviceRegistration.AttestationCert,
-                                            Counter = _deviceRegistration.Counter
+                                            Counter = (int) _deviceRegistration.Counter
                                         }
                                 },
                             AuthenticationRequest = new List<AuthenticationRequest>

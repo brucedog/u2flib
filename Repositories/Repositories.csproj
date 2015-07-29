@@ -63,6 +63,10 @@
     <Compile Include="Migrations\201507170044204_MultiDeviesForUsers.Designer.cs">
       <DependentUpon>201507170044204_MultiDeviesForUsers.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507240256246_UpdatedDeviceModelForCounter.cs" />
+    <Compile Include="Migrations\201507240256246_UpdatedDeviceModelForCounter.Designer.cs">
+      <DependentUpon>201507240256246_UpdatedDeviceModelForCounter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserRepository.cs" />
@@ -90,6 +94,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201507170044204_MultiDeviesForUsers.resx">
       <DependentUpon>201507170044204_MultiDeviesForUsers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507240256246_UpdatedDeviceModelForCounter.resx">
+      <DependentUpon>201507240256246_UpdatedDeviceModelForCounter.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

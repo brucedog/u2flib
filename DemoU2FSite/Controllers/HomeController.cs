@@ -53,7 +53,7 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                List<ServerChallenge> serverChallenge = _memeberShipService.GenerateServerChallenge(model.UserName.Trim());
+                List<ServerChallenge> serverChallenge = _memeberShipService.GenerateServerChallenges(model.UserName.Trim());
 
                 if(serverChallenge == null || serverChallenge.Count == 0)
                     throw new Exception("No server challenges were generated.");

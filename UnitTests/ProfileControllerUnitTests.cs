@@ -16,6 +16,7 @@ namespace UnitTests
     public class ProfileControllerUnitTests
     {
         private Mock<IUserRepository> _userRepository;
+        private Mock<IMemeberShipService> _memberShipService;
         private DeviceRegistration _deviceRegistration;
         private AuthenticateResponse _authenticateResponse;
         private User _user;
@@ -25,6 +26,7 @@ namespace UnitTests
         {
             CreateResponses();
             _userRepository = new Mock<IUserRepository>();
+            _memberShipService = new Mock<IMemeberShipService>();
             _user = new User
             {
                 Name = "test",
@@ -36,7 +38,7 @@ namespace UnitTests
                                     KeyHandle = _deviceRegistration.KeyHandle,
                                     PublicKey = _deviceRegistration.PublicKey,
                                     AttestationCert = _deviceRegistration.AttestationCert,
-                                    Counter = _deviceRegistration.Counter
+                                    Counter = (int) _deviceRegistration.Counter
                                 }
                         },
                 AuthenticationRequest = new List<AuthenticationRequest>
@@ -54,7 +56,7 @@ namespace UnitTests
         [TestMethod]
         public void ProfileController_ConstructsProperly()
         {
-            ProfileController profileController = new ProfileController(_userRepository.Object);
+            ProfileController profileController = new ProfileController(_userRepository.Object, _memberShipService.Object);
 
             Assert.IsNotNull(profileController);
         }
@@ -62,7 +64,7 @@ namespace UnitTests
         [TestMethod]
         public void ProfileController_Index()
         {
-            ProfileController profileController = new ProfileController(_userRepository.Object);
+            ProfileController profileController = new ProfileController(_userRepository.Object, _memberShipService.Object);
 
             ViewResult result = profileController.Index(_user.Name) as ViewResult;
 

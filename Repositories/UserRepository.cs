@@ -32,7 +32,7 @@ namespace Repositories
 
                 if (device != null)
                 {
-                    device.Counter = counter;
+                    device.Counter = Convert.ToInt32(counter);
                     device.UpdatedOn = DateTime.Now;
 
                     _dataContext.SaveChanges();
@@ -104,7 +104,7 @@ namespace Repositories
             user.DeviceRegistrations.Add(new Device
             {
                 AttestationCert = attestationCert,
-                Counter = counter,
+                Counter = Convert.ToInt32(counter),
                 CreatedOn = DateTime.Now,
                 UpdatedOn = DateTime.Now,
                 KeyHandle = keyHandle,
