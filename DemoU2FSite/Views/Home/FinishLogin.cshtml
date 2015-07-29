@@ -37,6 +37,15 @@
 
         <div class=".col-xs-12 .col-sm-6 .col-lg-8">
             <div class=".col-xs-6 .col-sm-4">
+                @Html.LabelFor(m => m.Challenges)
+            </div>
+            <div class=".col-xs-6 .col-sm-4">
+                <input data-val="true" name="challenges" readonly="True" type="text" value="@Model.Challenges" />
+            </div>
+        </div>
+
+        <div class=".col-xs-12 .col-sm-6 .col-lg-8">
+            <div class=".col-xs-6 .col-sm-4">
                 @Html.LabelFor(m => m.Version)
             </div>
             <div class=".col-xs-6 .col-sm-4">
