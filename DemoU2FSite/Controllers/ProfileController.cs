@@ -33,8 +33,7 @@ namespace DemoU2FSite.Controllers
 
         public JsonResult GetChallenge(string username)
         {
-            var user = _userRepository.FindUser(username);
-            ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerRegistration(username, user.Password);
+            ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerChallenge(username);
             CompleteRegisterModel registerModel = new CompleteRegisterModel
             {
                 UserName = username,

@@ -42,6 +42,28 @@ namespace UnitTests
             Assert.IsFalse(homeController.ModelState.IsValid);
             Assert.AreEqual("Login", result.ViewName);
         }
+
+        [TestMethod]
+        public void HomeController_BeginLoginException()
+        {
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.Is<string>(p => p == "tester"))).Returns(true);
+            _memeberShipService.Setup(s => s.IsValidUserNameAndPassword(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "password"))).Returns(true).Verifiable();
+            _memeberShipService.Setup(s => s.GenerateServerChallenges(It.Is<string>(p => p == "tester")))
+                .Returns(new List<ServerChallenge>());
+
+            HomeController homeController = new HomeController(_memeberShipService.Object);
+            BeginLoginModel beginLoginModel = new BeginLoginModel
+            {
+                UserName = "tester",
+                Password = "password"
+            };
+
+            ViewResult result = homeController.BeginLogin(beginLoginModel) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(homeController.ModelState.IsValid);
+            Assert.AreEqual("Login", result.ViewName);
+        }
         
         [TestMethod]
         public void HomeController_BeginLoginNoPassword()
@@ -206,7 +228,7 @@ namespace UnitTests
         public void HomeController_BeginRegisterPasswordsAndUsername()
         {
             _memeberShipService.Setup(
-                e => e.GenerateServerRegistration(It.Is<string>(p => p == "tester"), It.Is<string>(p => p == "password")))
+                e => e.GenerateServerChallenge(It.Is<string>(p => p == "tester")))
                 .Returns(new ServerRegisterResponse());
             HomeController homeController = new HomeController(_memeberShipService.Object);
             RegisterModel registerModel = new RegisterModel
@@ -221,6 +243,26 @@ namespace UnitTests
             Assert.IsNotNull(result);
             Assert.IsTrue(homeController.ModelState.IsValid);
             Assert.AreEqual("FinishRegister", result.ViewName);
+        }
+
+        [TestMethod]
+        public void HomeController_BeginRegisterDuplicateUser()
+        {
+            _memeberShipService.Setup(s => s.IsUserRegistered(It.Is<string>(p => p == "tester"))).Returns(true);
+            HomeController homeController = new HomeController(_memeberShipService.Object);
+
+            RegisterModel registerModel = new RegisterModel
+            {
+                UserName = "tester",
+                Password = "password",
+                ConfirmPassword = "password"
+            };
+
+            ViewResult result = homeController.BeginRegister(registerModel) as ViewResult;
+
+            Assert.IsNotNull(result);
+            Assert.IsFalse(homeController.ModelState.IsValid);
+            Assert.AreEqual("Register", result.ViewName);
         }
 
         [TestMethod]

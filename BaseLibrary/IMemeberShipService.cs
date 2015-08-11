@@ -5,13 +5,14 @@ namespace BaseLibrary
 {
     public interface IMemeberShipService
     {
+        bool SaveNewUser(string userName, string password);
+
         /// <summary>
-        /// Generates the server registration.
+        /// Generates the new server challenge for device registration.
         /// </summary>
-        /// <param name="userName">Name of the user.</param>
-        /// <param name="password">The password.</param>
+        /// <param name="username">The username.</param>
         /// <returns></returns>
-        ServerRegisterResponse GenerateServerRegistration(string userName, string password);
+        ServerRegisterResponse GenerateServerChallenge(string username);
 
         /// <summary>
         /// Completes the registration.

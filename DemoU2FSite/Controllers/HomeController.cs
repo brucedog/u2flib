@@ -36,8 +36,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginLogin(BeginLoginModel model)
         {
-            if ((string.IsNullOrWhiteSpace(model.UserName) 
-                || string.IsNullOrWhiteSpace(model.Password))
+            if ((string.IsNullOrWhiteSpace(model.Password))
                 || !_memeberShipService.IsUserRegistered(model.UserName.Trim()))
             {
                 // If we got this far, something failed, redisplay form
@@ -71,10 +70,10 @@ namespace DemoU2FSite.Controllers
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                
+                ModelState.AddModelError("CustomError", e.Message);
+                return View("Login", model);
             }
-
-            ModelState.AddModelError("CustomError", "User has not been registered");
-            return View("Login", model);
         }
 
         [System.Web.Mvc.HttpPost]
@@ -117,12 +116,21 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginRegister([FromBody] RegisterModel value)
         {
+            if (_memeberShipService.IsUserRegistered(value.UserName))
+            {
+                ModelState.AddModelError("CustomError", "User is already registered.");
+                return View("Register", value);
+            }
+
             if (!string.IsNullOrWhiteSpace(value.Password)
                 && !string.IsNullOrWhiteSpace(value.UserName)
                 && value.Password.Equals(value.ConfirmPassword))
             {
-                ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerRegistration(value.UserName.Trim(), value.Password.Trim());
-                CompleteRegisterModel registerModel = new CompleteRegisterModel
+                try
+                {
+                    _memeberShipService.SaveNewUser(value.UserName, value.Password);
+                    ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerChallenge(value.UserName.Trim());
+                    CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
                         AppId = serverRegisterResponse.AppId,
@@ -130,11 +138,19 @@ namespace DemoU2FSite.Controllers
                         Version = serverRegisterResponse.Version
                     };
 
-                return View("FinishRegister", registerModel);
+                    return View("FinishRegister", registerModel);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    ModelState.AddModelError("CustomError", e.Message);
+
+                    return View("Register", value);
+                }
             }
 
             ModelState.AddModelError("CustomError", "invalid input");
-            return View("Register");
+            return View("Register", value);
         }
 
         [System.Web.Mvc.HttpPost]
@@ -165,18 +181,6 @@ namespace DemoU2FSite.Controllers
             
             ModelState.AddModelError("CustomError", "bad username/device response");
             return View("FinishRegister", value);
-        }
-
-        private UserViewModel CreateUserViewModel(User user)
-        {
-            return new UserViewModel
-            {
-                Id = user.Id,
-                UserName = user.Name,
-                UpdatedOn = user.UpdatedOn,
-                CreatedOn = user.CreatedOn,
-                Devices = user.DeviceRegistrations
-            };
         }
     }
 }

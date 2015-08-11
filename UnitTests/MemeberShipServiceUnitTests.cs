@@ -64,6 +64,50 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void MemeberShipService_SaveBlankUserName()
+        {
+
+            var results = memeberShipService.SaveNewUser("", "");
+
+            Assert.IsFalse(results);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_SaveBlankPassword()
+        {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+
+            var results = memeberShipService.SaveNewUser("someone", "");
+
+            Assert.IsFalse(results);
+        }
+
+        [TestMethod]
+        public void MemeberShipService_CannotSaveDuplicateUserName()
+        {
+            _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "someone"))).Returns(new User()).Verifiable();
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+
+            var results = memeberShipService.SaveNewUser("someone", "password1");
+
+            Assert.IsFalse(results);
+            _userRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void MemeberShipService_SaveUserName()
+        {
+            _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "someone"))).Returns((User) null).Verifiable();
+            _userRepository.Setup(s => s.AddUser(It.Is<string>(p => p == "someone"), It.IsAny<string>())).Verifiable();
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+
+            var results = memeberShipService.SaveNewUser("someone", "password1");
+
+            Assert.IsTrue(results);
+            _userRepository.VerifyAll();
+        }
+
+        [TestMethod]
         public void MemeberShipService_GenerateServerChallengeSucess()
         {
             _userRepository.Setup(e => e.FindUser("test")).Returns(_user);
@@ -115,15 +159,14 @@ namespace UnitTests
 
             Assert.IsNull(result);
         }
-
+        
         [TestMethod]
         public void MemeberShipService_GenerateServerRegistration()
         {
-            _userRepository.Setup(e => e.AddUser(It.Is<string>(p => p == "test"), It.IsAny<string>()));
             _userRepository.Setup(e => e.SaveUserAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerRegistration("test", "password");
+            var result = memeberShipService.GenerateServerChallenge("test");
 
             Assert.IsNotNull(result);
             _userRepository.Verify(e => e.SaveUserAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -134,21 +177,11 @@ namespace UnitTests
         {
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerRegistration("test", "");
+            var result = memeberShipService.GenerateServerChallenge("test");
 
             Assert.IsNull(result);
         }
-
-        [TestMethod]
-        public void MemeberShipService_GenerateServerRegistrationNoUserName()
-        {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
-
-            var result = memeberShipService.GenerateServerRegistration("", "password");
-
-            Assert.IsNull(result);
-        }
-
+        
         [TestMethod]
         public void MemeberShipService_CompleteRegistrationSucess()
         {

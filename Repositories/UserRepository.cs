@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BaseLibrary;
 using DataModels;
@@ -16,9 +17,6 @@ namespace Repositories
 
         public User FindUser(string userName)
         {
-            if (string.IsNullOrWhiteSpace(userName))
-                return null;
-
             return _dataContext.Users.FirstOrDefault(f => f.Name.Equals(userName.Trim()));
         }
 
@@ -59,6 +57,9 @@ namespace Repositories
 
             if(user == null)
                 return;
+
+            if (user.AuthenticationRequest == null)
+                user.AuthenticationRequest = new List<AuthenticationRequest>();
 
             user.AuthenticationRequest.Add(
                 new AuthenticationRequest

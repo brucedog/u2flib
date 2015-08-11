@@ -14,7 +14,7 @@ namespace Services
     public class MemeberShipService : IMemeberShipService
     {
         private readonly IUserRepository _userRepository;
-        // NOTE: THIS HAS TO BE UPDATED TO MATCH YOUR SITE/EXAMPLE
+        // NOTE: THIS HAS TO BE UPDATED TO MATCH YOUR SITE/EXAMPLE and sites must be https for chrome plugin
         private const string DemoAppId = "https://localhost:44301";
 
         public MemeberShipService(IUserRepository userRepository)
@@ -23,12 +23,23 @@ namespace Services
         }
 
         #region IMemeberShipService methods
-        
-        public ServerRegisterResponse GenerateNewDeviceRegistration(string username, string password)
-        {
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                return null;
 
+        public bool SaveNewUser(string userName, string password)
+        {
+            if (string.IsNullOrWhiteSpace(password)
+                || IsUserRegistered(userName))
+                return false;
+
+            string hashedPassword = HashPassword(password);
+            _userRepository.AddUser(userName, hashedPassword);
+
+            return true;
+        }
+
+        public ServerRegisterResponse GenerateServerChallenge(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return null;
 
             StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
 
@@ -42,31 +53,9 @@ namespace Services
             };
         }
 
-        public ServerRegisterResponse GenerateServerRegistration(string userName, string password)
-        {
-            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
-                return null;
-
-            if (_userRepository.FindUser(userName) != null)
-                return null;
-
-            StartedRegistration startedRegistration = U2F.StartRegistration(DemoAppId);
-            string hashedPassword = HashPassword(password);
-
-            _userRepository.AddUser(userName, hashedPassword);
-            _userRepository.SaveUserAuthenticationRequest(userName, startedRegistration.AppId, startedRegistration.Challenge, startedRegistration.Version);
-
-            return new ServerRegisterResponse
-            {
-                AppId = startedRegistration.AppId,
-                Challenge = startedRegistration.Challenge,
-                Version = startedRegistration.Version
-            };
-        }
-
         public bool CompleteRegistration(string userName, string deviceResponse)
         {
-            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(deviceResponse))
+            if (string.IsNullOrWhiteSpace(deviceResponse))
                 return false;
 
             RegisterResponse registerResponse = RegisterResponse.FromJson<RegisterResponse>(deviceResponse);
@@ -127,7 +116,7 @@ namespace Services
 
             User user = _userRepository.FindUser(userName);
 
-            return user != null && user.DeviceRegistrations.Count > 0;
+            return user != null;
         }
 
         public List<ServerChallenge> GenerateServerChallenges(string userName)
