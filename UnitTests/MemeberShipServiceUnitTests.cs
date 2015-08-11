@@ -66,6 +66,7 @@ namespace UnitTests
         [TestMethod]
         public void MemeberShipService_SaveBlankUserName()
         {
+            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var results = memeberShipService.SaveNewUser("", "");
 
