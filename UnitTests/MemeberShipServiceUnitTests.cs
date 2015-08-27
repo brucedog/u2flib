@@ -174,13 +174,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void MemeberShipService_GenerateServerRegistrationNoPassword()
+        public void MemeberShipService_GenerateServerRegistrationForUser()
         {
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
 
             var result = memeberShipService.GenerateServerChallenge("test");
 
-            Assert.IsNull(result);
+            Assert.IsNotNull(result);
         }
         
         [TestMethod]

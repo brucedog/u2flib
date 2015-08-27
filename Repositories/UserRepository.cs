@@ -17,7 +17,7 @@ namespace Repositories
 
         public User FindUser(string userName)
         {
-            return _dataContext.Users.FirstOrDefault(f => f.Name.Equals(userName.Trim()));
+            return _dataContext.Users.FirstOrDefault(f => f.Name.Equals(userName));
         }
 
         public void UpdateDeviceCounter(string userName, byte[] devicePublicKey, uint counter)

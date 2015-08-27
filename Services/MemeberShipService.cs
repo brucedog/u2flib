@@ -58,14 +58,15 @@ namespace Services
             if (string.IsNullOrWhiteSpace(deviceResponse))
                 return false;
 
-            RegisterResponse registerResponse = RegisterResponse.FromJson<RegisterResponse>(deviceResponse);
-
             var user = _userRepository.FindUser(userName);
             
             if (user == null 
                 || user.AuthenticationRequest == null 
                 || user.AuthenticationRequest.Count == 0)
                 return false;
+
+
+            RegisterResponse registerResponse = RegisterResponse.FromJson<RegisterResponse>(deviceResponse);
 
             // When the user is registration they should only ever have one auth request.
             AuthenticationRequest authenticationRequest = user.AuthenticationRequest.First();
