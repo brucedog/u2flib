@@ -7,13 +7,16 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Security;
 
 namespace u2flib.Crypto
 {
     public class RandomChallengeGenerator : IChallengeGenerator
     {
-        private static readonly SecureRandom Random = new SecureRandom();
+        private static readonly IRandomGenerator Generator = new DigestRandomGenerator(new Sha256Digest());
+        private static readonly SecureRandom Random = new SecureRandom(Generator);
 
         public byte[] GenerateChallenge()
         {
