@@ -15,6 +15,8 @@ namespace u2flib.Crypto
 {
     public class RandomChallengeGenerator : IChallengeGenerator
     {
+        // version 1.7 of bouncy castle library uses sha1 which the security industry seems to moving away from 
+        // so manual setting generator to sha256 which is the default in the upcoming 1.8 bouncy castle library.
         private static readonly IRandomGenerator Generator = new DigestRandomGenerator(new Sha256Digest());
         private static readonly SecureRandom Random = new SecureRandom(Generator);
 
