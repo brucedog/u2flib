@@ -138,7 +138,7 @@
         $('#detail-info').on('show.bs.modal', function(e) {
             var deviceId = $(e.relatedTarget).data('id');
 
-            $.post("/Profile/DeviceInfo", { deviceId: deviceId, username: "n" })
+            $.post("/Profile/DeviceInfo", { deviceId: deviceId })
                 .done(function(data) {
                     $("#deviceId").text(data.Id);
                     $("#counter").text(data.Counter);
@@ -156,7 +156,7 @@
             5: 'Authentication timed out. Please reload to try again.'
         };
         $('#promptModal').on('show.bs.modal', function (e) {
-            $.post("/Profile/GetChallenge", { username: "a" }).
+            $.post("/Profile/GetChallenge").
                 done(function(data) {
                     window.u2f.register([
                         {
@@ -171,7 +171,7 @@
                         }
                         console.log("Register callback", data);
                         $('#promptModal').modal('hide');
-                        $.post("/Profile/AddDevice", { username: "a", deviceResponse: JSON.stringify(data) });
+                        $.post("/Profile/AddDevice", {deviceResponse: JSON.stringify(data) });
 
                         return false;
                     });

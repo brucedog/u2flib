@@ -19,24 +19,33 @@ namespace DemoU2FSite.Controllers
             _memeberShipService = memeberShipService;
         }
 
-        public ActionResult Index(string username)
+        public ActionResult Index()
         {
-            //var user = _userRepository.FindUser(HttpContext.User.Identity.Name);
-            var user = _userRepository.FindUser(username);
+            if (!HttpContext.User.Identity.IsAuthenticated)
+            {
+                ModelState.AddModelError("", "User has timed out.");
+                RedirectToAction("Login", "Home");
+            }
+            var user = _userRepository.FindUser(HttpContext.User.Identity.Name);
             return View("Index", user);
         }
 
-        public void AddDevice(string username, string deviceResponse)
+        public void AddDevice(string deviceResponse)
         {
-            _memeberShipService.CompleteRegistration(username, deviceResponse);
+            if (!HttpContext.User.Identity.IsAuthenticated)
+            {
+                ModelState.AddModelError("", "User has timed out.");
+                RedirectToAction("Login", "Home");
+            }
+            _memeberShipService.CompleteRegistration(HttpContext.User.Identity.Name, deviceResponse);
         }
 
-        public JsonResult GetChallenge(string username)
+        public JsonResult GetChallenge()
         {
-            ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerChallenge(username);
+            ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerChallenge(HttpContext.User.Identity.Name);
             CompleteRegisterModel registerModel = new CompleteRegisterModel
             {
-                UserName = username,
+                UserName = HttpContext.User.Identity.Name,
                 AppId = serverRegisterResponse.AppId,
                 Challenge = serverRegisterResponse.Challenge,
                 Version = serverRegisterResponse.Version
@@ -49,9 +58,15 @@ namespace DemoU2FSite.Controllers
             return result;
         }
 
-        public JsonResult DeviceInfo(int deviceId, string username)
+        public JsonResult DeviceInfo(int deviceId)
         {
-            var user = _userRepository.FindUser(username);
+            if (!HttpContext.User.Identity.IsAuthenticated)
+            {
+                ModelState.AddModelError("", "User has timed out.");
+                RedirectToAction("Login", "Home");
+            }
+
+            var user = _userRepository.FindUser(HttpContext.User.Identity.Name);
             var device = user.DeviceRegistrations.FirstOrDefault(f => f.Id == deviceId);
             dynamic formattedResult = new 
             {

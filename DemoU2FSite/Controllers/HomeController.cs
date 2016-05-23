@@ -94,7 +94,7 @@ namespace DemoU2FSite.Controllers
                     throw new Exception("Device response did not work with user.");
 
                 FormsAuthentication.SetAuthCookie(model.UserName, true);
-                return RedirectToAction("Index", "Profile", new {userName = model.UserName});
+                return RedirectToAction("Index", "Profile");
             }
             catch (Exception e)
             {

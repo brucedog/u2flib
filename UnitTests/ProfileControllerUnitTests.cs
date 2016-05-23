@@ -61,17 +61,6 @@ namespace UnitTests
             Assert.IsNotNull(profileController);
         }
 
-        [TestMethod]
-        public void ProfileController_Index()
-        {
-            ProfileController profileController = new ProfileController(_userRepository.Object, _memberShipService.Object);
-
-            ViewResult result = profileController.Index(_user.Name) as ViewResult;
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual("Index", result.ViewName);
-        }
-
         private void CreateResponses()
         {
             _deviceRegistration = new DeviceRegistration(
