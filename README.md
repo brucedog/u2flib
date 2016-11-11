@@ -4,6 +4,9 @@ This repository provides functionality for working with the server side aspects 
 
 The solution is nearly a line for line copy of the JAVA implementation rewritten in C# using the .NET 4.0 framework. I ported the JAVA example to .NET to help spread the adoption of U2F.
 
+## .NET Core Version can be found below
+https://github.com/brucedog/U2F_Core
+
 ## Working Demo Site  
 https://bfoster.net
 
