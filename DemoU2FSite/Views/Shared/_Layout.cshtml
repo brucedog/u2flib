@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Web.Mvc.Html
+@using System.Web.Optimization
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -59,7 +61,9 @@
     
         <footer class="footer">
             <div class="container">
-                <p class="text-muted">&copy; @DateTime.Now.Year - ASP.NET MVC Application U2F Demo</p>                
+                <p class="text-muted">&copy; @DateTime.Now.Year - ASP.NET MVC Application U2F Demo</p>    
+                <br/>
+                <p class="text-primary">This demo site is running version @typeof(u2flib.U2F).Assembly.GetName().Version of the U2F library.</p>
             </div>
         </footer>
 

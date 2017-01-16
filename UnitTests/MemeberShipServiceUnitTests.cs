@@ -56,14 +56,6 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void MemeberShipService_ConstructsProperly()
-        {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
-
-            Assert.IsNotNull(memeberShipService);
-        }
-
-        [TestMethod]
         public void MemeberShipService_SaveBlankUserName()
         {
             MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);

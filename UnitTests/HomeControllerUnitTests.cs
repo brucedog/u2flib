@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
 using System.Web.Mvc;
 using BaseLibrary;
 using DataModels;
@@ -19,14 +18,6 @@ namespace UnitTests
         public void Setup()
         {
             _memeberShipService = new Mock<IMemeberShipService>();
-        }
-
-        [TestMethod]
-        public void HomeController_ConstructsProperly()
-        {
-            HomeController homeController = new HomeController(_memeberShipService.Object);
-
-            Assert.IsNotNull(homeController);
         }
 
         [TestMethod]
