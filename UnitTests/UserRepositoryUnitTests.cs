@@ -66,14 +66,6 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void UserRepository_ConstructsProperly()
-        {
-            UserRepository userRepository = new UserRepository(_mockContext.Object);
-
-            Assert.IsNotNull(userRepository);
-        }
-
-        [TestMethod]
         public void UserRepository_FindUserNullReturnsNull()
         {
             UserRepository userRepository = new UserRepository(_mockContext.Object);
