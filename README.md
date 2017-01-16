@@ -6,6 +6,7 @@ The solution is nearly a line for line copy of the JAVA implementation rewritten
 
 ## .NET Core Version can be found below
 https://github.com/brucedog/U2F_Core
+https://www.nuget.org/packages/U2F.Core
 
 ## Working Demo Site  
 https://bfoster.net
