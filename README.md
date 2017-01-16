@@ -1,8 +1,8 @@
 ## .NET Universal 2nd Factor (U2F) 
 
-This repository provides functionality for working with the server side aspects of the U2F protocol on Windows. The repository also contains a working demo ASP.NET MVC 4 web site where one can test registering and login in with their U2F device.
+This repository provides functionality for working with the server side aspects of the U2F protocol on Windows. The repository also contains a working demo ASP.NET MVC 5 web site where one can test registering and login in with their U2F device.
 
-The solution is nearly a line for line copy of the JAVA implementation rewritten in C# using the .NET 4.0 framework. I ported the JAVA example to .NET to help spread the adoption of U2F.
+The solution is nearly a line for line copy of the JAVA implementation rewritten in C# using the .NET 4.6.1 framework. I ported the JAVA example to .NET to help spread the adoption of U2F.
 
 ## .NET Core Version can be found below
 - https://github.com/brucedog/U2F_Core
