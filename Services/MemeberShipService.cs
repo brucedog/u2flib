@@ -139,10 +139,11 @@ namespace Services
             _userRepository.RemoveUsersAuthenticationRequests(userName);
 
             List<ServerChallenge> serverChallenges = new List<ServerChallenge>();
+            byte[] challenge = U2F.ChallengeGenerator.GenerateChallenge();
             foreach (var registeredDevice in device)
             {
                 DeviceRegistration registration = new DeviceRegistration(registeredDevice.KeyHandle, registeredDevice.PublicKey, registeredDevice.AttestationCert, Convert.ToUInt32(registeredDevice.Counter));
-                StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration);
+                StartedAuthentication startedAuthentication = U2F.StartAuthentication(DemoAppId, registration, challenge);
 
                 serverChallenges.Add(new ServerChallenge
                 {
