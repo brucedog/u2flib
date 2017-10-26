@@ -16,7 +16,7 @@ namespace UnitTests
     public class ProfileControllerUnitTests
     {
         private Mock<IUserRepository> _userRepository;
-        private Mock<IMemeberShipService> _memberShipService;
+        private Mock<IMemberShipService> _memberShipService;
         private DeviceRegistration _deviceRegistration;
         private AuthenticateResponse _authenticateResponse;
         private User _user;
@@ -26,7 +26,7 @@ namespace UnitTests
         {
             CreateResponses();
             _userRepository = new Mock<IUserRepository>();
-            _memberShipService = new Mock<IMemeberShipService>();
+            _memberShipService = new Mock<IMemberShipService>();
             _user = new User
             {
                 Name = "test",

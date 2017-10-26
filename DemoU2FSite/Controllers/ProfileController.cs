@@ -11,12 +11,12 @@ namespace DemoU2FSite.Controllers
     public class ProfileController : Controller
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMemeberShipService _memeberShipService;
+        private readonly IMemberShipService _memberShipService;
 
-        public ProfileController(IUserRepository userRepository, IMemeberShipService memeberShipService)
+        public ProfileController(IUserRepository userRepository, IMemberShipService memberShipService)
         {
             _userRepository = userRepository;
-            _memeberShipService = memeberShipService;
+            _memberShipService = memberShipService;
         }
 
         public ActionResult Index()
@@ -37,12 +37,12 @@ namespace DemoU2FSite.Controllers
                 ModelState.AddModelError("", "User has timed out.");
                 RedirectToAction("Login", "Home");
             }
-            _memeberShipService.CompleteRegistration(HttpContext.User.Identity.Name, deviceResponse);
+            _memberShipService.CompleteRegistration(HttpContext.User.Identity.Name, deviceResponse);
         }
 
         public JsonResult GetChallenge()
         {
-            ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerChallenge(HttpContext.User.Identity.Name);
+            ServerRegisterResponse serverRegisterResponse = _memberShipService.GenerateServerChallenge(HttpContext.User.Identity.Name);
             CompleteRegisterModel registerModel = new CompleteRegisterModel
             {
                 UserName = HttpContext.User.Identity.Name,

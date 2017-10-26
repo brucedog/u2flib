@@ -3,7 +3,7 @@ using DataModels;
 
 namespace BaseLibrary
 {
-    public interface IMemeberShipService
+    public interface IMemberShipService
     {
         bool SaveNewUser(string userName, string password);
 
