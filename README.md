@@ -1,3 +1,8 @@
+# Deprecated
+It does not make sense to have 2 .NET library that support U2F. Being that U2F.Core is a dotnet core project and can run on all platforms this project does not make sense. 
+
+Note: This project will NOT be deleted. 
+
 ## .NET Universal 2nd Factor (U2F) 
 
 This repository provides functionality for working with the server side aspects of the U2F protocol on Windows. The repository also contains a working demo ASP.NET MVC 5 web site where one can test registering and login in with their U2F device.
