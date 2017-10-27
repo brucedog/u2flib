@@ -12,11 +12,11 @@ namespace DemoU2FSite.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IMemeberShipService _memeberShipService;
+        private readonly IMemberShipService _memberShipService;
 
-        public HomeController(IMemeberShipService memeberShipService)
+        public HomeController(IMemberShipService memberShipService)
         {
-            _memeberShipService = memeberShipService;
+            _memberShipService = memberShipService;
         }
         
         [System.Web.Mvc.AllowAnonymous]
@@ -37,14 +37,14 @@ namespace DemoU2FSite.Controllers
         public ActionResult BeginLogin(BeginLoginModel model)
         {
             if ((string.IsNullOrWhiteSpace(model.Password))
-                || !_memeberShipService.IsUserRegistered(model.UserName.Trim()))
+                || !_memberShipService.IsUserRegistered(model.UserName.Trim()))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("CustomError", "User has not been registered.");
                 return View("Login", model);
             }
 
-            if (!_memeberShipService.IsValidUserNameAndPassword(model.UserName.Trim(), model.Password.Trim()))
+            if (!_memberShipService.IsValidUserNameAndPassword(model.UserName.Trim(), model.Password.Trim()))
             {
                 ModelState.AddModelError("CustomError", "User/Password is not invalid.");
                 return View("Login", model);
@@ -52,7 +52,7 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                List<ServerChallenge> serverChallenge = _memeberShipService.GenerateServerChallenges(model.UserName.Trim());
+                List<ServerChallenge> serverChallenge = _memberShipService.GenerateServerChallenges(model.UserName.Trim());
 
                 if(serverChallenge == null || serverChallenge.Count == 0)
                     throw new Exception("No server challenges were generated.");
@@ -81,7 +81,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CompletedLogin(CompleteLoginModel model)
         {
-            if (!_memeberShipService.IsUserRegistered(model.UserName.Trim()))
+            if (!_memberShipService.IsUserRegistered(model.UserName.Trim()))
             {
                 // If we got this far, something failed, redisplay form
                 ModelState.AddModelError("", "User has not been registered.");
@@ -90,7 +90,7 @@ namespace DemoU2FSite.Controllers
 
             try
             {
-                if (!_memeberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
+                if (!_memberShipService.AuthenticateUser(model.UserName.Trim(), model.DeviceResponse.Trim()))
                     throw new Exception("Device response did not work with user.");
 
                 FormsAuthentication.SetAuthCookie(model.UserName, true);
@@ -116,7 +116,7 @@ namespace DemoU2FSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult BeginRegister([FromBody] RegisterModel value)
         {
-            if (_memeberShipService.IsUserRegistered(value.UserName))
+            if (_memberShipService.IsUserRegistered(value.UserName))
             {
                 ModelState.AddModelError("CustomError", "User is already registered.");
                 return View("Register", value);
@@ -128,8 +128,8 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    _memeberShipService.SaveNewUser(value.UserName, value.Password);
-                    ServerRegisterResponse serverRegisterResponse = _memeberShipService.GenerateServerChallenge(value.UserName.Trim());
+                    _memberShipService.SaveNewUser(value.UserName, value.Password);
+                    ServerRegisterResponse serverRegisterResponse = _memberShipService.GenerateServerChallenge(value.UserName.Trim());
                     CompleteRegisterModel registerModel = new CompleteRegisterModel
                     {
                         UserName = value.UserName,
@@ -163,7 +163,7 @@ namespace DemoU2FSite.Controllers
             {
                 try
                 {
-                    value.DeviceResponse = _memeberShipService.CompleteRegistration(value.UserName.Trim(),
+                    value.DeviceResponse = _memberShipService.CompleteRegistration(value.UserName.Trim(),
                         value.DeviceResponse.Trim())
                         ? "Registration was successful."
                         : "Registration failed.";

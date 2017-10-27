@@ -27,7 +27,7 @@ namespace DemoU2FSite
 
             // e.g. container.RegisterType<ITestService, TestService>();    
             container.RegisterType<IDataContext, Repositories.Context.DataContext>();
-            container.RegisterType<IMemeberShipService, MemeberShipService>();
+            container.RegisterType<IMemberShipService, MemberShipService>();
             container.RegisterType<IUserRepository, UserRepository>();
             RegisterTypes(container);
 

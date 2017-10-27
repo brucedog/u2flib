@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IDataContext.cs" />
-    <Compile Include="IMemeberShipService.cs" />
+    <Compile Include="IMemberShipService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

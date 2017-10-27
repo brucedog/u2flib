@@ -14,7 +14,7 @@ using DeviceRegistration = u2flib.Data.DeviceRegistration;
 namespace UnitTests
 {
     [TestClass]
-    public class MemeberShipServiceUnitTests
+    public class MemberShipServiceUnitTests
     {
         private Mock<IUserRepository> _userRepository;
         private RegisterResponse _registerResponse;
@@ -56,61 +56,61 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void MemeberShipService_SaveBlankUserName()
+        public void MemberShipService_SaveBlankUserName()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var results = memeberShipService.SaveNewUser("", "");
+            var results = memberShipService.SaveNewUser("", "");
 
             Assert.IsFalse(results);
         }
 
         [TestMethod]
-        public void MemeberShipService_SaveBlankPassword()
+        public void MemberShipService_SaveBlankPassword()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var results = memeberShipService.SaveNewUser("someone", "");
+            var results = memberShipService.SaveNewUser("someone", "");
 
             Assert.IsFalse(results);
         }
 
         [TestMethod]
-        public void MemeberShipService_CannotSaveDuplicateUserName()
+        public void MemberShipService_CannotSaveDuplicateUserName()
         {
             _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "someone"))).Returns(new User()).Verifiable();
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var results = memeberShipService.SaveNewUser("someone", "password1");
+            var results = memberShipService.SaveNewUser("someone", "password1");
 
             Assert.IsFalse(results);
             _userRepository.VerifyAll();
         }
 
         [TestMethod]
-        public void MemeberShipService_SaveUserName()
+        public void MemberShipService_SaveUserName()
         {
             _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "someone"))).Returns((User) null).Verifiable();
             _userRepository.Setup(s => s.AddUser(It.Is<string>(p => p == "someone"), It.IsAny<string>())).Verifiable();
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var results = memeberShipService.SaveNewUser("someone", "password1");
+            var results = memberShipService.SaveNewUser("someone", "password1");
 
             Assert.IsTrue(results);
             _userRepository.VerifyAll();
         }
 
         [TestMethod]
-        public void MemeberShipService_GenerateServerChallengeSucess()
+        public void MemberShipService_GenerateServerChallengeSucess()
         {
             _userRepository.Setup(e => e.FindUser("test")).Returns(_user);
             _userRepository.Setup(
                 e =>
                 e.SaveUserAuthenticationRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                                                 It.IsAny<string>()));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenges("test");
+            var result = memberShipService.GenerateServerChallenges("test");
 
             Assert.IsNotNull(result);
             _userRepository.Verify(
@@ -120,63 +120,63 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void MemeberShipService_GenerateServerChallengeNoDeviceFound()
+        public void MemberShipService_GenerateServerChallengeNoDeviceFound()
         {
             _userRepository.Setup(e => e.FindUser("test")).Returns(new User { DeviceRegistrations = new Collection<Device>() });
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenges("test");
+            var result = memberShipService.GenerateServerChallenges("test");
 
             Assert.IsNull(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_GenerateServerChallengeNoUserFound()
+        public void MemberShipService_GenerateServerChallengeNoUserFound()
         {
             _userRepository.Setup(e => e.FindUser("test"));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenges("test");
+            var result = memberShipService.GenerateServerChallenges("test");
 
             Assert.IsNull(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_GenerateServerChallengeNoUsername()
+        public void MemberShipService_GenerateServerChallengeNoUsername()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenges("");
+            var result = memberShipService.GenerateServerChallenges("");
 
             Assert.IsNull(result);
         }
         
         [TestMethod]
-        public void MemeberShipService_GenerateServerRegistration()
+        public void MemberShipService_GenerateServerRegistration()
         {
             _userRepository.Setup(e => e.SaveUserAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenge("test");
+            var result = memberShipService.GenerateServerChallenge("test");
 
             Assert.IsNotNull(result);
             _userRepository.Verify(e => e.SaveUserAuthenticationRequest(It.Is<string>(p => p == "test"), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_GenerateServerRegistrationForUser()
+        public void MemberShipService_GenerateServerRegistrationForUser()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.GenerateServerChallenge("test");
+            var result = memberShipService.GenerateServerChallenge("test");
 
             Assert.IsNotNull(result);
         }
         
         [TestMethod]
-        public void MemeberShipService_CompleteRegistrationSucess()
+        public void MemberShipService_CompleteRegistrationSucess()
         {
             Device device = _user.DeviceRegistrations.First();
             _user.AuthenticationRequest.First().Challenge = _startedRegistration.Challenge;
@@ -185,9 +185,9 @@ namespace UnitTests
             _userRepository.Setup(e => e.FindUser("test")).Returns(_user);
             _userRepository.Setup(e => e.RemoveUsersAuthenticationRequests("test"));
             _userRepository.Setup(e => e.AddDeviceRegistration("Test", device.AttestationCert, Convert.ToUInt32(device.Counter), device.KeyHandle, device.PublicKey));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.CompleteRegistration("test", _registerResponse.ToJson());
+            var result = memberShipService.CompleteRegistration("test", _registerResponse.ToJson());
 
             Assert.IsTrue(result);
             _userRepository.Verify(e => e.RemoveUsersAuthenticationRequests("test"), Times.Once);
@@ -195,51 +195,51 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void MemeberShipService_CompleteRegistrationNoUserFound()
+        public void MemberShipService_CompleteRegistrationNoUserFound()
         {
             _userRepository.Setup(e => e.FindUser("test"));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
+            var result = memberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_CompleteRegistrationUserFoundWithNoAuthenticationRequest()
+        public void MemberShipService_CompleteRegistrationUserFoundWithNoAuthenticationRequest()
         {
             _userRepository.Setup(e => e.FindUser("test")).Returns(new User());
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
+            var result = memberShipService.CompleteRegistration("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_CompleteRegistrationNoDeviceResponse()
+        public void MemberShipService_CompleteRegistrationNoDeviceResponse()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.CompleteRegistration("test", "");
+            var result = memberShipService.CompleteRegistration("test", "");
 
             Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void MemeberShipService_CompleteRegistrationNoUserName()
+        public void MemberShipService_CompleteRegistrationNoUserName()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.CompleteRegistration("", "nothing");
+            var result = memberShipService.CompleteRegistration("", "nothing");
 
             Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void MemeberShipService_IsUserRegistered()
+        public void MemberShipService_IsUserRegistered()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(new User
                 {
@@ -248,16 +248,16 @@ namespace UnitTests
                             new Device()
                         }
                 });
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsUserRegistered("test");
+            var result = memberShipService.IsUserRegistered("test");
 
             Assert.IsTrue(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_IsUserRegisteredNoUserName()
+        public void MemberShipService_IsUserRegisteredNoUserName()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(new User
             {
@@ -266,74 +266,74 @@ namespace UnitTests
                             new Device()
                         }
             });
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsUserRegistered("");
+            var result = memberShipService.IsUserRegistered("");
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Never);
         }
 
         [TestMethod]
-        public void MemeberShipService_IsUserRegisteredNoUserFound()
+        public void MemberShipService_IsUserRegisteredNoUserFound()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test")));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsUserRegistered("test");
+            var result = memberShipService.IsUserRegistered("test");
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_AuthenticateUserNoUserName()
+        public void MemberShipService_AuthenticateUserNoUserName()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.AuthenticateUser("", _authenticateResponse.ToJson());
+            var result = memberShipService.AuthenticateUser("", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void MemeberShipService_AuthenticateUserNoDeviceResponse()
+        public void MemberShipService_AuthenticateUserNoDeviceResponse()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.AuthenticateUser("test", null);
+            var result = memberShipService.AuthenticateUser("test", null);
 
             Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void MemeberShipService_AuthenticateUserNoUserFound()
+        public void MemberShipService_AuthenticateUserNoUserFound()
         {
             _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "test")));
 
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+            var result = memberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_AuthenticateUserNoDeviceFound()
+        public void MemberShipService_AuthenticateUserNoDeviceFound()
         {
             _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "test"))).Returns(new User { DeviceRegistrations = new Collection<Device>() });
 
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+            var result = memberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_AuthenticateUserNoAuthenticationRequestFound()
+        public void MemberShipService_AuthenticateUserNoAuthenticationRequestFound()
         {
             _userRepository.Setup(s => s.FindUser(It.Is<string>(p => p == "test"))).Returns(new User
             {
@@ -349,16 +349,16 @@ namespace UnitTests
                             }
             });
 
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+            var result = memberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_AuthenticateUser()
+        public void MemberShipService_AuthenticateUser()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(
                 new User
@@ -387,9 +387,9 @@ namespace UnitTests
                     });
             _userRepository.Setup(e => e.RemoveUsersAuthenticationRequests(It.Is<string>(p => p == "test")));
             _userRepository.Setup(e => e.UpdateDeviceCounter(It.Is<string>(p => p == "test"), It.IsAny<byte[]>(), It.IsAny<uint>()));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
+            var result = memberShipService.AuthenticateUser("test", _authenticateResponse.ToJson());
 
             Assert.IsTrue(result);
             _userRepository.Verify(e => e.FindUser("test"), Times.Once);
@@ -397,46 +397,46 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void MemeberShipService_IsValidUserNameAndPasswordNullPassword()
+        public void MemberShipService_IsValidUserNameAndPasswordNullPassword()
         {
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsValidUserNameAndPassword("test", null);
+            var result = memberShipService.IsValidUserNameAndPassword("test", null);
 
             Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void MemeberShipService_IsValidUserNameAndPassword()
+        public void MemberShipService_IsValidUserNameAndPassword()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(new User { Password = "KSpjLUfp4gaP1Zu4F+6qhcBNhQeJJLRnN1zt9MBHWh8=" });
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
+            var result = memberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
 
             Assert.IsTrue(result);
             _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_IsValidUserNameAndPasswordNoUser()
+        public void MemberShipService_IsValidUserNameAndPasswordNoUser()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test")));
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
+            var result = memberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);
         }
 
         [TestMethod]
-        public void MemeberShipService_IsValidUserNameAndPasswordBadPassword()
+        public void MemberShipService_IsValidUserNameAndPasswordBadPassword()
         {
             _userRepository.Setup(e => e.FindUser(It.Is<string>(p => p == "test"))).Returns(new User{Password = "notSame"});
-            MemeberShipService memeberShipService = new MemeberShipService(_userRepository.Object);
+            MemberShipService memberShipService = new MemberShipService(_userRepository.Object);
 
-            var result = memeberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
+            var result = memberShipService.IsValidUserNameAndPassword("test", "hashedPassword");
 
             Assert.IsFalse(result);
             _userRepository.Verify(e => e.FindUser(It.Is<string>(p => p == "test")), Times.Once);

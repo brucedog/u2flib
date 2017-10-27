@@ -11,18 +11,18 @@ using u2flib.Util;
 
 namespace Services
 {
-    public class MemeberShipService : IMemeberShipService
+    public class MemberShipService : IMemberShipService
     {
         private readonly IUserRepository _userRepository;
         // NOTE: THIS HAS TO BE UPDATED TO MATCH YOUR SITE/EXAMPLE and sites must be https for chrome plugin
         private const string DemoAppId = "https://localhost:44301";
 
-        public MemeberShipService(IUserRepository userRepository)
+        public MemberShipService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
-        #region IMemeberShipService methods
+        #region IMemberShipService methods
 
         public bool SaveNewUser(string userName, string password)
         {
